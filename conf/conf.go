@@ -2,13 +2,13 @@ package conf
 
 import (
 	"flag"
-	"fmt"
+	//"fmt"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strconv"
+	//"strconv"
 
 	"github.com/gpmgo/gopm/modules/goconfig"
 )
@@ -36,7 +36,7 @@ var (
 
 	configFile   = flag.String("config", "__unset__", "service config file")
 	maxThreadNum = flag.Int("max-thread", 0, "max threads of service")
-	debugMode    = flag.Bool("debug", false, "debug mode")
+	debugMode    = flag.Bool("debug", true, "debug mode")
 	webDebugMode = flag.Bool("web-debug", false, "web debug mode")
 	logLevel     = flag.String("log-level", "INFO", "DEBUG | INFO | WARN | ERROR | FATAL | PANIC")
 )
@@ -51,7 +51,7 @@ func init() {
 	if len(os.Args) == 2 {
 		if os.Args[1] == "reload" {
 			wd, _ := os.Getwd()
-			pidFile, err := os.Open(filepath.Join(wd, "instafig.pid"))
+			pidFile, err := os.Open(filepath.Join(wd, "sharetrace.pid"))
 			if err != nil {
 				log.Printf("Failed to open pid file: %s", err.Error())
 				os.Exit(1)
@@ -68,7 +68,7 @@ func init() {
 			}
 			_, err = exec.Command("kill", "-USR2", string(pids[:n])).Output()
 			if err != nil {
-				log.Printf("Failed to restart Instafig service: %s", err.Error())
+				log.Printf("Failed to restart service: %s", err.Error())
 				os.Exit(1)
 			}
 			pidFile.Close()

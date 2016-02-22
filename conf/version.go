@@ -16,5 +16,5 @@ const (
 func VersionString() string {
 	return fmt.Sprintf("%d.%d.%d-%s+%s",
 		VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH,
-		VERSION_STAGE, VERSION_BUILD_INFO)
+		VERSION_STAGE)
 }

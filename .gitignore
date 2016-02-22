@@ -1,3 +1,10 @@
-.web
-./pg_data
-./redis_data
+# Compiled Object files, Static and Dynamic libs (Shared Objects)
+*.o
+*.a
+*.so
+*.swp
+
+# Folders
+web
+pg_data
+redis_data

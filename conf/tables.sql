@@ -44,5 +44,33 @@ CREATE TABLE click_session(
 CREATE INDEX uidx_cs_cookieid ON click_session(cookieid);                                 
 CREATE INDEX idx_cs_shareid ON click_session(shareid);                                 
 
+-- 账号管理
+CREATE SEQUENCE user_id START 2016 NO CYCLE;
+CREATE TABLE user_info (
+    id BIGINT NOT NULL PRIMARY KEY,
+    email VARCHAR(256) NOT NULL,
+    passwd  VARCHAR(256) NOT NULL,
+    name VARCHAR(256) DEFAULT NULL,
+    des TEXT DEFAULT NULL,                                                          
+    status INT DEFAULT 0,                                                           
+    created_utc INT NOT NULL
+);
+CREATE INDEX uidx_ui_email ON user_info(email);                                 
+
+-- App管理
+-- 一个账号可以有多个App， 一个App只属于一个账号
+CREATE SEQUENCE app_id START 2016 NO CYCLE;
+CREATE TABLE app_info (
+    id BIGINT NOT NULL PRIMARY KEY,
+    appid VARCHAR(256) NOT NULL,
+    appname  VARCHAR(256) NOT NULL,
+    appicon VARCHAR(2048) DEFAULT NULL,
+    userid BIGIINT NOT NULL, 
+    des TEXT DEFAULT NULL,                                                          
+    status INT DEFAULT 0,                                                           
+    created_utc INT NOT NULL
+);
+
+
 -- 同appid， 同ida，只算一个? 客户端要判断，用户是否已经安装过了
 -- 用户安装了，删除了，又安装了, 怎么算

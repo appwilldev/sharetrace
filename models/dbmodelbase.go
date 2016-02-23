@@ -164,11 +164,11 @@ func generateSequenceValue(sequenceName string) (int64, error) {
 
 	res, err := rawSqlQuery(sql, columnTypes)
 	if err != nil {
-		log.Println("gen %s sequence error: %s", sequenceName, err.Error())
+		log.Println("gen sequence error: ", sequenceName, ", ", err.Error())
 		return 0, fmt.Errorf("gen %s sequence error: %s", sequenceName, err.Error())
 	}
 	if len(res) == 0 {
-		log.Println("gen %s sequence error: failed to increase id", sequenceName)
+		log.Println("gen sequence failed to increase id:", sequenceName)
 		return 0, fmt.Errorf("gen %s sequence error: failed to increase id", sequenceName)
 	}
 

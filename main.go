@@ -18,6 +18,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func authCheck() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		//TODO
+		//_, existed := c.Get("sso_userid")
+		//if !existed {
+		//	//controllers.Error(c, controllers.LOGIN_NEEDED)
+		//	c.Abort()
+		//}
+
+		c.Next()
+	}
+}
+
 func main() {
 	wd, _ := os.Getwd()
 	pidFile, err := os.OpenFile(filepath.Join(wd, "sharetrace.pid"), os.O_CREATE|os.O_WRONLY, 0666)
@@ -68,13 +81,20 @@ func main() {
 			})
 	}
 
-	stAPIV1 := ginIns.Group("/1/")
+	userAPIV1 := ginIns.Group("/1/user")
 	{
-		stAPIV1.POST("/st/share", controllers.Share)
-		stAPIV1.POST("/st/click", controllers.Click)
-		stAPIV1.POST("/st/install", controllers.Install)
-		stAPIV1.GET("/st/score", controllers.Score)
-		stAPIV1.GET("/st/webbeacon", controllers.WebBeacon)
+		userAPIV1.POST("/register", controllers.Register)
+		userAPIV1.POST("/login", controllers.Login)
+		userAPIV1.POST("/logout", authCheck(), controllers.Logout)
+	}
+
+	stAPIV1 := ginIns.Group("/1/st")
+	{
+		stAPIV1.POST("/share", controllers.Share)
+		stAPIV1.POST("/click", controllers.Click)
+		stAPIV1.POST("/install", controllers.Install)
+		stAPIV1.GET("/score", controllers.Score)
+		stAPIV1.GET("/webbeacon", controllers.WebBeacon)
 	}
 
 	// op api

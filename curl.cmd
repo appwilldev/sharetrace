@@ -1,6 +1,8 @@
-curl -l -H "Content-type: application/json" -X POST -d '{"user":"leo1","passwd":"123456"}' -D cookie.txt "http://localhost:8580/1/user/login"
+curl -l -H "Content-type: application/json" -X POST -d '{"email":"leo@appwill.com","passwd":"123456", "name":"leo"}' "http://localhost:8580/1/user/register"
 
+curl -l -H "Content-type: application/json" -X POST -d '{"email":"leo@appwill.com","passwd":"123456"}' -D cookie.txt "http://localhost:8580/1/user/login"
 
+curl -l -H "Content-type: application/json" -X POST -b cookie.txt "http://localhost:8580/1/user/logout"
 
 curl -l -H "Content-type: application/json" -X POST -b cookie.txt -d '{"from":"8931","code":"0410a4e72689d065448a7d1ff1099f8J","link_url":"http://appforvideo.com/v/8923?app=AV_FunnyTime&from=8934","app":"AV_FunnyTime","installed":0}'  "http://localhost:8580/1/user/weixinlink/click"
 

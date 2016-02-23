@@ -86,6 +86,7 @@ func main() {
 		userAPIV1.POST("/register", controllers.Register)
 		userAPIV1.POST("/login", controllers.Login)
 		userAPIV1.POST("/logout", authCheck(), controllers.Logout)
+		userAPIV1.GET("/all", controllers.UserInfoAll)
 	}
 
 	stAPIV1 := ginIns.Group("/1/st")

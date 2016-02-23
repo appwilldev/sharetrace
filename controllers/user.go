@@ -88,3 +88,12 @@ func Logout(c *gin.Context) {
 	http.SetCookie(c.Writer, utils.EmptyCookie())
 	Success(c, nil)
 }
+
+func UserInfoAll(c *gin.Context) {
+	var res interface{}
+	res, total, _ := models.GetUserInfoAll(nil)
+	ret := gin.H{"status": true}
+	ret["total"] = total
+	ret["res"] = res
+	c.JSON(200, ret)
+}

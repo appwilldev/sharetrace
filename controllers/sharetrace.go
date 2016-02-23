@@ -29,7 +29,7 @@ func Share(c *gin.Context) {
 		return
 	}
 
-	log.Println("---Share data:%s", postData)
+	log.Println("Share data:%s", postData)
 
 	data := new(models.ShareURL)
 	id, err := models.GenerateShareURLId()
@@ -58,7 +58,7 @@ func Share(c *gin.Context) {
 
 	data.CreatedUTC = utils.GetNowSecond()
 
-	log.Println("---generate data:%s", data)
+	log.Println("Generate data:%s", data)
 
 	err = models.InsertDBModel(nil, data)
 	if err != nil {
@@ -81,24 +81,24 @@ func Click(c *gin.Context) {
 		return
 	}
 
-	log.Println("---Click data:%s", postData)
+	log.Println("Click data:%s", postData)
 
 	idStr, err := caches.GetShareURLIdByUrl(postData.ShareURL)
 	if err != nil {
 		Error(c, SERVER_ERROR, nil, err.Error())
 		return
 	}
-	log.Println("---idStr:", idStr)
+	log.Println("idStr:", idStr)
 	shareid, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		Error(c, SERVER_ERROR, nil, err.Error())
 		return
 	}
-	log.Println("---shareid:", shareid)
+	log.Println("Shareid:", shareid)
 
 	data := new(models.ClickSession)
 	id, err := models.GenerateClickSessionId()
-	log.Println("---id:", id)
+	log.Println("Clickid:", id)
 	data.Id = id
 	if err != nil {
 		Error(c, SERVER_ERROR, nil, err.Error())
@@ -112,7 +112,7 @@ func Click(c *gin.Context) {
 
 	data.CreatedUTC = utils.GetNowSecond()
 
-	log.Println("---generate data:%s", data)
+	log.Println("Generate data:%s", data)
 
 	err = models.InsertDBModel(nil, data)
 	if err != nil {
@@ -137,7 +137,7 @@ func Install(c *gin.Context) {
 		return
 	}
 
-	log.Println("---Install data:%s", postData)
+	log.Println("Install data:%s", postData)
 
 	idStr, err := caches.GetClickSessionIdByCookieid(postData.St_cookieid)
 	if err != nil {
@@ -168,7 +168,6 @@ func Install(c *gin.Context) {
 		}
 
 	} else {
-		//Error(c, SERVER_ERROR, nil, err.Error())
 		ret := gin.H{"status": true}
 		c.JSON(200, ret)
 		return
@@ -181,18 +180,17 @@ func Score(c *gin.Context) {
 	q := c.Request.URL.Query()
 	userIdStr := q["userid"][0]
 	userId, _ := strconv.ParseInt(userIdStr, 10, 64)
-	log.Println("---userId:", userId)
+	log.Println("Score userId:", userId)
 
 	appIdStr := q["appid"][0]
 	appId, _ := strconv.ParseInt(appIdStr, 10, 64)
-	log.Println("---appId:", appId)
+	log.Println("Score appId:", appId)
 
 	dataList, _ := models.GetShareClickListOfAppUser(nil, appIdStr, userIdStr)
 	var data map[string]interface{}
 	data = make(map[string]interface{})
 	var total = float64(0.0)
-	for i, row := range dataList {
-		log.Println("---i:", i, ", data:", row.ClickSession.Id, ", created_utc:", row.ClickSession.CreatedUTC, ", installid:", row.ClickSession.Installid)
+	for _, row := range dataList {
 		row.ClickSession.Des = "用户：" + row.ClickSession.Cookieid + " 点击了用户ID:" + row.ShareURL.Fromid + "的分享链接:" + row.ShareURL.ShareURL
 		if row.ClickSession.Installid != "" {
 			row.ClickSession.Des = "推荐下载 获得100分: " + row.ClickSession.Des
@@ -204,7 +202,6 @@ func Score(c *gin.Context) {
 		created_utc := time.Unix(int64(row.ClickSession.CreatedUTC), 0)
 		year, mon, day := created_utc.Date()
 		hour, min, sec := created_utc.Clock()
-		//zone, _ := created_utc.UTC().Zone()
 		s := fmt.Sprintf("%d-%d-%d %02d:%02d:%02d\n", year, mon, day, hour, min, sec)
 		row.ClickSession.Des = row.ClickSession.Des + s
 		row.ScoreDesc = row.ClickSession.Des

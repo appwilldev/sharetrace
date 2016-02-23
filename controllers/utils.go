@@ -1,0 +1,110 @@
+package controllers
+
+import (
+	"github.com/gin-gonic/gin"
+	"log"
+)
+
+const (
+	SERVER_ERROR = iota
+	BAD_REQUEST
+	BAD_POST_DATA
+	LOGIN_NEEDED
+	LOGIN_FAILED
+	NOT_PERMITTED
+	DATA_NOT_FOUND
+	REGISTER_FAILED
+)
+
+type RequestLogData struct {
+	Status bool
+	Error  string
+	Msg    string
+}
+
+var (
+	errorStr = map[int][2]string{
+		SERVER_ERROR:    [2]string{"sever_error", "服务器错误"},
+		BAD_REQUEST:     [2]string{"bad_request", "客户端请求错误"},
+		BAD_POST_DATA:   [2]string{"bad_post_data", "客户端请求体错误"},
+		LOGIN_NEEDED:    [2]string{"login_needed", "未登录"},
+		LOGIN_FAILED:    [2]string{"login_failed", "登录失败"},
+		NOT_PERMITTED:   [2]string{"not_permitted", "无权进行此次操作"},
+		DATA_NOT_FOUND:  [2]string{"data_not_fond", "没有找到该数据"},
+		REGISTER_FAILED: [2]string{"register_failed", "注册失败, 登录名或邮箱重复"},
+	}
+)
+
+func Success(c *gin.Context, data interface{}) {
+	res := gin.H{"status": true}
+	if data != nil {
+		res["data"] = data
+	}
+
+	c.Set("request_log", &RequestLogData{Status: true})
+	c.JSON(200, res)
+}
+
+func Error(c *gin.Context, errorCode int, data ...interface{}) {
+	var (
+		errCodeStr = errorStr[errorCode][0]
+		errMsg     = errorStr[errorCode][1]
+		errMsgLog  = errMsg
+	)
+
+	if len(data) >= 1 {
+		if data[0] != nil {
+			errMsg = data[0].(string)
+		}
+		if len(data) >= 2 {
+			if data[1] != nil {
+				errMsgLog = data[1].(string)
+			} else {
+				errMsgLog = errMsg
+			}
+		}
+	}
+
+	log.Println("api_request code:%s, url:%s, err_msg:%s", errCodeStr, c.Request.URL.Path, errMsgLog)
+
+	res := gin.H{"status": false, "code": errCodeStr, "msg": errMsg}
+	c.Set("request_log", &RequestLogData{Status: false, Error: errCodeStr, Msg: errMsgLog})
+	c.JSON(200, res)
+}
+
+// 直接将子服务的返回结果返回给客户端
+func ChildServiceResponse(c *gin.Context, rawBytes []byte) {
+	c.Set("request_log", &RequestLogData{Status: true})
+	c.String(200, string(rawBytes))
+}
+
+func getUserIdFromContextMust(c *gin.Context) int64 {
+	//TODO
+	//return 1
+	s, _ := c.Get("sso_userid")
+	return s.(int64)
+}
+
+func getUserIdFromContext(c *gin.Context) int64 {
+	s, exists := c.Get("sso_userid")
+	if !exists {
+		return -1
+	}
+
+	return s.(int64)
+}
+
+func SetKeyLogData(c *gin.Context, data map[string]interface{}) {
+	c.Set("key_log", data)
+}
+
+func GetKeyLogDataFromContext(c *gin.Context) map[string]interface{} {
+	i, exists := c.Get("key_log")
+	if !exists || i == nil {
+		return nil
+	}
+
+	data := i.(map[string]interface{})
+
+	return data
+}

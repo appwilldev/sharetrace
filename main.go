@@ -13,6 +13,7 @@ import (
 	//"strings"
 
 	"github.com/appwilldev/sharetrace/conf"
+	"github.com/appwilldev/sharetrace/controllers"
 	"github.com/facebookgo/grace/gracehttp"
 	"github.com/gin-gonic/gin"
 )
@@ -65,6 +66,15 @@ func main() {
 				//}
 				//c.String(http.StatusOK, string(data))
 			})
+	}
+
+	stAPIV1 := ginIns.Group("/1/")
+	{
+		stAPIV1.POST("/st/share", controllers.Share)
+		stAPIV1.POST("/st/click", controllers.Click)
+		stAPIV1.POST("/st/install", controllers.Install)
+		stAPIV1.GET("/st/score", controllers.Score)
+		stAPIV1.GET("/st/webbeacon", controllers.WebBeacon)
 	}
 
 	// op api

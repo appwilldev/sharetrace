@@ -66,6 +66,9 @@ func Share(c *gin.Context) {
 		return
 	}
 	err = caches.NewShareURL(data)
+
+	ret := gin.H{"status": true}
+	c.JSON(200, ret)
 }
 
 func Click(c *gin.Context) {
@@ -217,7 +220,6 @@ func Score(c *gin.Context) {
 	return
 }
 func WebBeacon(c *gin.Context) {
-	//SetCookie("abc", 1234)
 	cookie := new(http.Cookie)
 	cookie.Name = "abc"
 	cookie.Expires = time.Now().Add(time.Duration(365*86400) * time.Second)

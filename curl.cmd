@@ -1,11 +1,11 @@
 curl -l -H "Content-type: application/json" -X POST -d '{"email":"leo@appwill.com","passwd":"123456", "name":"leo"}' "http://localhost:8580/1/user/register"
-
 curl -l -H "Content-type: application/json" -X POST -d '{"email":"leo@appwill.com","passwd":"123456"}' -D cookie.txt "http://localhost:8580/1/user/login"
-
 curl -l -H "Content-type: application/json" -X POST -b cookie.txt "http://localhost:8580/1/user/logout"
-
 curl -l -H "Content-type: application/json" "http://localhost:8580/1/user/all"
 
+////////////////////////// 
+curl -l -H "Content-type: application/json" -X POST -b cookie.txt -d '{"appid":"123456", "appname":"apptest", "appicon":"iconurl"}' "http://localhost:8580/1/app/new"
+curl -l -H "Content-type: application/json" "http://localhost:8580/1/app/all"
 
 ////////////////////////// 
 

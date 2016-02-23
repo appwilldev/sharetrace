@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"log"
+	//"strconv"
 )
 
 const (
@@ -14,6 +15,7 @@ const (
 	NOT_PERMITTED
 	DATA_NOT_FOUND
 	REGISTER_FAILED
+	DATA_DUPLICATED
 )
 
 type RequestLogData struct {
@@ -32,6 +34,7 @@ var (
 		NOT_PERMITTED:   [2]string{"not_permitted", "无权进行此次操作"},
 		DATA_NOT_FOUND:  [2]string{"data_not_fond", "没有找到该数据"},
 		REGISTER_FAILED: [2]string{"register_failed", "注册失败, 登录名或邮箱重复"},
+		DATA_DUPLICATED: [2]string{"data_duplicated", "数据重复"},
 	}
 )
 
@@ -65,46 +68,22 @@ func Error(c *gin.Context, errorCode int, data ...interface{}) {
 		}
 	}
 
-	log.Println("api_request code:%s, url:%s, err_msg:%s", errCodeStr, c.Request.URL.Path, errMsgLog)
+	log.Println("api_request code:", errCodeStr, "url:", c.Request.URL.Path, "err_msg:", errMsgLog)
 
 	res := gin.H{"status": false, "code": errCodeStr, "msg": errMsg}
 	c.Set("request_log", &RequestLogData{Status: false, Error: errCodeStr, Msg: errMsgLog})
 	c.JSON(200, res)
 }
 
-// 直接将子服务的返回结果返回给客户端
-func ChildServiceResponse(c *gin.Context, rawBytes []byte) {
-	c.Set("request_log", &RequestLogData{Status: true})
-	c.String(200, string(rawBytes))
-}
-
-func getUserIdFromContextMust(c *gin.Context) int64 {
-	//TODO
-	//return 1
-	s, _ := c.Get("sso_userid")
-	return s.(int64)
-}
-
 func getUserIdFromContext(c *gin.Context) int64 {
-	s, exists := c.Get("sso_userid")
-	if !exists {
-		return -1
-	}
-
+	s, _ := c.Get("userid")
+	//ck, err := c.Request.Cookie("userid")
+	//s, err := strconv.ParseInt(ck.Value, 10, 64)
+	//if err != nil {
+	//	Error(c, LOGIN_NEEDED, err.Error())
+	//	c.Abort()
+	//	return -1
+	//}
+	//return s
 	return s.(int64)
-}
-
-func SetKeyLogData(c *gin.Context, data map[string]interface{}) {
-	c.Set("key_log", data)
-}
-
-func GetKeyLogDataFromContext(c *gin.Context) map[string]interface{} {
-	i, exists := c.Get("key_log")
-	if !exists || i == nil {
-		return nil
-	}
-
-	data := i.(map[string]interface{})
-
-	return data
 }

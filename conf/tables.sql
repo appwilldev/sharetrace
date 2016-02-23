@@ -65,11 +65,12 @@ CREATE TABLE app_info (
     appid VARCHAR(256) NOT NULL,
     appname  VARCHAR(256) NOT NULL,
     appicon VARCHAR(2048) DEFAULT NULL,
-    userid BIGIINT NOT NULL, 
+    userid BIGINT NOT NULL, 
     des TEXT DEFAULT NULL,                                                          
     status INT DEFAULT 0,                                                           
     created_utc INT NOT NULL
 );
+CREATE INDEX uidx_ai_appid ON app_info(appid);                                 
 
 
 -- 同appid， 同ida，只算一个? 客户端要判断，用户是否已经安装过了

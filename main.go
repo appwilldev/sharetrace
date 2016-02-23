@@ -14,18 +14,38 @@ import (
 
 	"github.com/appwilldev/sharetrace/conf"
 	"github.com/appwilldev/sharetrace/controllers"
+	"github.com/appwilldev/sharetrace/utils"
 	"github.com/facebookgo/grace/gracehttp"
 	"github.com/gin-gonic/gin"
 )
 
+func authHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		cookie, err := c.Request.Cookie(utils.CookieKey)
+		if err != nil {
+			return
+		}
+
+		userId := utils.DecodeCookie(cookie.Value)
+		if conf.DebugMode {
+			log.Println("user:", userId)
+		}
+		if userId > 0 {
+			c.Set("userid", userId)
+		}
+
+		c.Next()
+	}
+}
+
 func authCheck() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//TODO
-		//_, existed := c.Get("sso_userid")
-		//if !existed {
-		//	//controllers.Error(c, controllers.LOGIN_NEEDED)
-		//	c.Abort()
-		//}
+		_, existed := c.Get("sso_userid")
+		if !existed {
+			//controllers.Error(c, controllers.LOGIN_NEEDED)
+			c.Abort()
+		}
 
 		c.Next()
 	}
@@ -48,7 +68,9 @@ func main() {
 	}
 
 	ginIns := gin.New()
+	ginIns.Use(authHandler())
 	ginIns.Use(gin.Recovery())
+
 	if conf.DebugMode {
 		ginIns.Use(gin.Logger())
 	}
@@ -87,6 +109,12 @@ func main() {
 		userAPIV1.POST("/login", controllers.Login)
 		userAPIV1.POST("/logout", authCheck(), controllers.Logout)
 		userAPIV1.GET("/all", controllers.UserInfoAll)
+	}
+
+	appAPIV1 := ginIns.Group("/1/app")
+	{
+		appAPIV1.POST("/new", controllers.NewApp)
+		appAPIV1.GET("/all", controllers.AppInfoAll)
 	}
 
 	stAPIV1 := ginIns.Group("/1/st")

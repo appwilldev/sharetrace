@@ -117,6 +117,11 @@ func main() {
 		appAPIV1.GET("/all", controllers.AppInfoAll)
 	}
 
+	statsAPIV1 := ginIns.Group("/1/stats")
+	{
+		statsAPIV1.GET("/share", controllers.StatsShare)
+	}
+
 	stAPIV1 := ginIns.Group("/1/st")
 	{
 		stAPIV1.POST("/share", controllers.Share)

@@ -16,3 +16,7 @@ curl -l -H "Content-type: application/json" -X POST  -d '{"share_url":"http://ap
 curl -l -H "Content-type: application/json" -X POST  -d '{"st_cookieid":"st_2016_2016","installid":"aaaaaaa"}' "http://localhost:8580/1/st/install"
 
 curl -l -H "Content-type: application/json" "http://localhost:8580/1/st/score?userid=8931&appid=123"
+
+
+////////////////////////// 
+curl -l -H "Content-type: application/json" "http://localhost:8580/1/stats/share?appid=123"

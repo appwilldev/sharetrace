@@ -20,3 +20,8 @@ curl -l -H "Content-type: application/json" "http://localhost:8580/1/st/score?us
 
 ////////////////////////// 
 curl -l -H "Content-type: application/json" "http://localhost:8580/1/stats/share?appid=123"
+
+SELECT count(*) FROM "share_url" INNER JOIN "click_session" ON share_url.id=click_session.shareid WHERE ((appid='123') AND (installid is not null)) AND (date(to_timestamp(click_session.created_utc))='2016-02-23') 
+
+
+SELECT count(*), (date(to_timestamp(click_session.created_utc)))  FROM "share_url" INNER JOIN "click_session" ON share_url.id=click_session.shareid WHERE ((appid='123') AND (installid is not null)) group by date(to_timestamp(click_session.created_utc)) ;

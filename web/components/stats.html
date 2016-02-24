@@ -4,9 +4,8 @@
     <meta charset="utf-8">
     <title>ShareTrace</title>
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-    <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/main.css" rel="stylesheet">
     <script src="../lib/echarts.min.js"></script>
+    <script src="../lib/fetch.js"></script>
     <style>
 
     </style>
@@ -21,12 +20,42 @@
 
         // 指定图表的配置项和数据
 
+    var ret_data;
+    var legend_data = new Array();
+    var xAxis_data = new Array();
+    var series_data = new Array();
+    fetch('/1/stats/total?appid=123', {
+        method: 'get',
+        credentials: 'same-origin'
+    }).then(function (response) {
+        return response.json();
+    }).then(function (data) {
+    	ret_data = data;
+    	for (var key in ret_data.data) {
+            legend_data.push(key);
+            var series_line = {};
+            series_line["name"] = key;
+            series_line["type"] = "line";
+            series_line["stack"] = "总量";
+            series_line["data"] = new Array();
+            for (var key2 in ret_data.data[key]){
+            	series_line["data"].push(ret_data.data[key][key2]);
+            }
+            console.log(series_line);
+            series_data.push(series_line);
+        }
+        console.log(series_data);
+        for (var key in ret_data.data["share"]){
+        	xAxis_data.push(key);
+        }
+
+
 option = {
-    tooltip : {
-        trigger: 'axis'
-    },
+    //tooltip : {
+    //    trigger: 'axis'
+    //},
     legend: {
-        data:['邮件营销','联盟广告','视频广告','直接访问','搜索引擎']
+        data:legend_data
     },
     grid: {
         left: '3%',
@@ -43,7 +72,7 @@ option = {
         {
             type : 'category',
             boundaryGap : false,
-            data : ['周一','周二','周三','周四','周五','周六','周日']
+            data:xAxis_data
         }
     ],
     yAxis : [
@@ -51,42 +80,33 @@ option = {
             type : 'value'
         }
     ],
-    series : [
-        {
-            name:'邮件营销',
-            type:'line',
-            stack: '总量',
-            data:[120, 132, 101, 134, 90, 230, 210]
-        },
-        {
-            name:'联盟广告',
-            type:'line',
-            stack: '总量',
-            data:[220, 182, 191, 234, 290, 330, 310]
-        },
-        {
-            name:'视频广告',
-            type:'line',
-            stack: '总量',
-            data:[150, 232, 201, 154, 190, 330, 410]
-        },
-        {
-            name:'直接访问',
-            type:'line',
-            stack: '总量',
-            data:[320, 332, 301, 334, 390, 330, 320]
-        },
-        {
-            name:'搜索引擎',
-            type:'line',
-            stack: '总量',
-            data:[820, 932, 901, 934, 1290, 1330, 1320]
-        }
-    ]
+    series: series_data
+    //series : [
+    //    {
+    //        name:'share',
+    //        type:'line',
+    //        stack: '总量',
+    //        data:[120, 132, 101, 134, 90, 230, 210]
+    //    },
+    //    {
+    //        name:'click',
+    //        type:'line',
+    //        stack: '总量',
+    //        data:[220, 182, 191, 234, 290, 330, 310]
+    //    },
+    //    {
+    //        name:'install',
+    //        type:'line',
+    //        stack: '总量',
+    //        data:[150, 232, 201, 154, 190, 330, 410]
+    //    },
+    //]
 };
 
+console.log(option["series"]);
         // 使用刚指定的配置项和数据显示图表。
         myChart.setOption(option);
+    });
     </script>
 
 

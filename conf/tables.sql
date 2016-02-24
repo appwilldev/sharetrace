@@ -43,6 +43,8 @@ CREATE TABLE click_session(
 );                                                                                  
 CREATE INDEX uidx_cs_cookieid ON click_session(cookieid);                                 
 CREATE INDEX idx_cs_shareid ON click_session(shareid);                                 
+-- CREATE INDEX idx_cs_date ON click_session(date(to_timestamp(created_utc));
+-- select count(*), date(to_timestamp(created_utc)) from click_session group by date(to_timestamp(created_utc)) order by date(to_timestamp(created_utc));
 
 -- 账号管理
 CREATE SEQUENCE user_id START 2016 NO CYCLE;

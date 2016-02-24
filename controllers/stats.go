@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"fmt"
-	"log"
-	"strconv"
+	//"log"
+	//"strconv"
 	"time"
 
 	"github.com/appwilldev/sharetrace/models"
@@ -14,8 +14,6 @@ func StatsShare(c *gin.Context) {
 	q := c.Request.URL.Query()
 
 	appIdStr := q["appid"][0]
-	appId, _ := strconv.ParseInt(appIdStr, 10, 64)
-	log.Println("Score appId:", appId)
 
 	dataList, _ := models.GetShareClickListByAppid(nil, appIdStr)
 	var data map[string]interface{}
@@ -45,4 +43,40 @@ func StatsShare(c *gin.Context) {
 	ret["data"] = data
 	c.JSON(200, ret)
 	return
+}
+
+func StatsTotal(c *gin.Context) {
+
+	q := c.Request.URL.Query()
+
+	appIdStr := q["appid"][0]
+
+	time_now := time.Now()
+	ret := gin.H{"status": true}
+
+	var data map[string]interface{}
+	data = make(map[string]interface{})
+
+	var share map[string]interface{}
+	share = make(map[string]interface{})
+	var click map[string]interface{}
+	click = make(map[string]interface{})
+	var install map[string]interface{}
+	install = make(map[string]interface{})
+
+	data["share"] = share
+	data["click"] = click
+	data["install"] = install
+
+	for i := 0; i < 7; i++ {
+		time_now_tmp := time_now.AddDate(0, 0, -i)
+		year, month, day := time_now_tmp.Date()
+		date_tmp := fmt.Sprintf("%d-%d-%d", year, month, day)
+		share[date_tmp], _ = models.GetShareTotalByAppid(nil, appIdStr, date_tmp)
+		click[date_tmp], _ = models.GetClickTotalByAppid(nil, appIdStr, date_tmp)
+		install[date_tmp], _ = models.GetInstallTotalByAppid(nil, appIdStr, date_tmp)
+	}
+
+	ret["data"] = data
+	c.JSON(200, ret)
 }

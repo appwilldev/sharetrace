@@ -120,6 +120,7 @@ func main() {
 	statsAPIV1 := ginIns.Group("/1/stats")
 	{
 		statsAPIV1.GET("/share", controllers.StatsShare)
+		statsAPIV1.GET("/total", controllers.StatsTotal)
 	}
 
 	stAPIV1 := ginIns.Group("/1/st")
@@ -129,6 +130,7 @@ func main() {
 		stAPIV1.POST("/install", controllers.Install)
 		stAPIV1.GET("/score", controllers.Score)
 		stAPIV1.GET("/webbeacon", controllers.WebBeacon)
+
 	}
 
 	// op api

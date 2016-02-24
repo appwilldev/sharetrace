@@ -63,6 +63,6 @@ func AppInfoAll(c *gin.Context) {
 	res, total, _ := models.GetAppInfoAll(nil)
 	ret := gin.H{"status": true}
 	ret["total"] = total
-	ret["res"] = res
+	ret["data"] = res
 	c.JSON(200, ret)
 }

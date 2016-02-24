@@ -5,6 +5,6 @@
 *.swp
 
 # Folders
-web
+#web
 pg_data
 redis_data

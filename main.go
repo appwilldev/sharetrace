@@ -132,25 +132,23 @@ func main() {
 	}
 
 	// op api
-	//opAPIGroup := ginIns.Group("/op")
-	//{
-	//	//opAPIGroup.POST("/login", Login)
-	//	//opAPIGroup.POST("/logout", OpAuth, Logout)
+	opAPIGroup := ginIns.Group("/op")
+	{
+		opAPIGroup.POST("/user/init", controllers.Register)
+		opAPIGroup.POST("/login", controllers.Login)
+		opAPIGroup.POST("/logout", controllers.Logout)
 
-	//	//opAPIGroup.GET("/users/:page/:count", InitUserCheck, OpAuth, GetUsers)
-	//	//opAPIGroup.POST("/user", OpAuth, ConfWriteCheck, NewUser)
-	//	//opAPIGroup.PUT("/user", OpAuth, ConfWriteCheck, UpdateUser)
-	//	//opAPIGroup.POST("/user/init", ConfWriteCheck, InitUser)
-	//	//opAPIGroup.GET("/user/info", OpAuth, GetLoginUserInfo)
+		//opAPIGroup.GET("/users/:page/:count", InitUserCheck, OpAuth, GetUsers)
+		//opAPIGroup.POST("/user", OpAuth, ConfWriteCheck, NewUser)
+		//opAPIGroup.PUT("/user", OpAuth, ConfWriteCheck, UpdateUser)
+		//opAPIGroup.GET("/user/info", OpAuth, GetLoginUserInfo)
 
-	//	//opAPIGroup.GET("/apps/user/:user_key", OpAuth, GetApps)
-	//	//opAPIGroup.GET("/apps/all/:page/:count", OpAuth, GetAllApps)
-	//	//opAPIGroup.GET("/app/:app_key", OpAuth, GetApp)
-	//	//opAPIGroup.GET("/apps/search", OpAuth, SearchApps)
-	//	//opAPIGroup.POST("/app", OpAuth, ConfWriteCheck, NewApp)
-	//	//opAPIGroup.PUT("/app", OpAuth, ConfWriteCheck, UpdateApp)
+		//opAPIGroup.GET("/apps/user/:user_key", OpAuth, GetApps)
+		opAPIGroup.GET("/apps/all/:page/:count", controllers.AppInfoAll)
+		opAPIGroup.POST("/app", controllers.NewApp)
+		//opAPIGroup.PUT("/app", OpAuth, ConfWriteCheck, UpdateApp)
 
-	//}
+	}
 
 	gracehttp.Serve(&http.Server{Addr: conf.HttpAddr, Handler: ginIns})
 }

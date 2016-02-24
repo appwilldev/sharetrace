@@ -49,7 +49,7 @@ var (
 	configFile   = flag.String("config", "__unset__", "service config file")
 	maxThreadNum = flag.Int("max-thread", 0, "max threads of service")
 	debugMode    = flag.Bool("debug", true, "debug mode")
-	webDebugMode = flag.Bool("web-debug", false, "web debug mode")
+	webDebugMode = flag.Bool("web-debug", true, "web debug mode")
 	logLevel     = flag.String("log-level", "INFO", "DEBUG | INFO | WARN | ERROR | FATAL | PANIC")
 
 	RedConfig = make(map[string]*RedisConfig)

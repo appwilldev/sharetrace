@@ -1,0 +1,118 @@
+.cond {
+    padding:5px 5px 5px 20px;
+    margin:5px 5px 5px 5px;
+    border:1px dashed #ff0000;
+}
+.subcond {
+    padding:8px 8px 8px 8px;
+    margin:5px 5px 5px 5px;
+    border:1px dashed #ff0000;
+}
+.return {
+    padding:5px 5px 5px 20px;
+    margin:5px 5px 5px 5px;
+}
+.ifcond {
+    padding:2px 2px 2px 2px;
+    margin:5px 5px 5px 5px;
+    /*border:1px dotted #0000ff;*/
+}
+
+.filter-group-relation {
+    width: 6%;
+    position: absolute;
+}
+
+.relation-topline {
+    margin: 15px 0 0 20px;
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    width: 100%;
+}
+
+.relation-bottomline {
+    margin: 0 0 15px 20px;
+    border-left: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    width: 100%;
+}
+
+.filter-contain {
+    width: 94%;
+    margin-left: 6%;
+}
+
+.filter-item {
+    width: 100%;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    padding: 2px 0;
+}
+
+.selector.property {
+    margin: 0 8px;
+    width: 160px;
+}
+
+.selector.func {
+    margin: 0 8px;
+    width: 140px;
+}
+
+.filter-item .input {
+    margin: 0 8px;
+}
+
+.flex-align-right {
+    -webkit-box-flex: 1;
+    -webkit-flex-grow: 1;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+    text-align: right;
+    display: inline-block;
+}
+
+.cond_btn {
+    background: #f6f8fa;
+    border: 1px solid #a8b7c8;
+    border-radius: 3px;
+    padding: 6px 10px 4px 10px;
+    display: inline-block;
+    outline: 0;
+    height: 36px;
+    min-width: 36px;
+    color: #4c535a;
+    font-size: 14px;
+    -webkit-transition: background .2s ease-in-out,box-shadow .2s ease-in-out;
+    transition: background .2s ease-in-out,box-shadow .2s ease-in-out;
+}
+
+.btn-danger-small {
+    color: #777c7c;
+    border: 0;
+    background: transparent;
+}
+
+.btn-selector {
+    background: #f6f8fa;
+    border: 1px solid #a8b7c8;
+    border-radius: 3px;
+    padding: 6px 10px 4px 10px;
+    display: inline-block;
+    outline: 0;
+    height: 36px;
+    min-width: 36px;
+    color: #4c535a;
+    font-size: 14px;
+    -webkit-transition: background .2s ease-in-out,box-shadow .2s ease-in-out;
+    transition: background .2s ease-in-out,box-shadow .2s ease-in-out;
+    padding-right: 26px;
+    position: relative;
+    text-align: left;
+}

@@ -1,0 +1,107 @@
+<div><h4 style="text-align:center;padding-top:10px;">用户列表</h4></div>
+<div>
+    <div>
+        <a style="float:right;cursor:pointer;" data-toggle="modal" data-target="#myModal">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 创建用户
+        </a>
+    </div>
+    <table class="table table-responsive" style="margin-top:10px;">
+        <thead>
+            <tr class="active">
+                <td style="width:24px;">#</td>
+                <td style="width:30px;"></td>
+                <td style="text-align:center;">用户名</td>
+                <td style="text-align:center;">Email</td>
+                <td style="text-align:center;">创建人</td>
+                <td style="text-align:center;">创建时间</td>
+                <td style="text-align:center;">App列表</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="(idx,user) in data.data.list">
+                <td style="vertical-align:middle;text-align:center;">{{idx+1}}</td>
+                <td style="vertical-align:middle;text-align:right;padding:4px 4px 4px 4px;">
+                    <img v-if="user.aux_info.icon && user.aux_info.icon!=''" class="img-circle" v-bind:src="user.aux_info.icon" style="width:30px;height:30px;">
+                    <img v-else data-name="{{user.name}}" class="icon img-circle"/>
+                </td>
+                <td style="vertical-align:middle;text-align:left;padding:4px 4px 4px 4px;">{{user.name}}</td>
+                <td style="vertical-align:middle;text-align:center;">{{user.aux_info.email}}</td>
+                <td style="vertical-align:middle;text-align:center;">{{user.creator_name}}</td>
+                <td style="vertical-align:middle;text-align:center;">{{user.created_utc | datetime}}</td>
+                <td style="vertical-align:middle;text-align:center;">
+                    <a style="cursor:pointer;font-size:15px;" v-link="{ path: '/apps/user/'+user.key }">查询</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+                </button>
+                <h4 class="modal-title" id="myModalLabel">创建用户</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" v-on:submit.prevent>
+                    <div class="form-group" v-bind:class="{'has-error':username_already_exists_error}">
+                        <label for="input_init_name" class="col-md-3 control-label">用户名</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" style="margin-top:5px;" v-model="name" placeholder="请输入用户名">
+                            <span class="alert-danger">{{ username_already_exists_error }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group" v-bind:class="{'has-error':password_error}">
+                        <label for="input_init_pass_code" class="col-md-3 control-label">密码</label>
+                        <div class="col-md-8">
+                            <input type="password" class="form-control" style="margin-top:5px;" v-model="pass_code" placeholder="输入密码">
+                        </div>
+                    </div>
+                    <div class="form-group" v-bind:class="{'has-error':password_error}">
+                        <label for="input_pass_code" class="col-md-3 control-label">确认密码</label>
+                        <div class="col-md-8">
+                            <input type="password" class="form-control" style="margin-top:5px;" v-model="confirm_pass_code" placeholder="再次输入密码">
+                            <span class="alert-danger">{{ password_error }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group" v-bind:class="{'has-error':email_error}">
+                        <label for="input_init_email" class="col-md-3 control-label">邮箱</label>
+                        <div class="col-md-8">
+                            <input type="email" class="form-control" style="margin-top:5px;" v-model="email" placeholder="输入邮箱">
+                            <span class="alert-danger">{{ email_error }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="input_init_icon" class="col-md-3 control-label">头像</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" style="margin-top:5px;" v-model="icon" placeholder="输入头像url">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-8 col-md-offset-3">
+                            <button class="btn btn-success" style="margin-top:15px;width:100%;" v-on:click="add_user">创建</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="text-align:center;">
+    <ul class="pagination pagination-sm" style="cursor:pointer;">
+        <li v-bind:class="{disabled:$route.params.page<=1}">
+            <a v-if="$route.params.page>1" v-link="{path:'/users/all/'+(parseInt($route.params.page)-1)}">&laquo上一页</a>
+            <a v-else>&laquo上一页</a>
+        </li>
+        <li v-for="page in page_count" v-bind:class="{active:page+1==parseInt($route.params.page)}">
+            <a v-link="{path:'/users/all/'+(page+1)}">{{page+1}}</a>
+        </li>
+        <li v-bind:class="{disabled:parseInt($route.params.page)>=page_count}">
+            <a v-if="parseInt($route.params.page)<page_count" v-link="{path:'/users/all/'+(parseInt($route.params.page)+1)}">下一页&raquo</a>
+            <a v-else>下一页&raquo</a>
+        </li>
+    </ul>
+</div>

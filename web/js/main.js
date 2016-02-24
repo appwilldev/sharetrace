@@ -4,8 +4,6 @@ var user_auth_ok = false;
 var user_info = null;
 var COUNT_PER_PAGE = 10;
 
-console.log("--- init user_auth_ok:", user_auth_ok);
-
 var init_vue = function () {
     router = new VueRouter({
         //'linkActiveClass': 'active'
@@ -76,7 +74,6 @@ var start_vue = function () {
                 return is.startWith(this.$route.path, "/app");
             },
             is_users_active: function () {
-            	console.log("--- this:", this.$rout);
                 return is.startWith(this.$route.path, "/users");
             },
             register: function () {

@@ -24,20 +24,15 @@
                     <ul class="nav navbar-nav">
                         <li style="cursor:pointer;" v-bind:class="{'active':is_users_active()}" v-link="{ path: '/users' }"><a>用户</a></li>
                     </ul>
+
                     <ul class="nav navbar-nav navbar-right">
-                                <li><a style="cursor:pointer;" role="presentation" v-on:click="login"><span class="glyphicon glyphicon-log-in"></span> 登录</a></li>
+                        <li><a style="cursor:pointer;" role="presentation" v-on:click="login"><span class="glyphicon glyphicon-log-in"></span> 登录</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                                <li><a style="cursor:pointer;" role="presentation" v-on:click="register"><span class="glyphicon glyphicon-log-in"></span> 注册</a></li>
+                        <li><a style="cursor:pointer;" role="presentation" v-on:click="register"><span class="glyphicon glyphicon-log-in"></span> 注册</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <li class="dropdown">
-                            <a href="#" v-bind:class="{'active':is_user_info_active()}" class="dropdown-toggle" data-toggle="dropdown" id="dropdownMenu" aria-haspopup="true" aria-expanded="true">{{user_info.data.name}}</a>
-                            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-                                <li style="cursor:pointer;" role="presentation" v-link="{ path: '/user_info' }"><a><span class="glyphicon glyphicon-user"></span> 用户信息</a></li>
-                                <li><a style="cursor:pointer;" role="presentation" v-on:click="logout"><span class="glyphicon glyphicon-log-out"></span> 登出</a></li>
-                            </ul>
-                        </li>
+                        <li><a style="cursor:pointer;" role="presentation" v-on:click="logout"><span class="glyphicon glyphicon-log-out"></span> 登出</a></li>
                     </ul>
                 </div>
             </div>

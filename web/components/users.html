@@ -1,10 +1,5 @@
 <div><h4 style="text-align:center;padding-top:10px;">用户列表</h4></div>
 <div>
-    <div>
-        <a style="float:right;cursor:pointer;" data-toggle="modal" data-target="#myModal">
-            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 创建用户
-        </a>
-    </div>
     <table class="table table-responsive" style="margin-top:10px;">
         <thead>
             <tr class="active">
@@ -12,21 +7,19 @@
                 <td style="width:30px;"></td>
                 <td style="text-align:center;">用户名</td>
                 <td style="text-align:center;">Email</td>
-                <td style="text-align:center;">创建人</td>
                 <td style="text-align:center;">创建时间</td>
-                <td style="text-align:center;">App列表</td>
+                <td v-if="$route.params.page!=undefined || $route.params.keyword!=undefined" style="text-align:center;">操作</td>
             </tr>
         </thead>
         <tbody>
-            <tr v-for="(idx,user) in data.data.list">
+            <tr v-for="(idx,user) in data">
                 <td style="vertical-align:middle;text-align:center;">{{idx+1}}</td>
                 <td style="vertical-align:middle;text-align:right;padding:4px 4px 4px 4px;">
                     <img v-if="user.aux_info.icon && user.aux_info.icon!=''" class="img-circle" v-bind:src="user.aux_info.icon" style="width:30px;height:30px;">
                     <img v-else data-name="{{user.name}}" class="icon img-circle"/>
                 </td>
                 <td style="vertical-align:middle;text-align:left;padding:4px 4px 4px 4px;">{{user.name}}</td>
-                <td style="vertical-align:middle;text-align:center;">{{user.aux_info.email}}</td>
-                <td style="vertical-align:middle;text-align:center;">{{user.creator_name}}</td>
+                <td style="vertical-align:middle;text-align:center;">{{user.email}}</td>
                 <td style="vertical-align:middle;text-align:center;">{{user.created_utc | datetime}}</td>
                 <td style="vertical-align:middle;text-align:center;">
                     <a style="cursor:pointer;font-size:15px;" v-link="{ path: '/apps/user/'+user.key }">查询</a>

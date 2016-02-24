@@ -1,7 +1,6 @@
 //全局变量
 var router = null;
 var user_auth_ok = false;
-var user_auth_not_ok = true;
 var user_info = null;
 var COUNT_PER_PAGE = 10;
 
@@ -11,9 +10,6 @@ var init_vue = function () {
     });
 
     router.map({
-        '/init_user': {
-            component: Register
-        },
         '/register': {
             component: Register
         },
@@ -37,7 +33,6 @@ var init_vue = function () {
     });
 
     router.beforeEach(function (transition) {
-    	console.log("beforeEach");
         if (transition.to.auth && !user_auth_ok) {
             transition.abort();
         } else {
@@ -47,16 +42,15 @@ var init_vue = function () {
     });
 
     router.afterEach(function (transition) {
-    	console.log("afterEach");
-        if (is.startWith(transition.to.path, "/users")) {
-            setTimeout(function () {
-                $('.icon').initial({ charCount: 1, width: 30, height: 30, fontSize: 18 });
-            }, 100);
-        } else if (is.startWith(transition.to.path, "/apps")) {
-            setTimeout(function () {
-                $('.icon').initial({ charCount: 1, width: 40, height: 40, fontSize: 24 });
-            }, 100);
-        }
+        //if (is.startWith(transition.to.path, "/users")) {
+        //    setTimeout(function () {
+        //        $('.icon').initial({ charCount: 1, width: 30, height: 30, fontSize: 18 });
+        //    }, 100);
+        //} else if (is.startWith(transition.to.path, "/apps")) {
+        //    setTimeout(function () {
+        //        $('.icon').initial({ charCount: 1, width: 40, height: 40, fontSize: 24 });
+        //    }, 100);
+        //}
     });
 
     Vue.filter('datetime', function (value) {
@@ -78,14 +72,10 @@ var start_vue = function () {
         },
         methods: {
             is_apps_active: function () {
-            	console.log("---is_apps_active");
                 return is.startWith(this.$route.path, "/app");
             },
             is_users_active: function () {
                 return is.startWith(this.$route.path, "/users");
-            },
-            is_user_info_active: function () {
-                return is.startWith(this.$route.path, "/user_info");
             },
             register: function () {
                 router.go("/register");

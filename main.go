@@ -138,7 +138,7 @@ func main() {
 		opAPIGroup.POST("/login", controllers.Login)
 		opAPIGroup.POST("/logout", controllers.Logout)
 
-		//opAPIGroup.GET("/users/:page/:count", InitUserCheck, OpAuth, GetUsers)
+		opAPIGroup.GET("/users/:page/:count", controllers.UserInfoAll)
 		//opAPIGroup.POST("/user", OpAuth, ConfWriteCheck, NewUser)
 		//opAPIGroup.PUT("/user", OpAuth, ConfWriteCheck, UpdateUser)
 		//opAPIGroup.GET("/user/info", OpAuth, GetLoginUserInfo)

@@ -89,10 +89,10 @@ var Login = function (resolve, reject) {
                             if (data.status == true) {
                                 index = 2;
                                 user_auth_ok = true;
-                                console.log("user_auth_ok:",  user_auth_ok);
                                 user_info = data;
                                 //TODO if admin go to users, else go to apps
-                                router.go("/apps");
+                                console.log("--- DEBUG user_auth_ok:", user_auth_ok);
+                                router.go("/");
                             } else {
                                 if (is.startWith(data.msg, 'user not exist')) {
                                     vm.username_error = "用户不存在";
@@ -137,7 +137,6 @@ var Users = function (resolve, reject) {
                                 } else {
                                     page_count = Math.floor(data.total/ COUNT_PER_PAGE) + 1;
                                 }
-                                console.log("--- users data:", data);
                                 return {
                                     data: data.data,
                                     password_error: '',

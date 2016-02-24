@@ -4,6 +4,8 @@ var user_auth_ok = false;
 var user_info = null;
 var COUNT_PER_PAGE = 10;
 
+console.log("--- init user_auth_ok:", user_auth_ok);
+
 var init_vue = function () {
     router = new VueRouter({
         //'linkActiveClass': 'active'
@@ -27,7 +29,6 @@ var init_vue = function () {
     });
 
     router.alias({
-        '/': '/apps/all/1',
         '/apps': '/apps/all/1',
         '/users': '/users/all/1'
     });
@@ -75,12 +76,14 @@ var start_vue = function () {
                 return is.startWith(this.$route.path, "/app");
             },
             is_users_active: function () {
+            	console.log("--- this:", this.$rout);
                 return is.startWith(this.$route.path, "/users");
             },
             register: function () {
                 router.go("/register");
             },
             login: function () {
+            	var vm = this;
                 router.go("/login");
             },
             logout: function () {
@@ -99,7 +102,7 @@ var start_vue = function () {
             },
             apps:function(){
             	router.go("/apps");
-            }
+            },
         }
     });
     router.start(ShareTrace, '#sharetrace');

@@ -90,12 +90,10 @@ var Login = function (resolve, reject) {
                                 index = 2;
                                 user_auth_ok = true;
                                 user_info = data;
+                                router.app.user_info = data;
+                                $.cookie("userinfo", user_info["data"],{path: '/', expires: 604800});
                                 //TODO if admin go to users, else go to apps
-                                //set cookies
-                                console.log("--- DEBUG user_auth_ok:", user_auth_ok);
-                                $.cookie("email", user_info["data"]["email"],{path: '/', expires: 604800});
-                                console.log($.cookie("email"));
-                                router.go("/");
+                                router.go("/apps");
                             } else {
                                 if (is.startWith(data.msg, 'user not exist')) {
                                     vm.username_error = "用户不存在";

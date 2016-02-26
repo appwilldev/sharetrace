@@ -80,7 +80,6 @@ var start_vue = function () {
                 router.go("/register");
             },
             login: function () {
-            	var vm = this;
                 router.go("/login");
             },
             logout: function () {
@@ -95,8 +94,8 @@ var start_vue = function () {
                     user_info = null;
                     vm.user_info = null;
                     router.go("/login");
-                    $.removeCookie("email");
-                    console.log($.cookie("email"));
+                    $.removeCookie("userinfo");
+                    //console.log($.cookie("email"));
                 });
             },
             apps:function(){
@@ -111,15 +110,14 @@ var start_vue = function () {
 init_vue();
 
 //确认是否有登录
-var email = $.cookie("email");
-console.log("get cookie email:", email);
-
-if (email == undefined || email == ""){
+var userinfo= $.cookie("userinfo");
+if (userinfo== undefined){
     start_vue();
     router.go("/login");
 }else{
     user_auth_ok = true;
     start_vue();
+    router.app.user_info = userinfo;
 }
 
 //fetch('/op/users/1/1', { credentials: 'same-origin' })

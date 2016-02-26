@@ -25,16 +25,18 @@
                         <li style="cursor:pointer;" v-bind:class="{'active':is_users_active()}" v-link="{ path: '/users' }"><a>用户</a></li>
                     </ul>
 
-                    <ul class="nav navbar-nav navbar-right">
+                    <ul class="nav navbar-nav navbar-right" v-if="user_info">
                         <li><a style="cursor:pointer;" role="presentation" v-on:click="logout"><span class="glyphicon glyphicon-log-out"></span> 登出</a></li>
                     </ul>
 
+                    <template v-else>
                     <ul class="nav navbar-nav navbar-right">
                         <li><a style="cursor:pointer;" role="presentation" v-on:click="register"><span class="glyphicon glyphicon-log-in"></span> 注册</a></li>
                     </ul>
-                    <ul class="nav navbar-nav navbar-right">
+                    <ul class="nav navbar-nav navbar-right" v-else>
                         <li v-bind:class="{'active':true}"><a style="cursor:pointer;" role="presentation" v-on:click="login" ><span class="glyphicon glyphicon-log-in" ></span> 登录</a></li>
                     </ul>
+                    </template>
 
 
                 </div>

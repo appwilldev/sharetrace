@@ -71,6 +71,10 @@ type ClickSession struct {
 	Cookieid string `xorm:"cookieid VARCHAR(256) NOT NULL" json:"cookieid"`
 
 	Installid string `xorm:"installid VARCHAR(256) DEFAULT NULL" json:"installid"`
+	ClickType int    `xorm:"click_type INT DEFAULT 0" json:"click_type"`
+	Agent     string `xorm:"agent VARCHAR(1024) DEFAULT NULL" json:"agent"`
+	AgentIP   string `xorm:"agentip VARCHAR(256) DEFAULT NULL" json:"agentip"`
+	AgentId   string `xorm:"agentid VARCHAR(256) DEFAULT NULL" json:"agentid"`
 	Des       string `xorm:"des TEXT DEFAULT NULL" json:"des"`
 
 	Status     int `xorm:"status INT DEFAULT 0" json:"status"`

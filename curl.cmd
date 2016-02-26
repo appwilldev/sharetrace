@@ -18,6 +18,9 @@ curl -l -H "Content-type: application/json" -X POST  -d '{"st_cookieid":"st_2016
 curl -l -H "Content-type: application/json" "http://localhost:8580/1/st/score?userid=8931&appid=123"
 
 
+curl -l -H "Content-type: application/json" -X POST  -d '{"share_url":"http://appforvideo.com/v/8923?app=AV_FunnyTime&from=8934", "agent_ip":"192.168.1.1","agent":"webagent wechat"}' "http://localhost:8580/1/st/agentclick"
+
+
 ////////////////////////// 
 curl -l -H "Content-type: application/json" "http://localhost:8580/1/stats/share?appid=123"
 

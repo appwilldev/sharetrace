@@ -127,6 +127,7 @@ func main() {
 	{
 		stAPIV1.POST("/share", controllers.Share)
 		stAPIV1.POST("/click", controllers.Click)
+		stAPIV1.POST("/agentclick", controllers.AgentClick)
 		stAPIV1.POST("/install", controllers.Install)
 		stAPIV1.GET("/score", controllers.Score)
 		stAPIV1.GET("/webbeacon", controllers.WebBeacon)

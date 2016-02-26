@@ -126,6 +126,68 @@ func Click(c *gin.Context) {
 	c.JSON(200, ret)
 }
 
+func AgentClick(c *gin.Context) {
+	var postData struct {
+		ShareURL string `json:"share_url" binding:"required"`
+		AgentIP  string `json:"agent_ip" binding:"required"`
+		Agent    string `json:"agent"`
+	}
+	err := c.BindJSON(&postData)
+	if err != nil {
+		Error(c, BAD_POST_DATA, nil, err.Error())
+		return
+	}
+
+	log.Println("Agent Click data:%s", postData)
+
+	idStr, err := caches.GetShareURLIdByUrl(postData.ShareURL)
+	if err != nil {
+		Error(c, SERVER_ERROR, nil, err.Error())
+		return
+	}
+	log.Println("idStr:", idStr)
+	shareid, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		Error(c, SERVER_ERROR, nil, err.Error())
+		return
+	}
+	log.Println("Shareid:", shareid)
+
+	data := new(models.ClickSession)
+	id, err := models.GenerateClickSessionId()
+	log.Println("Clickid:", id)
+	data.Id = id
+	if err != nil {
+		Error(c, SERVER_ERROR, nil, err.Error())
+		return
+	}
+
+	data.Shareid = shareid
+
+	cookieid := fmt.Sprintf("st_%d_%d", shareid, id)
+	data.Cookieid = cookieid
+
+	data.ClickType = 1
+	data.Agent = postData.Agent
+	data.AgentIP = postData.AgentIP
+	// todo: generate agentid
+
+	data.CreatedUTC = utils.GetNowSecond()
+
+	log.Println("Generate data:%s", data)
+
+	err = models.InsertDBModel(nil, data)
+	if err != nil {
+		Error(c, SERVER_ERROR, nil, nil)
+		return
+	}
+	err = caches.NewClickSession(data)
+
+	ret := gin.H{"status": true}
+	ret["st_cookieid"] = cookieid
+	c.JSON(200, ret)
+}
+
 func Install(c *gin.Context) {
 	var postData struct {
 		St_cookieid string `json:"st_cookieid" binding:"required"`

@@ -36,6 +36,7 @@
                     <td style="vertical-align:middle;text-align:center;">{{{app.created_utc | datetime}}}</td>
                     <td style="vertical-align:middle;text-align:center;" v-if="$route.params.page!=undefined || $route.params.keyword!=undefined">
                         <a style="cursor:pointer;font-size:15px;" data-toggle="modal" data-target="#myModal" v-on:click="show_edit_app(app)">修改</a>
+                        <a style="cursor:pointer;font-size:15px;" v-on:click="show_app_data(app)">查看数据</a>
                     </td>
                 </tr>
         </tbody>

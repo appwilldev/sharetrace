@@ -28,23 +28,10 @@ func authHandler() gin.HandlerFunc {
 
 		userId := utils.DecodeCookie(cookie.Value)
 		if conf.DebugMode {
-			log.Println("user:", userId)
+			log.Println("get user:", userId)
 		}
 		if userId > 0 {
 			c.Set("userid", userId)
-		}
-
-		c.Next()
-	}
-}
-
-func authCheck() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		//TODO
-		_, existed := c.Get("sso_userid")
-		if !existed {
-			//controllers.Error(c, controllers.LOGIN_NEEDED)
-			c.Abort()
 		}
 
 		c.Next()
@@ -68,7 +55,6 @@ func main() {
 	}
 
 	ginIns := gin.New()
-	ginIns.Use(authHandler())
 	ginIns.Use(gin.Recovery())
 
 	if conf.DebugMode {
@@ -107,14 +93,14 @@ func main() {
 	{
 		userAPIV1.POST("/register", controllers.Register)
 		userAPIV1.POST("/login", controllers.Login)
-		userAPIV1.POST("/logout", authCheck(), controllers.Logout)
+		userAPIV1.POST("/logout", authHandler(), controllers.Logout)
 		userAPIV1.GET("/all", controllers.UserInfoAll)
 	}
 
 	appAPIV1 := ginIns.Group("/1/app")
 	{
-		appAPIV1.POST("/new", controllers.NewApp)
-		appAPIV1.PUT("/update", controllers.UpdateApp)
+		appAPIV1.POST("/new", authHandler(), controllers.NewApp)
+		appAPIV1.PUT("/update", authHandler(), controllers.UpdateApp)
 		appAPIV1.GET("/all", controllers.AppInfoAll)
 	}
 
@@ -126,10 +112,10 @@ func main() {
 
 	stAPIV1 := ginIns.Group("/1/st")
 	{
-		stAPIV1.POST("/share", controllers.Share)
-		stAPIV1.POST("/click", controllers.Click)
-		stAPIV1.POST("/agentclick", controllers.AgentClick)
-		stAPIV1.POST("/install", controllers.Install)
+		stAPIV1.POST("/share", authHandler(), controllers.Share)
+		stAPIV1.POST("/click", authHandler(), controllers.Click)
+		stAPIV1.POST("/agentclick", authHandler(), controllers.AgentClick)
+		stAPIV1.POST("/install", authHandler(), controllers.Install)
 		stAPIV1.GET("/score", controllers.Score)
 		stAPIV1.GET("/webbeacon", controllers.WebBeacon)
 
@@ -140,17 +126,17 @@ func main() {
 	{
 		opAPIGroup.POST("/user/init", controllers.Register)
 		opAPIGroup.POST("/login", controllers.Login)
-		opAPIGroup.POST("/logout", controllers.Logout)
+		opAPIGroup.POST("/logout", authHandler(), controllers.Logout)
 
-		opAPIGroup.GET("/users/:page/:count", controllers.UserInfoAll)
+		opAPIGroup.GET("/users/:page/:count", authHandler(), controllers.UserInfoAll)
 		//opAPIGroup.POST("/user", OpAuth, ConfWriteCheck, NewUser)
 		//opAPIGroup.PUT("/user", OpAuth, ConfWriteCheck, UpdateUser)
 		//opAPIGroup.GET("/user/info", OpAuth, GetLoginUserInfo)
 
 		//opAPIGroup.GET("/apps/user/:user_key", OpAuth, GetApps)
 		opAPIGroup.GET("/apps/all/:page/:count", controllers.AppInfoAll)
-		opAPIGroup.POST("/app", controllers.NewApp)
-		opAPIGroup.PUT("/app", controllers.UpdateApp)
+		opAPIGroup.POST("/app", authHandler(), controllers.NewApp)
+		opAPIGroup.PUT("/app", authHandler(), controllers.UpdateApp)
 
 	}
 

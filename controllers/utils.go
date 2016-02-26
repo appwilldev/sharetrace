@@ -85,5 +85,6 @@ func getUserIdFromContext(c *gin.Context) int64 {
 	//	return -1
 	//}
 	//return s
+	log.Println("getUserIdFromContext userid:", s)
 	return s.(int64)
 }

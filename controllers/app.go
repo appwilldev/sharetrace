@@ -73,11 +73,6 @@ func UpdateApp(c *gin.Context) {
 		return
 	}
 
-	userid := getUserIdFromContext(c)
-	if userid <= 0 {
-		Error(c, LOGIN_NEEDED, nil, nil)
-	}
-
 	appInfo, err := models.GetAppInfoById(nil, reqData.Id)
 	if err != nil {
 		Error(c, DATA_NOT_FOUND, nil, err.Error())

@@ -18,11 +18,11 @@ var init_vue = function () {
         },
         '/apps/all/:page': {
             component: Apps,
-            //auth: true
+            auth: true
         },
         '/users/all/:page': {
             component: Users,
-            //auth: true
+            auth: true
         },
     });
 
@@ -41,15 +41,15 @@ var init_vue = function () {
     });
 
     router.afterEach(function (transition) {
-        //if (is.startWith(transition.to.path, "/users")) {
-        //    setTimeout(function () {
-        //        $('.icon').initial({ charCount: 1, width: 30, height: 30, fontSize: 18 });
-        //    }, 100);
-        //} else if (is.startWith(transition.to.path, "/apps")) {
-        //    setTimeout(function () {
-        //        $('.icon').initial({ charCount: 1, width: 40, height: 40, fontSize: 24 });
-        //    }, 100);
-        //}
+        if (is.startWith(transition.to.path, "/users")) {
+            setTimeout(function () {
+                $('.icon').initial({ charCount: 1, width: 30, height: 30, fontSize: 18 });
+            }, 100);
+        } else if (is.startWith(transition.to.path, "/apps")) {
+            setTimeout(function () {
+                $('.icon').initial({ charCount: 1, width: 40, height: 40, fontSize: 24 });
+            }, 100);
+        }
     });
 
     Vue.filter('datetime', function (value) {
@@ -95,6 +95,8 @@ var start_vue = function () {
                     user_info = null;
                     vm.user_info = null;
                     router.go("/login");
+                    $.removeCookie("email");
+                    console.log($.cookie("email"));
                 });
             },
             apps:function(){
@@ -107,4 +109,38 @@ var start_vue = function () {
 
 //初始化vue
 init_vue();
-start_vue();
+
+//确认是否有登录
+var email = $.cookie("email");
+console.log("get cookie email:", email);
+
+if (email == undefined || email == ""){
+    start_vue();
+    router.go("/login");
+}else{
+    user_auth_ok = true;
+    start_vue();
+}
+
+//fetch('/op/users/1/1', { credentials: 'same-origin' })
+//    .then(function (response) {
+//        return response.json();
+//    }).then(function (data) {
+//        if (data.status == false && data.code) {
+//            start_vue();
+//            if (data.code == 'user_not_init') {
+//                router.go("/init_user");
+//            } else if (data.code == 'not_login') {
+//                router.go("/login");
+//            }
+//        } else {
+//            user_auth_ok = true;
+//            fetch('/op/user/info', { credentials: 'same-origin' })
+//                .then(function (response) {
+//                    return response.json();
+//                }).then(function (data) {
+//                    user_info = data;
+//                    start_vue();
+//                });
+//        }
+//    });

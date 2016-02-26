@@ -91,7 +91,10 @@ var Login = function (resolve, reject) {
                                 user_auth_ok = true;
                                 user_info = data;
                                 //TODO if admin go to users, else go to apps
+                                //set cookies
                                 console.log("--- DEBUG user_auth_ok:", user_auth_ok);
+                                $.cookie("email", user_info["data"]["email"],{path: '/', expires: 604800});
+                                console.log($.cookie("email"));
                                 router.go("/");
                             } else {
                                 if (is.startWith(data.msg, 'user not exist')) {

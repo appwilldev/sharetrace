@@ -77,6 +77,7 @@ var Apps = function (resolve, reject) {
                             fetch('/op/app', {
                                 method: 'PUT',
                                 body: JSON.stringify({
+                                    "id": vm.app.id,
                                     "appid": vm.app.appid,
                                     "appname": vm.app.appname,
                                     "icon": vm.app.icon

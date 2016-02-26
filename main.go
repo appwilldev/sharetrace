@@ -114,6 +114,7 @@ func main() {
 	appAPIV1 := ginIns.Group("/1/app")
 	{
 		appAPIV1.POST("/new", controllers.NewApp)
+		appAPIV1.PUT("/update", controllers.UpdateApp)
 		appAPIV1.GET("/all", controllers.AppInfoAll)
 	}
 
@@ -149,7 +150,7 @@ func main() {
 		//opAPIGroup.GET("/apps/user/:user_key", OpAuth, GetApps)
 		opAPIGroup.GET("/apps/all/:page/:count", controllers.AppInfoAll)
 		opAPIGroup.POST("/app", controllers.NewApp)
-		//opAPIGroup.PUT("/app", OpAuth, ConfWriteCheck, UpdateApp)
+		opAPIGroup.PUT("/app", controllers.UpdateApp)
 
 	}
 

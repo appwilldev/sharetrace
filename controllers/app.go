@@ -58,6 +58,46 @@ func NewApp(c *gin.Context) {
 	Success(c, nil)
 }
 
+type UpdateAppPostData struct {
+	Id      int64  `json:"id" binding:"required"`
+	Appid   string `json:"appid"`
+	AppName string `json:"appname"`
+	AppIcon string `json:"appicon"`
+}
+
+func UpdateApp(c *gin.Context) {
+	var reqData UpdateAppPostData
+	err := c.BindJSON(&reqData)
+	if err != nil {
+		Error(c, BAD_POST_DATA)
+		return
+	}
+
+	userid := getUserIdFromContext(c)
+	if userid <= 0 {
+		Error(c, LOGIN_NEEDED, nil, nil)
+	}
+
+	appInfo, err := models.GetAppInfoById(nil, reqData.Id)
+	if err != nil {
+		Error(c, DATA_NOT_FOUND, nil, err.Error())
+		return
+	}
+
+	appInfo.Appid = reqData.Appid
+	appInfo.AppName = reqData.AppName
+	appInfo.AppIcon = reqData.AppIcon
+
+	err = models.UpdateDBModel(nil, appInfo)
+	if err != nil {
+		Error(c, SERVER_ERROR, nil, err.Error())
+		return
+	}
+
+	Success(c, nil)
+
+}
+
 func AppInfoAll(c *gin.Context) {
 	var res interface{}
 	res, total, _ := models.GetAppInfoAll(nil)

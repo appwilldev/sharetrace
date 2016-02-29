@@ -76,6 +76,7 @@ CREATE TABLE app_info (
     id BIGINT NOT NULL PRIMARY KEY,
     appid VARCHAR(256) NOT NULL,
     appname  VARCHAR(256) NOT NULL,
+    appschema VARCHAR(256) NOT NULL,
     appicon VARCHAR(2048) DEFAULT NULL,
     userid BIGINT NOT NULL, 
     des TEXT DEFAULT NULL,                                                          

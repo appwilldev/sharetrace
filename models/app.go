@@ -10,6 +10,7 @@ type AppInfo struct {
 	Id         int64  `xorm:"id INT PK NOT NULL" json:"id"`
 	Appid      string `xorm:"appid VARCHAR(256) NOT NULL" json:"appid"`
 	AppName    string `xorm:"appname VARCHAR(256) NOT NULL" json:"appname"`
+	AppSchema  string `xorm:"appschema VARCHAR(256) NOT NULL" json:"appschema"`
 	AppIcon    string `xorm:"appicon VARCHAR(2048) DEFAULT NULL" json:"appicon"`
 	Userid     int64  `xorm:"userid VARCHAR(256) DEFAULT NULL" json:"userid"`
 	Des        string `xorm:"des TEXT  DEFAULT NULL" json:"des"`

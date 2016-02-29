@@ -11,9 +11,10 @@ import (
 )
 
 type NewAppPostData struct {
-	Appid   string `json:"appid" binding:"required"`
-	AppName string `json:"appname" binding:"required"`
-	AppIcon string `json:"appicon"`
+	Appid     string `json:"appid" binding:"required"`
+	AppName   string `json:"appname" binding:"required"`
+	AppSchema string `json:"appschema" binding:"required"`
+	AppIcon   string `json:"appicon"`
 }
 
 func NewApp(c *gin.Context) {
@@ -45,6 +46,7 @@ func NewApp(c *gin.Context) {
 
 	appInfo.Appid = reqData.Appid
 	appInfo.AppName = reqData.AppName
+	appInfo.AppSchema = reqData.AppSchema
 	appInfo.Userid = userid
 	appInfo.AppIcon = reqData.AppIcon
 	appInfo.CreatedUTC = utils.GetNowSecond()
@@ -59,17 +61,18 @@ func NewApp(c *gin.Context) {
 }
 
 type UpdateAppPostData struct {
-	Id      int64  `json:"id" binding:"required"`
-	Appid   string `json:"appid"`
-	AppName string `json:"appname"`
-	AppIcon string `json:"appicon"`
+	Id        int64  `json:"id" binding:"required"`
+	Appid     string `json:"appid"`
+	AppName   string `json:"appname"`
+	AppSchema string `json:"appschema"`
+	AppIcon   string `json:"appicon"`
 }
 
 func UpdateApp(c *gin.Context) {
 	var reqData UpdateAppPostData
 	err := c.BindJSON(&reqData)
 	if err != nil {
-		Error(c, BAD_POST_DATA)
+		Error(c, BAD_POST_DATA, nil, err.Error())
 		return
 	}
 
@@ -81,6 +84,7 @@ func UpdateApp(c *gin.Context) {
 
 	appInfo.Appid = reqData.Appid
 	appInfo.AppName = reqData.AppName
+	appInfo.AppSchema = reqData.AppSchema
 	appInfo.AppIcon = reqData.AppIcon
 
 	err = models.UpdateDBModel(nil, appInfo)

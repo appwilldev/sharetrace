@@ -367,10 +367,15 @@ func WebBeaconCheck(c *gin.Context) {
 		Error(c, DATA_NOT_FOUND, nil, "No Appid")
 		return
 	}
-	log.Println("appid:", appid)
 
-	// TODO get appschema by appid
+	app, err := models.GetAppInfoByAppid(nil, appid)
+	if err != nil {
+		Error(c, DATA_NOT_FOUND, nil, err.Error())
+		return
+	}
 
-	data := gin.H{"appschema": "avft"}
+	appschema := app.AppSchema
+
+	data := gin.H{"appschema": appschema}
 	c.HTML(200, "webbeaconcheck.html", data)
 }

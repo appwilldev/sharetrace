@@ -60,6 +60,7 @@ var Apps = function (resolve, reject) {
                                 body: JSON.stringify({
                                     "appid": vm.app.appid,
                                     "appname": vm.app.appname,
+                                    "appschema": vm.app.appschema,
                                     "appicon": vm.app.icon
                                 }),
                                 credentials: 'same-origin'
@@ -80,6 +81,7 @@ var Apps = function (resolve, reject) {
                                     "id": vm.app.id,
                                     "appid": vm.app.appid,
                                     "appname": vm.app.appname,
+                                    "appschema": vm.app.appschema,
                                     "icon": vm.app.icon
                                 }),
                                 credentials: 'same-origin'
@@ -101,6 +103,7 @@ var Apps = function (resolve, reject) {
                         this.app = {
                             "appid": "",
                             "appname": "",
+                            "appschema": "",
                             "icon": "",
                         };
                         this.modal_title = '增加应用';

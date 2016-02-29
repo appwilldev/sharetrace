@@ -1,0 +1,25 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width">
+</head> 
+
+<script> 
+    var c = document.cookie; 
+    var m = c.match(/stcookieid=(\w+)/);
+    //console.log(m);
+    
+    var name;
+    if (m) {
+      name = m[1];
+      location.href = "{{.appschema}}://stcookieid/" + name;
+    } else {
+      name = "";
+      location.href = "{{.appschema}}://stcookieid/" + name;
+    }
+    
+</script>
+
+<body> 
+check
+</body>
+</html>

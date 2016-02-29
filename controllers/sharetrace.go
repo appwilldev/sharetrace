@@ -123,7 +123,7 @@ func Click(c *gin.Context) {
 	err = caches.NewClickSession(data)
 
 	ret := gin.H{"status": true}
-	ret["st_cookieid"] = cookieid
+	ret["stcookieid"] = cookieid
 	c.JSON(200, ret)
 }
 
@@ -185,14 +185,14 @@ func AgentClick(c *gin.Context) {
 	err = caches.NewClickSession(data)
 
 	ret := gin.H{"status": true}
-	ret["st_cookieid"] = cookieid
+	ret["stcookieid"] = cookieid
 	c.JSON(200, ret)
 }
 
 func Install(c *gin.Context) {
 	var postData struct {
-		St_cookieid string `json:"st_cookieid" binding:"required"`
-		Installid   string `json:"installid" binding:"required"`
+		Stcookieid string `json:"stcookieid" binding:"required"`
+		Installid  string `json:"installid" binding:"required"`
 	}
 	err := c.BindJSON(&postData)
 	if err != nil {
@@ -202,7 +202,7 @@ func Install(c *gin.Context) {
 
 	log.Println("Install data:%s", postData)
 
-	idStr, err := caches.GetClickSessionIdByCookieid(postData.St_cookieid)
+	idStr, err := caches.GetClickSessionIdByCookieid(postData.Stcookieid)
 	if err != nil {
 		Error(c, SERVER_ERROR, nil, err.Error())
 		return

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/appwilldev/sharetrace/models"
@@ -278,12 +279,98 @@ func Score(c *gin.Context) {
 	//c.HTML(200, "mymoney.html", data)
 	return
 }
+
 func WebBeacon(c *gin.Context) {
+	q := c.Request.URL.Query()
+	share_url := q["share_url"][0]
+	if share_url == "" {
+		Error(c, DATA_NOT_FOUND, nil, "No URL")
+		return
+	}
+	log.Println("share_url:", share_url)
+
+	clientIP := c.ClientIP()
+	if clientIP == "" {
+		Error(c, SERVER_ERROR, nil, "No ClientIP")
+		return
+	}
+
+	click_type := 0
+	agent := c.Request.Header.Get("User-Agent")
+	if agent == "" {
+		Error(c, DATA_NOT_FOUND, nil, "No Agent")
+		return
+	} else {
+		if strings.Contains(agent, "Safari") {
+			click_type = 0
+		} else {
+			click_type = 1
+		}
+	}
+
+	old_cookie, err := c.Request.Cookie("stcookieid")
+	if err == nil {
+		log.Println("Exist stcookieid:", old_cookie.Value)
+		return
+	}
+
+	idStr, err := caches.GetShareURLIdByUrl(share_url)
+	if err != nil {
+		Error(c, SERVER_ERROR, nil, err.Error())
+		return
+	}
+	shareid, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		Error(c, SERVER_ERROR, nil, err.Error())
+		return
+	}
+
+	data := new(models.ClickSession)
+	id, err := models.GenerateClickSessionId()
+	data.Id = id
+	if err != nil {
+		Error(c, SERVER_ERROR, nil, err.Error())
+		return
+	}
+
+	data.Shareid = shareid
+	cookieid := fmt.Sprintf("st_%d_%d", shareid, id)
+	data.Cookieid = cookieid
+	data.ClickType = click_type
+	data.Agent = agent
+	data.AgentIP = clientIP
+
+	data.CreatedUTC = utils.GetNowSecond()
+
+	log.Println("Generate data:%s", data)
+
+	err = models.InsertDBModel(nil, data)
+	if err != nil {
+		Error(c, SERVER_ERROR, nil, nil)
+		return
+	}
+	err = caches.NewClickSession(data)
+
 	cookie := new(http.Cookie)
-	cookie.Name = "abc"
-	cookie.Expires = time.Now().Add(time.Duration(365*86400) * time.Second)
-	cookie.Value = "1234"
+	cookie.Name = "stcookieid"
+	cookie.Expires = time.Now().Add(time.Duration(7*86400) * time.Second)
+	cookie.Value = cookieid
 	cookie.Path = "/"
 	http.SetCookie(c.Writer, cookie)
 	return
+}
+
+func WebBeaconCheck(c *gin.Context) {
+	q := c.Request.URL.Query()
+	appid := q["appid"][0]
+	if appid == "" {
+		Error(c, DATA_NOT_FOUND, nil, "No Appid")
+		return
+	}
+	log.Println("appid:", appid)
+
+	// TODO get appschema by appid
+
+	data := gin.H{"appschema": "avft"}
+	c.HTML(200, "webbeaconcheck.html", data)
 }

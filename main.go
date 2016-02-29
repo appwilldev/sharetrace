@@ -118,7 +118,7 @@ func main() {
 		stAPIV1.POST("/install", authHandler(), controllers.Install)
 		stAPIV1.GET("/score", controllers.Score)
 		stAPIV1.GET("/webbeacon", controllers.WebBeacon)
-
+		stAPIV1.GET("/webbeaconcheck", controllers.WebBeaconCheck)
 	}
 
 	// op api
@@ -139,6 +139,8 @@ func main() {
 		opAPIGroup.PUT("/app", authHandler(), controllers.UpdateApp)
 
 	}
+
+	ginIns.LoadHTMLFiles("./templates/webbeaconcheck.html")
 
 	gracehttp.Serve(&http.Server{Addr: conf.HttpAddr, Handler: ginIns})
 }

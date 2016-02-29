@@ -7,6 +7,7 @@ var COUNT_PER_PAGE = 10;
 var init_vue = function () {
     router = new VueRouter({
         //'linkActiveClass': 'active'
+        'hashbang':false // TOASK
     });
 
     router.map({

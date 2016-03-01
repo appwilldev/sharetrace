@@ -22,8 +22,10 @@
 ### 安装通知,告诉ST新安装App设备的信息
       * URL:  /1/st/install
       * POST: 
-            * stcookieid: string
-            * installid: string, IDFA 
-            * click_type: 0:有cookieid，installid为idfa, 1:没有cookieid，使用IP，installid为IP(192.168.1.17)
-      * Example: curl -l -H "Content-type: application/json" -X POST  -d '{"stcookieid":"st_2016_2016","click_type":"0","installid":"aaaaaaa"}' "http://localhost:8580/1/st/install"
+            * click_type: 
+                * 0:使用cookieid，
+                * 1:用IP
+            * installid: IDFA(451141EE-9540-4AA1-A82A-350AC548193D) 
+            * trackid: stcookieid 当click_type=1时为IP(192.168.1.17)
+      * Example: curl -l -H "Content-type: application/json" -X POST  -d '{"trackid":"st_2016_2016","click_type":"0","installid":"aaaaaaa"}' "http://localhost:8580/1/st/install"
 

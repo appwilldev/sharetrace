@@ -113,12 +113,12 @@ func main() {
 	stAPIV1 := ginIns.Group("/1/st")
 	{
 		stAPIV1.POST("/share", authHandler(), controllers.Share)
-		stAPIV1.POST("/click", authHandler(), controllers.Click)
-		stAPIV1.POST("/agentclick", authHandler(), controllers.AgentClick)
-		stAPIV1.POST("/install", authHandler(), controllers.Install)
+		//stAPIV1.POST("/click", authHandler(), controllers.Click)
+		//stAPIV1.POST("/agentclick", authHandler(), controllers.AgentClick)
 		stAPIV1.GET("/score", controllers.Score)
 		stAPIV1.GET("/webbeacon", controllers.WebBeacon)
 		stAPIV1.GET("/webbeaconcheck", controllers.WebBeaconCheck)
+		stAPIV1.POST("/install", authHandler(), controllers.Install)
 	}
 
 	// op api
@@ -127,13 +127,8 @@ func main() {
 		opAPIGroup.POST("/user/init", controllers.Register)
 		opAPIGroup.POST("/login", controllers.Login)
 		opAPIGroup.POST("/logout", authHandler(), controllers.Logout)
-
 		opAPIGroup.GET("/users/:page/:count", authHandler(), controllers.UserInfoAll)
-		//opAPIGroup.POST("/user", OpAuth, ConfWriteCheck, NewUser)
-		//opAPIGroup.PUT("/user", OpAuth, ConfWriteCheck, UpdateUser)
-		//opAPIGroup.GET("/user/info", OpAuth, GetLoginUserInfo)
 
-		//opAPIGroup.GET("/apps/user/:user_key", OpAuth, GetApps)
 		opAPIGroup.GET("/apps/all/:page/:count", controllers.AppInfoAll)
 		opAPIGroup.POST("/app", authHandler(), controllers.NewApp)
 		opAPIGroup.PUT("/app", authHandler(), controllers.UpdateApp)

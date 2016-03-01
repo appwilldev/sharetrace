@@ -44,7 +44,7 @@ func handleExpiresTask() {
 		expiresData[expires.cacheKey] = expires.expires
 		expiresCount++
 
-		if expiresCount%1000 == 0 && utils.GetNowSecond()-dumpExpiresUTC > conf.DumpExpiresDuration {
+		if expiresCount%10 == 0 || utils.GetNowSecond()-dumpExpiresUTC > conf.DumpExpiresDuration {
 			go dumpExpiresTask(expiresData)
 			expiresData = make(map[string]int)
 			expiresCount = 0

@@ -30,7 +30,38 @@ func Share(c *gin.Context) {
 		return
 	}
 
-	log.Println("Share data:%s", postData)
+	//log.Println("Share data:%s", postData)
+
+	// if exist shareurl in cache, return
+	var shareid int64
+	shareid = 0
+	old_idStr, err := caches.GetShareURLIdByUrl(postData.ShareURL)
+	if err == nil && old_idStr != "" {
+		log.Println("Exist cahche:%s", postData.ShareURL)
+		return
+	} else {
+		if old_idStr != "" {
+			shareid, err = strconv.ParseInt(old_idStr, 10, 64)
+			if err != nil {
+				Error(c, SERVER_ERROR, nil, err.Error())
+				return
+			}
+		}
+	}
+
+	// if no shareid but exist share_url in db, reset cache, then return
+	if shareid == 0 {
+		old_data, err := models.GetShareURLByUrl(nil, postData.ShareURL)
+		if err == nil && old_data != nil {
+			log.Println("Exist db data share_url:%s", postData.ShareURL)
+			// recache
+			err := caches.SetShareURL(old_data)
+			if err != nil {
+				log.Println("Failed to cache info %s", err.Error())
+			}
+			return
+		}
+	}
 
 	data := new(models.ShareURL)
 	id, err := models.GenerateShareURLId()
@@ -66,7 +97,7 @@ func Share(c *gin.Context) {
 		Error(c, SERVER_ERROR, nil, nil)
 		return
 	}
-	err = caches.NewShareURL(data)
+	err = caches.SetShareURL(data)
 
 	ret := gin.H{"status": true}
 	c.JSON(200, ret)
@@ -191,8 +222,10 @@ func AgentClick(c *gin.Context) {
 
 func Install(c *gin.Context) {
 	var postData struct {
-		Stcookieid string `json:"stcookieid" binding:"required"`
-		Installid  string `json:"installid" binding:"required"`
+		Installid string `json:"installid" binding:"required"`
+		//ClickType int    `json:"click_type" binding:"required"` -- TOASK
+		ClickType int    `json:"click_type"`
+		Trackid   string `json:"trackid"`
 	}
 	err := c.BindJSON(&postData)
 	if err != nil {
@@ -202,39 +235,51 @@ func Install(c *gin.Context) {
 
 	log.Println("Install data:%s", postData)
 
-	idStr, err := caches.GetClickSessionIdByCookieid(postData.Stcookieid)
-	if err != nil {
-		Error(c, SERVER_ERROR, nil, err.Error())
-		return
+	idStr := ""
+
+	if postData.ClickType == 0 {
+		// Cookie
+		idStr, err = caches.GetClickSessionIdByCookieid(postData.Trackid)
+		if err != nil {
+			Error(c, SERVER_ERROR, nil, err.Error())
+			return
+		}
+	} else if postData.ClickType == 1 {
+		// IP
+		idStr, err = caches.GetClickSessionIdByIP(postData.Trackid)
+		if err != nil {
+			Error(c, SERVER_ERROR, nil, err.Error())
+			return
+		}
 	}
+
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		Error(c, SERVER_ERROR, nil, err.Error())
 		return
 	}
+
 	data, err := caches.GetClickSessionModelInfoById(id)
 	if err != nil {
 		Error(c, SERVER_ERROR, nil, err.Error())
 		return
 	}
+
 	if data.Installid == "" {
 		data.Installid = postData.Installid
+		data.ClickType = postData.ClickType
 		err = models.UpdateDBModel(nil, data)
 		if err != nil {
 			Error(c, SERVER_ERROR, nil, err.Error())
-			//return
+			return
 		}
 		err = caches.UpdateClickSession(data)
 		if err != nil {
 			Error(c, SERVER_ERROR, nil, err.Error())
-			//return
+			return
 		}
-
-	} else {
-		ret := gin.H{"status": true}
-		c.JSON(200, ret)
-		return
 	}
+
 	ret := gin.H{"status": true}
 	c.JSON(200, ret)
 }
@@ -280,25 +325,39 @@ func Score(c *gin.Context) {
 	return
 }
 
+// Just return nothing, maybe  set cookie
 func WebBeacon(c *gin.Context) {
+
+	// if exist stcookieid, return
+	old_cookie, err := c.Request.Cookie("stcookieid")
+	if err == nil {
+		if old_cookie.Value == "" {
+		} else {
+			log.Println("Exist stcookieid:", old_cookie.Value)
+			return
+		}
+	}
+
+	// if no share_url para, return
 	q := c.Request.URL.Query()
 	share_url := q["share_url"][0]
 	if share_url == "" {
-		Error(c, DATA_NOT_FOUND, nil, "No URL")
+		log.Println("No share_url para:")
 		return
 	}
-	log.Println("share_url:", share_url)
+	//log.Println("share_url:", share_url)
 
+	// if no clientIP, return
 	clientIP := c.ClientIP()
 	if clientIP == "" {
-		Error(c, SERVER_ERROR, nil, "No ClientIP")
+		log.Println("No client IP")
 		return
 	}
 
 	click_type := 0
 	agent := c.Request.Header.Get("User-Agent")
 	if agent == "" {
-		Error(c, DATA_NOT_FOUND, nil, "No Agent")
+		log.Println("No client agent")
 		return
 	} else {
 		if strings.Contains(agent, "Safari") {
@@ -308,20 +367,37 @@ func WebBeacon(c *gin.Context) {
 		}
 	}
 
-	old_cookie, err := c.Request.Cookie("stcookieid")
-	if err == nil {
-		log.Println("Exist stcookieid:", old_cookie.Value)
-		return
+	//HACK
+	//click_type = 1
+
+	if click_type == 0 {
+		if old_cookie.Value == "" {
+			//
+		} else {
+			// if already exist cookie cache, return
+			idStr, err := caches.GetClickSessionIdByCookieid(old_cookie.Value)
+			if err == nil && idStr != "" {
+				log.Println("Exist cookie:", old_cookie.Value)
+				return
+			}
+		}
+	} else if click_type == 1 {
+		idStr, err := caches.GetClickSessionIdByIP(clientIP)
+		// if already exist IP cache, return
+		if err == nil && idStr != "" {
+			log.Println("Exist IP:", clientIP)
+			return
+		}
 	}
 
-	idStr, err := caches.GetShareURLIdByUrl(share_url)
+	idShareStr, err := caches.GetShareURLIdByUrl(share_url)
 	if err != nil {
-		Error(c, SERVER_ERROR, nil, err.Error())
+		log.Println(err.Error())
 		return
 	}
-	shareid, err := strconv.ParseInt(idStr, 10, 64)
+	shareid, err := strconv.ParseInt(idShareStr, 10, 64)
 	if err != nil {
-		Error(c, SERVER_ERROR, nil, err.Error())
+		log.Println(err.Error())
 		return
 	}
 
@@ -329,7 +405,7 @@ func WebBeacon(c *gin.Context) {
 	id, err := models.GenerateClickSessionId()
 	data.Id = id
 	if err != nil {
-		Error(c, SERVER_ERROR, nil, err.Error())
+		log.Println(err.Error())
 		return
 	}
 
@@ -344,19 +420,32 @@ func WebBeacon(c *gin.Context) {
 
 	log.Println("Generate data:%s", data)
 
+	// insert to db
 	err = models.InsertDBModel(nil, data)
 	if err != nil {
-		Error(c, SERVER_ERROR, nil, nil)
+		log.Println(err.Error())
 		return
 	}
-	err = caches.NewClickSession(data)
+
+	// cache clicksession by cookie / IP
+	if click_type == 0 {
+		err = caches.NewClickSession(data)
+	} else {
+		err = caches.NewClickSessionByIP(data)
+	}
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
 
 	cookie := new(http.Cookie)
 	cookie.Name = "stcookieid"
+	// cookie cache 7 days
 	cookie.Expires = time.Now().Add(time.Duration(7*86400) * time.Second)
 	cookie.Value = cookieid
 	cookie.Path = "/"
 	http.SetCookie(c.Writer, cookie)
+
 	return
 }
 
@@ -364,7 +453,7 @@ func WebBeaconCheck(c *gin.Context) {
 	q := c.Request.URL.Query()
 	appid := q["appid"][0]
 	if appid == "" {
-		Error(c, DATA_NOT_FOUND, nil, "No Appid")
+		Error(c, BAD_REQUEST, nil, "No Appid")
 		return
 	}
 

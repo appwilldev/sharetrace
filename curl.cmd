@@ -9,11 +9,13 @@ curl -l -H "Content-type: application/json" "http://localhost:8580/1/app/all"
 
 ////////////////////////// 
 
-curl -l -H "Content-type: application/json" -X POST  -d '{"fromid":"8931","appid":"123", "itemid":"d1ff1099f8J","share_url":"http://appforvideo.com/v/8923?app=AV_FunnyTime&from=8934","appname":"AV_FunnyTime", "channel":"weixin", "des":"test"}' "http://localhost:8580/1/st/share"
+curl -l -H "Content-type: application/json" -X POST  -d '{"fromid":"8932","appid":"123", "itemid":"d1ff1099f8J","share_url":"http://appforvideo.com/v/8923?app=AV_FunnyTime&from=8936","appname":"AV_FunnyTime", "channel":"weixin", "des":"test"}' "http://localhost:8580/1/st/share"
 
 curl -l -H "Content-type: application/json" -X POST  -d '{"share_url":"http://appforvideo.com/v/8923?app=AV_FunnyTime&from=8934"}' "http://localhost:8580/1/st/click"
 
-curl -l -H "Content-type: application/json" -X POST  -d '{"stcookieid":"st_2016_2016","installid":"aaaaaaa"}' "http://localhost:8580/1/st/install"
+curl -l -H "Content-type: application/json" -X POST  -d '{"click_type":0, "trackid":"st_2016_2016","installid":"aaaaaaa"}' "http://localhost:8580/1/st/install"
+
+curl -l -H "Content-type: application/json" -X POST  -d '{"click_type":1, "trackid":"192.168.1.17","installid":"bbbbbbb"}' "http://localhost:8580/1/st/install"
 
 curl -l -H "Content-type: application/json" "http://localhost:8580/1/st/score?userid=8931&appid=123"
 

@@ -17,7 +17,7 @@ func init() {
 }
 
 func GetShareURLModelInfoById(id int64) (*models.ShareURL, error) {
-	j, err := getJsonModelInfo(getShareURLInfoCacheKey(id), true, 0)
+	j, err := getJsonModelInfo(getShareURLInfoCacheKey(id), true, conf.UserExpires)
 	if j == nil {
 		return nil, err
 	}
@@ -26,11 +26,6 @@ func GetShareURLModelInfoById(id int64) (*models.ShareURL, error) {
 	fillJsonModelInfo(v, j)
 
 	return v, nil
-}
-
-func SaveShareURLInfo(data *models.ShareURL) {
-	jsonStr, _ := json.Marshal(data)
-	cache.Set(conf.DEFAULT_CACHE_DB_NAME, getShareURLInfoCacheKey(data.Id), string(jsonStr), 0)
 }
 
 func GetShareURLJsonModelInfo(id int64) (*simplejson.Json, error) {
@@ -57,25 +52,17 @@ func GetShareURLIdByUrl(url string) (string, error) {
 
 func UpdateShareURL(data *models.ShareURL) error {
 	v, _ := json.Marshal(data)
-	err := cache.Set(conf.DEFAULT_CACHE_DB_NAME, getShareURLInfoCacheKey(data.Id), string(v), 0)
-	if err != nil && conf.UserExpires > 0 {
-		expiresDataCh <- expiresInfo{cacheKey: getShareURLInfoCacheKey(data.Id), expires: conf.UserExpires}
-	}
-
+	err := cache.Set(conf.DEFAULT_CACHE_DB_NAME, getShareURLInfoCacheKey(data.Id), string(v), conf.UserExpires)
 	return err
 }
 
-func NewShareURL(data *models.ShareURL) error {
+func SetShareURL(data *models.ShareURL) error {
 	err := UpdateShareURL(data)
 	if err != nil {
-		log.Println("Failed to cache link info %s", err.Error())
-		return fmt.Errorf("Failed to cache link info %s", err.Error())
+		log.Println("Failed to cache info %s", err.Error())
+		return fmt.Errorf("Failed to cache info %s", err.Error())
 	}
-	// Set link url cache map
-	err = cache.Set(conf.DEFAULT_CACHE_DB_NAME, getShareURLIdCacheKeyByURL(data.ShareURL), fmt.Sprintf("%d", data.Id), 0)
-	if err != nil && conf.UserExpires > 0 {
-		expiresDataCh <- expiresInfo{cacheKey: getShareURLIdCacheKeyByURL(data.ShareURL), expires: conf.UserExpires}
-	}
-
+	// Set url cache map
+	err = cache.Set(conf.DEFAULT_CACHE_DB_NAME, getShareURLIdCacheKeyByURL(data.ShareURL), fmt.Sprintf("%d", data.Id), conf.UserExpires)
 	return err
 }

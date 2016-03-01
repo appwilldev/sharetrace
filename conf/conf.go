@@ -31,7 +31,7 @@ const (
 	DEFAULT_CACHE_DB_NAME = "default"
 	DEFAULT_CACHE_EXPIRE  = 7 * 24 * 60 * 60
 	UserExpires           = 7 * 24 * 60 * 60
-	DumpExpiresDuration   = 3600
+	DumpExpiresDuration   = 60
 )
 
 var (

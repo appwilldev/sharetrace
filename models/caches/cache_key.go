@@ -38,3 +38,7 @@ func getClickSessionInfoCacheKeyStr(idStr string) string {
 func getClickSessionIdCacheKeyByCookieid(idStr string) string {
 	return fmt.Sprintf("cs_id_by_cookieid_%s", idStr)
 }
+
+func getClickSessionIdCacheKeyByIP(IPStr string) string {
+	return fmt.Sprintf("cs_id_by_ip_%s", IPStr)
+}

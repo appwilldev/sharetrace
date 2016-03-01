@@ -47,7 +47,7 @@ CREATE TABLE click_session(
     status INT DEFAULT 0,                                                           
     created_utc INT                                                                 
 );                                                                                  
-CREATE INDEX uidx_cs_cookieid ON click_session(cookieid);                                 
+CREATE UNIQUE INDEX uidx_cs_cookieid ON click_session(cookieid);                                 
 CREATE INDEX idx_cs_shareid ON click_session(shareid);                                 
 --ALTER TABLE click_session ADD COLUMN click_type int default 0;
 --ALTER TABLE click_session ADD COLUMN agent varchar(1024) default null;
@@ -67,7 +67,7 @@ CREATE TABLE user_info (
     status INT DEFAULT 0,                                                           
     created_utc INT NOT NULL
 );
-CREATE INDEX uidx_ui_email ON user_info(email);                                 
+CREATE UNIQUE INDEX uidx_ui_email ON user_info(email);                                 
 
 -- App管理
 -- 一个账号可以有多个App， 一个App只属于一个账号
@@ -83,8 +83,6 @@ CREATE TABLE app_info (
     status INT DEFAULT 0,                                                           
     created_utc INT NOT NULL
 );
-CREATE INDEX uidx_ai_appid ON app_info(appid);                                 
-
-
+CREATE UNIQUE INDEX uidx_ai_appid ON app_info(appid);                                 
 -- 同appid， 同ida，只算一个? 客户端要判断，用户是否已经安装过了
 -- 用户安装了，删除了，又安装了, 怎么算

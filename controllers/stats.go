@@ -59,8 +59,8 @@ func StatsTotal(c *gin.Context) {
 	if len(q["start"]) > 0 {
 		t_start_str := q["start"][0]
 		t_start, _ = strconv.ParseInt(t_start_str, 10, 64)
-		//start_utc := time.Unix(t_start, 0)
-		//time_now = start_utc
+		start_utc := time.Unix(t_start, 0)
+		time_now = start_utc
 		//year, month, day := start_utc.Date()
 		//date_tmp := fmt.Sprintf("%d-%d-%d", year, month, day)
 	}

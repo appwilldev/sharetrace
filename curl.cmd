@@ -23,6 +23,9 @@ curl -l -H "Content-type: application/json" "http://localhost:8580/1/st/score?us
 curl -l -H "Content-type: application/json" -X POST  -d '{"share_url":"http://appforvideo.com/v/8923?app=AV_FunnyTime&from=8934", "agent_ip":"192.168.1.1","agent":"webagent wechat"}' "http://localhost:8580/1/st/agentclick"
 
 
+curl "http://localhost:8580/1/st/webbeacon?share_url=http%3A%2F%2Fappforvideo.com%2Fv%2F8923%3Fapp%3DAV_FunnyTime%26from%3D8934"
+
+
 ////////////////////////// 
 curl -l -H "Content-type: application/json" "http://localhost:8580/1/stats/share?appid=123"
 

@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"fmt"
-	//"log"
-	//"strconv"
+	"log"
+	"strconv"
 	"time"
 
 	"github.com/appwilldev/sharetrace/models"
@@ -11,6 +11,7 @@ import (
 )
 
 func StatsShare(c *gin.Context) {
+	log.Println("")
 	q := c.Request.URL.Query()
 
 	appIdStr := q["appid"][0]
@@ -48,10 +49,35 @@ func StatsShare(c *gin.Context) {
 func StatsTotal(c *gin.Context) {
 
 	q := c.Request.URL.Query()
-
 	appIdStr := q["appid"][0]
 
-	time_now := time.Now()
+	var delta int
+	delta = 7
+	time_now := time.Now().AddDate(0, 0, -delta)
+
+	var t_start int64
+	if len(q["start"]) > 0 {
+		t_start_str := q["start"][0]
+		t_start, _ = strconv.ParseInt(t_start_str, 10, 64)
+		//start_utc := time.Unix(t_start, 0)
+		//time_now = start_utc
+		//year, month, day := start_utc.Date()
+		//date_tmp := fmt.Sprintf("%d-%d-%d", year, month, day)
+	}
+
+	var t_end int64
+	if len(q["end"]) > 0 {
+		t_end_str := q["end"][0]
+		t_end, _ = strconv.ParseInt(t_end_str, 10, 64)
+		//end_utc := time.Unix(t_end, 0)
+		//year, month, day := end_utc.Date()
+		//date_tmp := fmt.Sprintf("%d-%d-%d", year, month, day)
+	}
+
+	if t_start > 0 && t_end > 0 {
+		delta = int((t_end - t_start) / (24 * 3600))
+	}
+
 	ret := gin.H{"status": true}
 
 	var data map[string]interface{}
@@ -68,8 +94,8 @@ func StatsTotal(c *gin.Context) {
 	data["click"] = click
 	data["install"] = install
 
-	for i := 0; i < 7; i++ {
-		time_now_tmp := time_now.AddDate(0, 0, -i)
+	for i := 0; i < delta; i++ {
+		time_now_tmp := time_now.AddDate(0, 0, +i)
 		year, month, day := time_now_tmp.Date()
 		date_tmp := fmt.Sprintf("%d-%d-%d", year, month, day)
 		share[date_tmp], _ = models.GetShareTotalByAppid(nil, appIdStr, date_tmp)

@@ -2,6 +2,7 @@
 var router = null;
 var user_auth_ok = false;
 var user_info = null;
+var useremail = null;
 var COUNT_PER_PAGE = 10;
 
 var init_vue = function () {
@@ -67,7 +68,8 @@ var start_vue = function () {
     var ShareTrace= Vue.extend({
         data: function () {
             return {
-                user_info: user_info
+                user_info: user_info,
+                useremail: useremail,
             };
         },
         methods: {
@@ -94,8 +96,9 @@ var start_vue = function () {
                     user_auth_ok = false;
                     user_info = null;
                     vm.user_info = null;
+                    vm.useremal = null;
                     router.go("/login");
-                    $.removeCookie("userinfo");
+                    $.removeCookie("useremail");
                     //console.log($.cookie("email"));
                 });
             },
@@ -111,14 +114,15 @@ var start_vue = function () {
 init_vue();
 
 //确认是否有登录
-var userinfo= $.cookie("userinfo");
-if (userinfo== undefined){
+var useremail= $.cookie("useremail");
+if (useremail== undefined){
     start_vue();
     router.go("/login");
 }else{
     user_auth_ok = true;
     start_vue();
-    router.app.user_info = userinfo;
+    console.log("get cookie:", useremail);
+    router.app.useremail= useremail;
 }
 
 //fetch('/op/users/1/1', { credentials: 'same-origin' })

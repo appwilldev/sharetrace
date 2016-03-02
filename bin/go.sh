@@ -5,8 +5,8 @@
 x=`date +%F_%T`
 y=`git rev-parse HEAD`
 
-OUT=funnytime_linux_amd64
+OUT=st_linux_amd64
 #GOOS=linux go build -ldflags "-X main.date=$x -X main.rev=$y" -o $OUT
 GOOS=linux  GOARCH=amd64 go build -o $OUT
 
-#scp $OUT funnytime@beijing6.appdao.com:~
+scp $OUT sharetrace@beijing6.appdao.com:~/sharetrace

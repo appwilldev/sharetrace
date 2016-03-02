@@ -22,12 +22,12 @@
                     <ul class="nav navbar-nav">
                         <li style="cursor:pointer;" v-bind:class="{'active':is_apps_active()}" v-link="{ path: '/apps' }"><a>应用</a></li>
                     </ul>
-                    <ul class="nav navbar-nav">
+                    <ul class="nav navbar-nav" v-if="useremail == 'admin@appwill.com' ">
                         <li style="cursor:pointer;" v-bind:class="{'active':is_users_active()}" v-link="{ path: '/users' }"><a>用户</a></li>
                     </ul>
 
-                    <ul class="nav navbar-nav navbar-right" v-if="user_info">
-                        <li><a style="cursor:pointer;" role="presentation" v-on:click="logout"><span class="glyphicon glyphicon-log-out"></span> 登出</a></li>
+                    <ul class="nav navbar-nav navbar-right" v-if="useremail">
+                        <li><a style="cursor:pointer;" role="presentation" v-on:click="logout"><span class="glyphicon glyphicon-log-out"></span> &nbsp; {{useremail}} 登出</a></li>
                     </ul>
 
                     <template v-else>

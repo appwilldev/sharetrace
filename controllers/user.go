@@ -66,10 +66,11 @@ func Login(c *gin.Context) {
 	}
 
 	user, err := models.GetUserInfoByEmail(nil, loginData.Email)
-	if err != nil {
+	if err != nil || user == nil {
 		Error(c, LOGIN_FAILED, nil, err.Error())
 		return
 	}
+	log.Println("---user:", user)
 
 	//TODO passwd md5
 	oldPasswd := user.Passwd

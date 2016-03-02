@@ -89,9 +89,10 @@ var Login = function (resolve, reject) {
                             if (data.status == true) {
                                 index = 2;
                                 user_auth_ok = true;
-                                user_info = data;
-                                router.app.user_info = data;
-                                $.cookie("userinfo", user_info["data"],{path: '/', expires: 604800});
+                                user_info = data["data"];
+                                router.app.user_info = user_info;
+                                router.app.useremail = user_info["email"];
+                                $.cookie("useremail", user_info["email"],{path: '/', expires: 604800});
                                 //TODO if admin go to users, else go to apps
                                 router.go("/apps");
                             } else {

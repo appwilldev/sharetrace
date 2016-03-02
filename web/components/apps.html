@@ -12,6 +12,7 @@
                 <td style="text-align:center;">应用ID</td>
                 <td style="text-align:center;">应用名</td>
                 <td style="text-align:center;">应用Schema</td>
+                <td style="text-align:center;">创建者</td>
                 <td style="text-align:center;">创建时间</td>
                 <td v-if="$route.params.page!=undefined || $route.params.keyword!=undefined" style="text-align:center;">操作</td>
             </tr>
@@ -22,19 +23,26 @@
                         {{idx+1}}
                     </td>
                     <td style="vertical-align:middle;text-align:center;padding:4px 4px 4px 4px;">
-                        <a v-link="{path:'/app/'+app.appid+'/'+app.key,query:{from_apps_page:$route.params.page}}">{{app.appid}}</a>
+                        {{app.appid}}
                         <br/>
                     </td>
 
                     <td style="vertical-align:middle;text-align:center;padding:4px 4px 4px 4px;">
-                        <a v-link="{path:'/app/'+app.appname+'/'+app.key,query:{from_apps_page:$route.params.page}}">{{app.appname}}</a>
+                        {{app.appname}}
                         <br/>
                     </td>
 
                     <td style="vertical-align:middle;text-align:center;padding:4px 4px 4px 4px;">
-                        <a v-link="{path:'/app/'+app.appschema+'/'+app.key,query:{from_apps_page:$route.params.page}}">{{app.appschema}}</a>
+                        {{app.appschema}}
                         <br/>
                     </td>
+
+                    <td style="vertical-align:middle;text-align:center;padding:4px 4px 4px 4px;">
+                        <img data-name="{{app.des}}" class="icon img-circle"/>
+                        {{app.des}}
+                        <br/>
+                    </td>
+
 
                     <td style="vertical-align:middle;text-align:center;">{{{app.created_utc | datetime}}}</td>
                     <td style="vertical-align:middle;text-align:center;" v-if="$route.params.page!=undefined || $route.params.keyword!=undefined">

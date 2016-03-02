@@ -103,8 +103,30 @@ func AppInfoAll(c *gin.Context) {
 		Error(c, LOGIN_NEEDED, nil, nil)
 	}
 
-	var res interface{}
+	var res []*models.AppInfo
+	user, _ := models.GetUserInfoById(nil, userid)
 	res, total, _ := models.GetAppInfoListByUserid(nil, userid)
+	if user.Name == "admin" {
+		res, total, _ = models.GetAppInfoAll(nil)
+		resLen := len(res)
+		for i := 0; i < resLen; i++ {
+			tmp_app := res[i]
+			tmp_userid := tmp_app.Userid
+			tmp_user, _ := models.GetUserInfoById(nil, tmp_userid)
+			if tmp_user != nil {
+				res[i].Des = tmp_user.Name
+			}
+		}
+	} else {
+		tmp_user, _ := models.GetUserInfoById(nil, userid)
+		if tmp_user != nil {
+			resLen := len(res)
+			for i := 0; i < resLen; i++ {
+				res[i].Des = tmp_user.Name
+			}
+		}
+	}
+
 	ret := gin.H{"status": true}
 	ret["total"] = total
 	ret["data"] = res

@@ -8,7 +8,6 @@
                 <td style="text-align:center;">用户名</td>
                 <td style="text-align:center;">Email</td>
                 <td style="text-align:center;">创建时间</td>
-                <td v-if="$route.params.page!=undefined || $route.params.keyword!=undefined" style="text-align:center;">操作</td>
             </tr>
         </thead>
         <tbody>
@@ -21,9 +20,6 @@
                 <td style="vertical-align:middle;text-align:left;padding:4px 4px 4px 4px;">{{user.name}}</td>
                 <td style="vertical-align:middle;text-align:center;">{{user.email}}</td>
                 <td style="vertical-align:middle;text-align:center;">{{user.created_utc | datetime}}</td>
-                <td style="vertical-align:middle;text-align:center;">
-                    <a style="cursor:pointer;font-size:15px;" v-link="{ path: '/apps/user/'+user.key }">查询</a>
-                </td>
             </tr>
         </tbody>
     </table>

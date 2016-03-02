@@ -94,14 +94,14 @@ func main() {
 		userAPIV1.POST("/register", controllers.Register)
 		userAPIV1.POST("/login", controllers.Login)
 		userAPIV1.POST("/logout", authHandler(), controllers.Logout)
-		userAPIV1.GET("/all", controllers.UserInfoAll)
+		userAPIV1.GET("/all", authHandler(), controllers.UserInfoAll)
 	}
 
 	appAPIV1 := ginIns.Group("/1/app")
 	{
 		appAPIV1.POST("/new", authHandler(), controllers.NewApp)
 		appAPIV1.PUT("/update", authHandler(), controllers.UpdateApp)
-		appAPIV1.GET("/all", controllers.AppInfoAll)
+		appAPIV1.GET("/all", authHandler(), controllers.AppInfoAll)
 	}
 
 	statsAPIV1 := ginIns.Group("/1/stats")
@@ -129,7 +129,7 @@ func main() {
 		opAPIGroup.POST("/logout", authHandler(), controllers.Logout)
 		opAPIGroup.GET("/users/:page/:count", authHandler(), controllers.UserInfoAll)
 
-		opAPIGroup.GET("/apps/all/:page/:count", controllers.AppInfoAll)
+		opAPIGroup.GET("/apps/all/:page/:count", authHandler(), controllers.AppInfoAll)
 		opAPIGroup.POST("/app", authHandler(), controllers.NewApp)
 		opAPIGroup.PUT("/app", authHandler(), controllers.UpdateApp)
 

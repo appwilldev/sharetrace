@@ -98,8 +98,13 @@ func UpdateApp(c *gin.Context) {
 }
 
 func AppInfoAll(c *gin.Context) {
+	userid := getUserIdFromContext(c)
+	if userid <= 0 {
+		Error(c, LOGIN_NEEDED, nil, nil)
+	}
+
 	var res interface{}
-	res, total, _ := models.GetAppInfoAll(nil)
+	res, total, _ := models.GetAppInfoListByUserid(nil, userid)
 	ret := gin.H{"status": true}
 	ret["total"] = total
 	ret["data"] = res

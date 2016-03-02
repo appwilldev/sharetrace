@@ -24,7 +24,7 @@
 #### 分享页面iFrame, 嵌入分享页面，便于ST种下跟踪Cookie，以及跟踪用户IP
 * Code:
 ```
-       /<iframe src="http://st.appforvideo.com/1/st/webbeacon?share_url=Encoded_Share_URL"/> /</iframe/>
+       <iframe src="http://st.appforvideo.com/1/st/webbeacon?share_url=Encoded_Share_URL"/> </iframe/>
 ```
 * Example: 
 ```

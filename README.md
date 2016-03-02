@@ -22,13 +22,14 @@
 
 ## 跟踪 
 #### 分享页面iFrame, 嵌入分享页面，便于ST种下跟踪Cookie，以及跟踪用户IP
-* Code: 
-
-      <iframe src="http://st.appforvideo.com/1/st/webbeacon?share_url=Encoded_Share_URL"></iframe>
-        
+* Code:
+```
+       /<iframe src="http://st.appforvideo.com/1/st/webbeacon?share_url=Encoded_Share_URL"/> /</iframe/>
+```
 * Example: 
-
+```
       <iframe src="http://192.168.1.17:8580/1/st/webbeacon?share_url=http%3A%2F%2Fappforvideo.com%2Fv%2F8923%3Fapp%3DAV_FunnyTime%26from%3D8934"></iframe>
+```
         
         
 * 如果是在Safari打开的页面，会在ST的域名(st.appforvideo.com)下面种下stcookieid，作为跟踪标识

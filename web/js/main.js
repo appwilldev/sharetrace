@@ -94,12 +94,14 @@ var start_vue = function () {
                     return response.json();
                 }).then(function (data) {
                     user_auth_ok = false;
+
                     user_info = null;
+                    useremail= null;
                     vm.user_info = null;
                     vm.useremal = null;
                     router.go("/login");
-                    $.removeCookie("useremail");
-                    //console.log($.cookie("email"));
+
+                    $.removeCookie("useremail",{path: '/', expires: 604800} );
                 });
             },
             apps:function(){

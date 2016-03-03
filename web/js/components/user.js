@@ -96,13 +96,7 @@ var Login = function (resolve, reject) {
                                 //TODO if admin go to users, else go to apps
                                 router.go("/apps");
                             } else {
-                                if (is.startWith(data.msg, 'user not exist')) {
-                                    vm.username_error = "用户不存在";
-                                    vm.user_password_error = "";
-                                } else if (is.startWith(data.msg, 'user passcode wrong')) {
-                                    vm.username_error = "";
-                                    vm.user_password_error = "密码输入错误";
-                                }
+                                alert(data.msg);
                             }
                         });
                     }

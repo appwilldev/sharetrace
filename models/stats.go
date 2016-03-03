@@ -76,7 +76,7 @@ func GetInstallTotalByAppid(s *ModelSession, appid string, date string) (int64, 
 	data := new(ShareClick)
 	var session *xorm.Session
 	session = s.Join("INNER", "click_session", "share_url.id=click_session.shareid")
-	total, err = session.Where("appid=?", appid).And("installid is not null").And("date(to_timestamp(click_session.created_utc))=?", date).Count(data)
+	total, err = session.Where("appid=?", appid).And("click_session.status = 1").And("date(to_timestamp(click_session.created_utc))=?", date).Count(data)
 
 	if err != nil {
 		return -1, err

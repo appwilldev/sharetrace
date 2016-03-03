@@ -4,7 +4,7 @@
 ## 管理界面
 #### 登录账号
 * URL :<http://st.apptao.com/web>
-* 账号:guest@apppwill.com
+* 账号:guest@appwill.com
 * 密码:123456
 
 #### 效果图

@@ -39,16 +39,7 @@
 * Code:
 ```
 
-<script language="JavaScript">
-function set_stiframe(){
-    var iframe = document.createElement('iframe');
-    var stiframe_url="http://st.apptao.com/1/st/webbeacon?share_url=" + encodeURIComponent(window.location);
-    iframe.src = stiframe_url;
-    document.body.appendChild(iframe);
-}
-
-set_stiframe()
-</script>
+<script src="http://st.apptao.com/web/js/sharetrace.js"></script>
 
 ```
 

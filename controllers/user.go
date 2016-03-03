@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	//"strconv"
+	"fmt"
 
 	"github.com/appwilldev/sharetrace/models"
 	"github.com/appwilldev/sharetrace/utils"
@@ -67,6 +68,9 @@ func Login(c *gin.Context) {
 
 	user, err := models.GetUserInfoByEmail(nil, loginData.Email)
 	if err != nil || user == nil {
+		if err == nil {
+			err = fmt.Errorf("user nil")
+		}
 		Error(c, LOGIN_FAILED, nil, err.Error())
 		return
 	}

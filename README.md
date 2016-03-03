@@ -25,14 +25,21 @@
 ---
 
 ## 跟踪 
-#### 分享页面iFrame, 嵌入分享页面，便于ST种下跟踪Cookie，以及跟踪用户IP
+#### 把下面代码加入分享页面， 这段代码会把iFrame, 嵌入分享页面，便于在ST域名下跟踪Cookie，以及用户IP
 * Code:
 ```
-       <iframe src="http://st.appforvideo.com/1/st/webbeacon?share_url=Encoded_Share_URL"/> </iframe/>
-```
-* Example: 
-```
-      <iframe src="http://192.168.1.17:8580/1/st/webbeacon?share_url=http%3A%2F%2Fappforvideo.com%2Fv%2F8923%3Fapp%3DAV_FunnyTime%26from%3D8934"></iframe>
+
+<script language="JavaScript">
+function set_stiframe(){
+    iframe = document.createElement('iframe');
+    var stiframe_url="http://st.apptao.com/1/st/webbeacon?share_url=" + encodeURIComponent(window.location);
+    iframe.src = stiframe_url;
+    document.body.appendChild(iframe);
+}
+
+set_stiframe()
+</script>
+
 ```
         
         

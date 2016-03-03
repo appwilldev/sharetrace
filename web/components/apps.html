@@ -10,9 +10,9 @@
             <tr class="active">
                 <td style="width:24px;">#</td>
                 <td style="text-align:center;">应用ID</td>
-                <td style="text-align:center;">应用名</td>
+                <td style="text-align:left;">应用名</td>
                 <td style="text-align:center;">应用Schema</td>
-                <td style="text-align:center;">创建者</td>
+                <td style="text-align:left;">创建者</td>
                 <td style="text-align:center;">创建时间</td>
                 <td v-if="$route.params.page!=undefined || $route.params.keyword!=undefined" style="text-align:center;">操作</td>
             </tr>
@@ -27,7 +27,8 @@
                         <br/>
                     </td>
 
-                    <td style="vertical-align:middle;text-align:center;padding:4px 4px 4px 4px;">
+                    <td style="vertical-align:middle;text-align:left;padding:4px 4px 4px 4px;">
+                        <img data-name="{{app.appname}}" class="icon img-circle"/>
                         {{app.appname}}
                         <br/>
                     </td>
@@ -37,7 +38,7 @@
                         <br/>
                     </td>
 
-                    <td style="vertical-align:middle;text-align:center;padding:4px 4px 4px 4px;">
+                    <td style="vertical-align:middle;text-align:left;padding:4px 4px 4px 4px;">
                         <img data-name="{{app.des}}" class="icon img-circle"/>
                         {{app.des}}
                         <br/>

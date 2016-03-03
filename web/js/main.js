@@ -43,13 +43,9 @@ var init_vue = function () {
     });
 
     router.afterEach(function (transition) {
-        if (is.startWith(transition.to.path, "/users")) {
+    	if (is.startWith(transition.to.path, "/users") || is.startWith(transition.to.path, "/apps") ) {
             setTimeout(function () {
                 $('.icon').initial({ charCount: 1, width: 30, height: 30, fontSize: 18 });
-            }, 100);
-        } else if (is.startWith(transition.to.path, "/apps")) {
-            setTimeout(function () {
-                $('.icon').initial({ charCount: 1, width: 40, height: 40, fontSize: 24 });
             }, 100);
         }
     });

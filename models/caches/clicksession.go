@@ -41,6 +41,15 @@ func GetClickSessionJsonModelInfo(id int64) (*simplejson.Json, error) {
 	return j, nil
 }
 
+func GetClickSessionId(clicktype int, parastr string) (string, error) {
+	if clicktype == conf.CLICK_TYPE_COOKIE {
+		return GetClickSessionIdByCookieid(parastr)
+	} else if clicktype == conf.CLICK_TYPE_IP {
+		return GetClickSessionIdByIP(parastr)
+	}
+	return "", fmt.Errorf("ClickType Error")
+}
+
 func GetClickSessionIdByCookieid(idStr string) (string, error) {
 	data, err := cache.Get(conf.DEFAULT_CACHE_DB_NAME, getClickSessionIdCacheKeyByCookieid(idStr))
 	if err != nil {
@@ -69,16 +78,12 @@ func NewClickSession(data *models.ClickSession) error {
 	if err != nil {
 		return fmt.Errorf("Failed to cache link info %s", err.Error())
 	}
-	err = cache.Set(conf.DEFAULT_CACHE_DB_NAME, getClickSessionIdCacheKeyByCookieid(data.Cookieid), fmt.Sprintf("%d", data.Id), conf.UserExpires)
-
-	return err
-}
-
-func NewClickSessionByIP(data *models.ClickSession) error {
-	err := UpdateClickSession(data)
-	if err != nil {
-		return fmt.Errorf("Failed to cache link info %s", err.Error())
+	if data.Cookieid != "" {
+		err = cache.Set(conf.DEFAULT_CACHE_DB_NAME, getClickSessionIdCacheKeyByCookieid(data.Cookieid), fmt.Sprintf("%d", data.Id), conf.UserExpires)
 	}
-	err = cache.Set(conf.DEFAULT_CACHE_DB_NAME, getClickSessionIdCacheKeyByIP(data.AgentIP), fmt.Sprintf("%d", data.Id), conf.UserExpires)
+	if data.AgentIP != "" {
+		err = cache.Set(conf.DEFAULT_CACHE_DB_NAME, getClickSessionIdCacheKeyByIP(data.AgentIP), fmt.Sprintf("%d", data.Id), conf.UserExpires)
+	}
+
 	return err
 }

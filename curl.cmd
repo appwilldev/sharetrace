@@ -15,7 +15,7 @@ curl -l -H "Content-type: application/json" -X POST  -d '{"share_url":"http://ap
 
 curl -l -H "Content-type: application/json" -X POST  -d '{"click_type":0, "trackid":"st_2016_2016","installid":"aaaaaaa"}' "http://localhost:8580/1/st/install"
 
-curl -l -H "Content-type: application/json" -X POST  -d '{"click_type":1, "trackid":"192.168.1.17","installid":"bbbbbbb"}' "http://localhost:8580/1/st/install"
+curl -l -H "Content-type: application/json" -X POST  -d '{"click_type":1, "trackid":"::1","installid":"bbbbbbb"}' "http://localhost:8580/1/st/install"
 
 curl -l -H "Content-type: application/json" "http://localhost:8580/1/st/score?userid=8931&appid=123"
 

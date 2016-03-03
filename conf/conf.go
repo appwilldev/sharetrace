@@ -28,10 +28,15 @@ type RedisConfig struct {
 }
 
 const (
-	DEFAULT_CACHE_DB_NAME = "default"
-	DEFAULT_CACHE_EXPIRE  = 7 * 24 * 60 * 60
-	UserExpires           = 7 * 24 * 60 * 60
-	DumpExpiresDuration   = 60
+	DEFAULT_CACHE_DB_NAME          = "default"
+	DEFAULT_CACHE_EXPIRE           = 7 * 24 * 60 * 60
+	UserExpires                    = 7 * 24 * 60 * 60
+	DumpExpiresDuration            = 60
+	CLICK_SESSION_STATUS_INSTALLED = 1
+	CLICK_SESSION_STATUS_CLICK     = 0
+	CLICK_TYPE_COOKIE              = 0
+	CLICK_TYPE_IP                  = 1
+	COOKIE_PREFIX                  = "st"
 )
 
 var (

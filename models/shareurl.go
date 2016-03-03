@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+	"github.com/appwilldev/sharetrace/conf"
 	"github.com/go-xorm/xorm"
 )
 
@@ -91,6 +93,15 @@ func (m *ClickSession) UniqueCond() (string, []interface{}) {
 	return "id=?", res
 }
 
+func GetClickSession(s *ModelSession, clicktype int, paraStr string) (*ClickSession, error) {
+	if clicktype == conf.CLICK_TYPE_COOKIE {
+		return GetClickSessionByCookieId(s, paraStr)
+	} else if clicktype == conf.CLICK_TYPE_IP {
+		return GetClickSessionByIP(s, paraStr)
+	}
+	return nil, fmt.Errorf("ClickType Error")
+}
+
 func GetClickSessionById(s *ModelSession, Id int64) (*ClickSession, error) {
 	if s == nil {
 		s = newAutoCloseModelsSession()
@@ -109,6 +120,19 @@ func GetClickSessionByCookieId(s *ModelSession, IdStr string) (*ClickSession, er
 	}
 	data := &ClickSession{}
 	has, err := s.Where("cookieid=?", IdStr).Get(data)
+	if !has || err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func GetClickSessionByIP(s *ModelSession, IPStr string) (*ClickSession, error) {
+	if s == nil {
+		s = newAutoCloseModelsSession()
+	}
+	data := &ClickSession{}
+	has, err := s.Where("agentip=?", IPStr).Get(data)
+	// TOASK not only one?
 	if !has || err != nil {
 		return nil, err
 	}

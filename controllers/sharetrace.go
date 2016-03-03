@@ -331,7 +331,7 @@ func WebBeacon(c *gin.Context) {
 	// if exist stcookieid, return
 	old_cookie, err := c.Request.Cookie("stcookieid")
 	if err == nil {
-		if old_cookie.Value == "" {
+		if old_cookie == nil || old_cookie.Value == "" {
 		} else {
 			log.Println("Exist stcookieid:", old_cookie.Value)
 			return
@@ -354,34 +354,22 @@ func WebBeacon(c *gin.Context) {
 		return
 	}
 
-	click_type := 0
+	click_type := conf.CLICK_TYPE_COOKIE
 	agent := c.Request.Header.Get("User-Agent")
 	if agent == "" {
 		log.Println("No client agent")
 		return
 	} else {
-		if strings.Contains(agent, "Safari") {
-			click_type = 0
+		if strings.Contains(agent, "Safari") && !strings.Contains(agent, "Chrome") {
+			click_type = conf.CLICK_TYPE_COOKIE
 		} else {
-			click_type = 1
+			click_type = conf.CLICK_TYPE_IP
 		}
 	}
 
-	//HACK
-	//click_type = 1
-
-	if click_type == 0 {
-		if old_cookie.Value == "" {
-			//
-		} else {
-			// if already exist cookie cache, return
-			idStr, err := caches.GetClickSessionIdByCookieid(old_cookie.Value)
-			if err == nil && idStr != "" {
-				log.Println("Exist cookie:", old_cookie.Value)
-				return
-			}
-		}
-	} else if click_type == 1 {
+	if click_type == conf.CLICK_TYPE_COOKIE {
+	} else if click_type == conf.CLICK_TYPE_IP {
+		// if cookie forbidden by client, we can use IP
 		idStr, err := caches.GetClickSessionIdByIP(clientIP)
 		// if already exist IP cache, return
 		if err == nil && idStr != "" {
@@ -410,7 +398,7 @@ func WebBeacon(c *gin.Context) {
 	}
 
 	data.Shareid = shareid
-	cookieid := fmt.Sprintf("st_%d_%d", shareid, id)
+	cookieid := fmt.Sprintf("%s_%d_%d", conf.COOKIE_PREFIX, shareid, id)
 	data.Cookieid = cookieid
 	data.ClickType = click_type
 	data.Agent = agent
@@ -418,7 +406,7 @@ func WebBeacon(c *gin.Context) {
 
 	data.CreatedUTC = utils.GetNowSecond()
 
-	log.Println("Generate data:%s", data)
+	log.Println("Webbeacon clicksession data:%s", data)
 
 	// insert to db
 	err = models.InsertDBModel(nil, data)

@@ -1,5 +1,14 @@
 # ST: sharetrace
 
+
+## 管理界面
+####登录账号
+*URL :<http://st.apptao.com/web>
+*账号:guest@apppwill.com
+*密码:123456
+
+####效果图
+ ![image](https://github.com/appwilldev/sharetrace/blob/master/web/img/stat_demo.png)
 ---
 
 ## 分享

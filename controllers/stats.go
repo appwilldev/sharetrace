@@ -53,7 +53,7 @@ func StatsTotal(c *gin.Context) {
 
 	var delta int
 	delta = 7
-	time_now := time.Now().AddDate(0, 0, -delta)
+	time_now := time.Now().AddDate(0, 0, -delta+1)
 
 	var t_start int64
 	if len(q["start"]) > 0 {

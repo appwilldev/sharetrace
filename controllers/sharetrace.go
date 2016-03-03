@@ -466,40 +466,48 @@ func WebBeaconCheck(c *gin.Context) {
 
 	// TODO get cookie, ip, return , then  write to db
 	idStr := ""
-	cookieid := ""
-	clientIP := c.ClientIP()
 	old_cookie, err := c.Request.Cookie("stcookieid")
-	if err == nil && old_cookie != nil && old_cookie.Value != "" {
-		cookieid = old_cookie.Value
-		idStr, err = caches.GetClickSessionIdByCookieid(old_cookie.Value)
-		if err == nil && idStr != "" {
-			log.Println("Error!!! Exist cookie but no isStr:", old_cookie.Value)
-		}
+	click_type := conf.CLICK_TYPE_COOKIE
+	trackid := ""
 
+	if err == nil && old_cookie != nil && old_cookie.Value != "" {
+		click_type = conf.CLICK_TYPE_COOKIE
+		trackid = old_cookie.Value
 	} else {
-		idStr, err = caches.GetClickSessionIdByIP(clientIP)
-		if err == nil && idStr != "" {
-			log.Println("Exist IP but no isStr:", old_cookie.Value)
+		click_type = conf.CLICK_TYPE_IP
+		trackid = c.ClientIP()
+	}
+
+	idStr, _ = caches.GetClickSessionId(click_type, trackid)
+	if idStr == "" {
+		old_data, err := models.GetClickSession(nil, click_type, trackid)
+		if err == nil && old_data != nil {
+			log.Println("No cache for data and recached")
+			_ = caches.NewClickSession(old_data)
+			idStr, _ = caches.GetClickSessionId(click_type, trackid)
+		} else {
+			Error(c, SERVER_ERROR, nil, err.Error())
+			return
 		}
 	}
 
 	if idStr == "" {
-		log.Println("Exist IP but no isStr:", old_cookie.Value)
+		log.Println("No cache or db! Data:", click_type, trackid)
+		// TODO newuser not from share
 		return
 	} else {
 		id, _ := strconv.ParseInt(idStr, 10, 64)
-		data, err := caches.GetClickSessionModelInfoById(id)
-		if err != nil {
-			Error(c, SERVER_ERROR, nil, err.Error())
-			return
-		}
+		data, _ := caches.GetClickSessionModelInfoById(id)
 
-		if data.Status == 0 {
-			if cookieid != "" && data.Cookieid == cookieid {
-			} else if clientIP != "" && data.AgentIP == clientIP {
-				data.Installid = clientIP
-				data.ClickType = conf.CLICK_TYPE_IP
+		if data.Status == conf.CLICK_SESSION_STATUS_CLICK {
+			if click_type == conf.CLICK_TYPE_COOKIE && data.Cookieid == trackid {
+				// get installid by install API
+			} else if click_type == conf.CLICK_TYPE_IP && data.AgentIP == trackid {
+				if data.Installid == "" {
+					data.Installid = trackid
+				}
 			}
+			data.ClickType = click_type
 			data.Status = conf.CLICK_SESSION_STATUS_INSTALLED
 			err = models.UpdateDBModel(nil, data)
 			if err != nil {
@@ -511,8 +519,9 @@ func WebBeaconCheck(c *gin.Context) {
 				Error(c, SERVER_ERROR, nil, err.Error())
 				return
 			}
+		} else {
+			log.Println("Duplicated webbeaconcheck! Data:", trackid)
 		}
 
 	}
-	// TODO record new user not from share
 }

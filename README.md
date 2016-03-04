@@ -58,6 +58,24 @@ curl -l -H "Content-type: application/json"       -X POST        -d '{"fromid":"
 * 客户端代码可以参考：<https://github.com/mackuba/SafariAutoLoginTest>
 * Obj-C 核心代码参考：
 ```
+#import <SafariServices/SafariServices.h>
+
+# 主界面的ViewController引入：SFSafariViewControllerDelegate
+
+......
+@property (nonatomic, strong) SFSafariViewController *safariVC;
+......
+
+- (void)viewDidLoad {
+    ......
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"STChecked"]!=YES) {
+            [self displaySafari];
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"STChecked"];
+    }
+    ......
+}
+
+......
 - (void)displaySafari {
     NSString *sURL =[NSString stringWithFormat:@"%@/1/st/webbeaconcheck?appid=%@&installid=%@", @"http://st.apptao.com", @"1042901066", [AWUtilsLite idA]];
     NSURL *url = [NSURL URLWithString:sURL] ;
@@ -68,13 +86,13 @@ curl -l -H "Content-type: application/json"       -X POST        -d '{"fromid":"
     [self presentViewController:self.safariVC animated:NO completion:nil];
 }
 
-#pragma mark - SFSafariViewControllerDelegate
 -(void)safariViewController:(SFSafariViewController *)controller didCompleteInitialLoad:(BOOL)didLoadSuccessfully {
     [self.safariVC dismissViewControllerAnimated:YES completion:nil];
 }
 -(void)safariViewControllerDidFinish:(SFSafariViewController *)controller {
     self.safariVC = nil;
 }
+......
 
 ```
 

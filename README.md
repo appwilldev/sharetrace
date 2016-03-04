@@ -10,8 +10,10 @@
 
 ## 创建账号
 #### 注册管理账号，录入App相关信息
-* URL :<http://st.apptao.com/web>
-* 测试账号:guest@appwill.com,  密码:123456
+* URL : <http://st.apptao.com/web>
+```
+测试账号: guest@appwill.com,  密码:123456
+```
 ---
 
 ## 记录分享
@@ -56,43 +58,5 @@ curl -l -H "Content-type: application/json"       -X POST        -d '{"fromid":"
 * installid: 必填, 用户ID, 可以用IDFA，或者注册后的UserID，但是不要混用
 ```
 * 客户端代码可以参考：<https://github.com/mackuba/SafariAutoLoginTest>
-* Obj-C 核心代码参考：
-```
-#import <SafariServices/SafariServices.h>
-
-# 主界面的ViewController引入：SFSafariViewControllerDelegate
-
-......
-@property (nonatomic, strong) SFSafariViewController *safariVC;
-......
-
-- (void)viewDidLoad {
-    ......
-    if([[NSUserDefaults standardUserDefaults] boolForKey:@"STChecked"]!=YES) {
-            [self displaySafari];
-            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"STChecked"];
-    }
-    ......
-}
-
-......
-- (void)displaySafari {
-    NSString *sURL =[NSString stringWithFormat:@"%@/1/st/webbeaconcheck?appid=%@&installid=%@", @"http://st.apptao.com", @"1042901066", [AWUtilsLite idA]];
-    NSURL *url = [NSURL URLWithString:sURL] ;
-    self.safariVC = [[SFSafariViewController alloc]initWithURL:url entersReaderIfAvailable:YES];
-    self.safariVC.delegate = self;
-    self.safariVC.modalPresentationStyle = UIModalPresentationOverCurrentContext;
-    self.safariVC.view.alpha = 0.0;
-    [self presentViewController:self.safariVC animated:NO completion:nil];
-}
-
--(void)safariViewController:(SFSafariViewController *)controller didCompleteInitialLoad:(BOOL)didLoadSuccessfully {
-    [self.safariVC dismissViewControllerAnimated:YES completion:nil];
-}
--(void)safariViewControllerDidFinish:(SFSafariViewController *)controller {
-    self.safariVC = nil;
-}
-......
-
-```
+* Obj-C 核心代码参考： <https://github.com/appwilldev/sharetrace/blob/master/web/js/objcexam.m>
 

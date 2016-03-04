@@ -52,16 +52,15 @@
 
 ## 跟踪安装
 
-#### 客户端打开ST的指定页面，获取stcookieid，作为trackid
-* 采用SFSafariViewController 可以打开一个透明的View，从下面的URL获取ST域名下面的stcookieid,然后关掉这个View
+#### 客户端打开ST的指定页面
+* 这个动作不会对客户端体验有任何影响，不用跳出App到Safari，可以理解为在后台打开一个View，然后自动关闭了
+* 原理是采用SFSafariViewController 打开一个透明的View，ST会从URL获取ST域名下面的stcookieid
  
 * URL: http://st.apptao.com/1/st/webbeaconcheck?appid=???&installid=???
 ```
 * appid:必填, 就是用户在管理系统中配置的appid，此参数必须有
 * installid: 必填, 用户ID, 可以用IDFA，或者注册后的UserID，但是不要混用
 ```
-
-* SFSafariViewController打开的URL会跟据App Schema（比如：avft）跳回来，并且带上stcookieid, 比如：avft://stcookieid/st_2016_2016, 其中st_2016_2016即stcookieid
 
 * 客户端代码可以参考：<https://github.com/mackuba/SafariAutoLoginTest>
 

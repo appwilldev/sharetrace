@@ -81,7 +81,7 @@ func UpdateDBModel(s *ModelSession, m DBModel) (err error) {
 		s = newAutoCloseModelsSession()
 	}
 
-	_, err = s.Where(whereStr, whereArgs...).Update(m)
+	_, err = s.AllCols().Where(whereStr, whereArgs...).Update(m)
 
 	return
 }

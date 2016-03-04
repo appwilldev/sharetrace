@@ -23,7 +23,7 @@
     self.safariVC.delegate = self;
     self.safariVC.modalPresentationStyle = UIModalPresentationOverCurrentContext;
     self.safariVC.view.alpha = 0.0;
-    [self presentViewController:self.safariVC animated:NO completion:nil];
+    [self.presentedViewController presentViewController:self.safariVC animated:NO completion:nil];
 }
 
 -(void)safariViewController:(SFSafariViewController *)controller didCompleteInitialLoad:(BOOL)didLoadSuccessfully {

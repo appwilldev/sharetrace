@@ -4,19 +4,7 @@
 </head> 
 
 <script> 
-    var c = document.cookie; 
-    var m = c.match(/stcookieid=(\w+)/);
-    //console.log(m);
-    
-    var name;
-    if (m) {
-      name = m[1];
-      location.href = "{{.appschema}}://stcookieid/" + name;
-    } else {
-      name = "";
-      location.href = "{{.appschema}}://stcookieid/" + name;
-    }
-    
+    location.href = "{{.appschema}}://";
 </script>
 
 <body> 

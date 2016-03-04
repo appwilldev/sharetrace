@@ -379,7 +379,10 @@ func WebBeacon(c *gin.Context) {
 	}
 
 	idShareStr, err := caches.GetShareURLIdByUrl(share_url)
-	if err != nil {
+	if err != nil || idShareStr == "" {
+		if err == nil {
+			err = fmt.Errorf("No cache for share url:", share_url)
+		}
 		log.Println(err.Error())
 		return
 	}
@@ -498,13 +501,6 @@ func WebBeaconCheck(c *gin.Context) {
 
 		if data.Status == conf.CLICK_SESSION_STATUS_CLICK {
 			data.Installid = installid
-			//if click_type == conf.CLICK_TYPE_COOKIE && data.Cookieid == trackid {
-			//	// get installid by install API
-			//} else if click_type == conf.CLICK_TYPE_IP && data.AgentIP == trackid {
-			//	if data.Installid == "" {
-			//		data.Installid = trackid
-			//	}
-			//}
 			data.ClickType = click_type
 			data.Status = conf.CLICK_SESSION_STATUS_INSTALLED
 			err = models.UpdateDBModel(nil, data)

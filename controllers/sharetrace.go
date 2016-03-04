@@ -219,70 +219,70 @@ func Share(c *gin.Context) {
 //	c.JSON(200, ret)
 //}
 
-func Install(c *gin.Context) {
-	var postData struct {
-		Installid string `json:"installid" binding:"required"`
-		//ClickType int    `json:"click_type" binding:"required"` -- TOASK
-		ClickType int    `json:"click_type"`
-		Trackid   string `json:"trackid"`
-	}
-	err := c.BindJSON(&postData)
-	if err != nil {
-		Error(c, BAD_POST_DATA, nil, err.Error())
-		return
-	}
-
-	idStr := ""
-
-	idStr, err = caches.GetClickSessionId(postData.ClickType, postData.Trackid)
-	if err != nil || idStr == "" {
-		old_data, err := models.GetClickSession(nil, postData.ClickType, postData.Trackid)
-		if err == nil && old_data != nil {
-			log.Println("No cache for data and recached:", postData)
-			_ = caches.NewClickSession(old_data)
-			idStr, _ = caches.GetClickSessionId(postData.ClickType, postData.Trackid)
-		} else {
-			Error(c, SERVER_ERROR, nil, err.Error())
-			return
-		}
-	}
-
-	// TODO record new user not from share
-	log.Println("Get idStr:", idStr)
-
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
-		Error(c, SERVER_ERROR, nil, err.Error())
-		return
-	}
-
-	data, err := caches.GetClickSessionModelInfoById(id)
-	if err != nil {
-		Error(c, SERVER_ERROR, nil, err.Error())
-		return
-	}
-
-	if data.Status == conf.CLICK_SESSION_STATUS_CLICK || data.Installid == "" {
-		data.Status = conf.CLICK_SESSION_STATUS_INSTALLED
-		data.Installid = postData.Installid
-		data.ClickType = postData.ClickType
-		err = models.UpdateDBModel(nil, data)
-		if err != nil {
-			Error(c, SERVER_ERROR, nil, err.Error())
-			return
-		}
-		err = caches.UpdateClickSession(data)
-		if err != nil {
-			Error(c, SERVER_ERROR, nil, err.Error())
-			return
-		}
-	} else {
-		log.Println("Duplicated install notify! Data:", postData)
-	}
-
-	ret := gin.H{"status": true}
-	c.JSON(200, ret)
-}
+//func Install(c *gin.Context) {
+//	var postData struct {
+//		Installid string `json:"installid" binding:"required"`
+//		//ClickType int    `json:"click_type" binding:"required"` -- TOASK
+//		ClickType int    `json:"click_type"`
+//		Trackid   string `json:"trackid"`
+//	}
+//	err := c.BindJSON(&postData)
+//	if err != nil {
+//		Error(c, BAD_POST_DATA, nil, err.Error())
+//		return
+//	}
+//
+//	idStr := ""
+//
+//	idStr, err = caches.GetClickSessionId(postData.ClickType, postData.Trackid)
+//	if err != nil || idStr == "" {
+//		old_data, err := models.GetClickSession(nil, postData.ClickType, postData.Trackid)
+//		if err == nil && old_data != nil {
+//			log.Println("No cache for data and recached:", postData)
+//			_ = caches.NewClickSession(old_data)
+//			idStr, _ = caches.GetClickSessionId(postData.ClickType, postData.Trackid)
+//		} else {
+//			Error(c, SERVER_ERROR, nil, err.Error())
+//			return
+//		}
+//	}
+//
+//	// TODO record new user not from share
+//	log.Println("Get idStr:", idStr)
+//
+//	id, err := strconv.ParseInt(idStr, 10, 64)
+//	if err != nil {
+//		Error(c, SERVER_ERROR, nil, err.Error())
+//		return
+//	}
+//
+//	data, err := caches.GetClickSessionModelInfoById(id)
+//	if err != nil {
+//		Error(c, SERVER_ERROR, nil, err.Error())
+//		return
+//	}
+//
+//	if data.Status == conf.CLICK_SESSION_STATUS_CLICK || data.Installid == "" {
+//		data.Status = conf.CLICK_SESSION_STATUS_INSTALLED
+//		data.Installid = postData.Installid
+//		data.ClickType = postData.ClickType
+//		err = models.UpdateDBModel(nil, data)
+//		if err != nil {
+//			Error(c, SERVER_ERROR, nil, err.Error())
+//			return
+//		}
+//		err = caches.UpdateClickSession(data)
+//		if err != nil {
+//			Error(c, SERVER_ERROR, nil, err.Error())
+//			return
+//		}
+//	} else {
+//		log.Println("Duplicated install notify! Data:", postData)
+//	}
+//
+//	ret := gin.H{"status": true}
+//	c.JSON(200, ret)
+//}
 
 func Score(c *gin.Context) {
 	q := c.Request.URL.Query()
@@ -442,8 +442,17 @@ func WebBeaconCheck(c *gin.Context) {
 	}
 
 	app, err := models.GetAppInfoByAppid(nil, appid)
-	if err != nil {
+	if err != nil || app == nil {
+		if err == nil {
+			err = fmt.Errorf("app nil")
+		}
 		Error(c, DATA_NOT_FOUND, nil, err.Error())
+		return
+	}
+
+	installid := q["installid"][0]
+	if installid == "" {
+		Error(c, BAD_REQUEST, nil, "No installid")
 		return
 	}
 
@@ -488,13 +497,14 @@ func WebBeaconCheck(c *gin.Context) {
 		data, _ := caches.GetClickSessionModelInfoById(id)
 
 		if data.Status == conf.CLICK_SESSION_STATUS_CLICK {
-			if click_type == conf.CLICK_TYPE_COOKIE && data.Cookieid == trackid {
-				// get installid by install API
-			} else if click_type == conf.CLICK_TYPE_IP && data.AgentIP == trackid {
-				if data.Installid == "" {
-					data.Installid = trackid
-				}
-			}
+			data.Installid = installid
+			//if click_type == conf.CLICK_TYPE_COOKIE && data.Cookieid == trackid {
+			//	// get installid by install API
+			//} else if click_type == conf.CLICK_TYPE_IP && data.AgentIP == trackid {
+			//	if data.Installid == "" {
+			//		data.Installid = trackid
+			//	}
+			//}
 			data.ClickType = click_type
 			data.Status = conf.CLICK_SESSION_STATUS_INSTALLED
 			err = models.UpdateDBModel(nil, data)

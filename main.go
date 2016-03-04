@@ -115,10 +115,10 @@ func main() {
 		stAPIV1.POST("/share", authHandler(), controllers.Share)
 		//stAPIV1.POST("/click", authHandler(), controllers.Click)
 		//stAPIV1.POST("/agentclick", authHandler(), controllers.AgentClick)
-		stAPIV1.GET("/score", controllers.Score)
+		//stAPIV1.POST("/install", authHandler(), controllers.Install)
 		stAPIV1.GET("/webbeacon", controllers.WebBeacon)
 		stAPIV1.GET("/webbeaconcheck", controllers.WebBeaconCheck)
-		stAPIV1.POST("/install", authHandler(), controllers.Install)
+		stAPIV1.GET("/score", controllers.Score)
 	}
 
 	// op api

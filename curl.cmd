@@ -25,6 +25,8 @@ curl -l -H "Content-type: application/json" -X POST  -d '{"share_url":"http://ap
 
 curl "http://localhost:8580/1/st/webbeacon?share_url=http%3A%2F%2Fappforvideo.com%2Fv%2F8923%3Fapp%3DAV_FunnyTime%26from%3D8934"
 
+curl "http://localhost:8580/1/st/webbeaconcheck?appid=1042901066&installid=ccccccc"
+
 
 ////////////////////////// 
 curl -l -H "Content-type: application/json" "http://localhost:8580/1/stats/share?appid=123"

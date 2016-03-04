@@ -88,3 +88,14 @@ func getUserIdFromContext(c *gin.Context) int64 {
 	log.Println("getUserIdFromContext userid:", s)
 	return s.(int64)
 }
+
+func GetRequestLogDataFromContext(c *gin.Context) *RequestLogData {
+	i, exists := c.Get("request_log")
+	if !exists || i == nil {
+		return nil
+	}
+
+	data := i.(*RequestLogData)
+
+	return data
+}

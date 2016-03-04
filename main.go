@@ -3,21 +3,46 @@ package main
 import (
 	"log"
 	"net/http"
-
-	//"time"
-
 	"os"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	//"strings"
 
 	"github.com/appwilldev/sharetrace/conf"
 	"github.com/appwilldev/sharetrace/controllers"
+	"github.com/appwilldev/sharetrace/logger"
 	"github.com/appwilldev/sharetrace/utils"
 	"github.com/facebookgo/grace/gracehttp"
 	"github.com/gin-gonic/gin"
 )
+
+func requestLogger() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		start := time.Now()
+		c.Next()
+
+		dur := time.Since(start) / time.Millisecond
+
+		requestLogData := controllers.GetRequestLogDataFromContext(c)
+		logInfo := map[string]interface{}{
+			"code":   c.Writer.Status(),
+			"dur":    dur,
+			"remote": c.ClientIP(),
+			"url":    c.Request.URL.Path,
+			"query":  c.Request.URL.RawQuery,
+			"method": c.Request.Method,
+			"data":   requestLogData,
+		}
+
+		if c.Writer.Status() >= 400 {
+			logger.RequestLogger.Error(logInfo)
+		} else {
+			logger.RequestLogger.Info(logInfo)
+		}
+	}
+}
 
 func authHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -56,6 +81,7 @@ func main() {
 
 	ginIns := gin.New()
 	ginIns.Use(gin.Recovery())
+	ginIns.Use(requestLogger())
 
 	if conf.DebugMode {
 		ginIns.Use(gin.Logger())

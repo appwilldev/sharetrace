@@ -147,6 +147,11 @@ func main() {
 		stAPIV1.GET("/score", controllers.Score)
 	}
 
+	ctAPIV1 := ginIns.Group("/1/ct")
+	{
+		ctAPIV1.GET("/webbeacon", controllers.WebBeaconCT)
+	}
+
 	// op api
 	opAPIGroup := ginIns.Group("/op")
 	{

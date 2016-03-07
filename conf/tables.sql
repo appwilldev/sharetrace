@@ -86,3 +86,20 @@ CREATE TABLE app_info (
 CREATE UNIQUE INDEX uidx_ai_appid ON app_info(appid);                                 
 -- 同appid， 同ida，只算一个? 客户端要判断，用户是否已经安装过了
 -- 用户安装了，删除了，又安装了, 怎么算
+
+-- ShareTrace 简化版本 ClickTrace
+-- agentid：  md5(click_url, agent, agentip)
+CREATE SEQUENCE click_trace_id START 2016 NO CYCLE;
+CREATE TABLE click_trace(
+    id BIGINT NOT NULL PRIMARY KEY,                                                 
+    click_url VARCHAR(1024) DEFAULT NULL,
+    url_host VARCHAR(256) DEFAULT NULL,
+    agent VARCHAR(1024) DEFAULT NULL,
+    agentip VARCHAR(256) DEFAULT NULL,
+    agentid VARCHAR(1024) DEFAULT NULL,                                             
+    des TEXT DEFAULT NULL,                                                          
+    status INT DEFAULT 0,                                                           
+    created_utc INT                                                                 
+);                                                                                  
+CREATE UNIQUE INDEX uidx_ct_agentid ON click_trace(agentid);
+ 

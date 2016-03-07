@@ -35,3 +35,10 @@ SELECT count(*) FROM "share_url" INNER JOIN "click_session" ON share_url.id=clic
 
 
 SELECT count(*), (date(to_timestamp(click_session.created_utc)))  FROM "share_url" INNER JOIN "click_session" ON share_url.id=click_session.shareid WHERE ((appid='123') AND (installid is not null)) group by date(to_timestamp(click_session.created_utc)) ;
+
+
+
+//////
+
+curl "http://localhost:8580/1/ct/webbeacon?share_url=http%3A%2F%2Fappforvideo.com%2Fv%2F8923%3Fapp%3DAV_FunnyTime%26from%3D8934"
+

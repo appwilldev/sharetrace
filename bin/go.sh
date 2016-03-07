@@ -11,3 +11,5 @@ GOOS=linux  GOARCH=amd64 go build -o $OUT
 
 OUT2=st_linux_amd64_new
 scp $OUT sharetrace@beijing6.appdao.com:~/sharetrace/$OUT2
+
+#kill -SIGUSR2 $pid

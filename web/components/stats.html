@@ -125,7 +125,7 @@
                 }
                 //console.log(series_line);
                 series_data.push(series_line);
-                loudou_series_data.push({value:parseInt(total_dict[key]*100/total_share), name:key});
+                loudou_series_data.push({value:total_dict[key],percent:parseInt(total_dict[key]*100/total_share), name:key});
             }
 
 
@@ -174,7 +174,7 @@
                 },
                 tooltip : {
                     trigger: 'item',
-                    formatter: "{a} <br/>{b} : {c}%"
+                    formatter: "{a} <br/>{b} : {c}"
                 },
                 toolbox: {
                     show : true,
@@ -196,16 +196,14 @@
                         type:'funnel',
                         left: '10%',
                         top: 60,
-                        //x2: 80,
                         bottom: 60,
                         width: '80%',
-                        // height: {totalHeight} - y - y2,
-                        min: 0,
-                        max: 10,
-                        minSize: '0%',
-                        maxSize: '100%',
+                        //min: 0,
+                        //max: 10,
+                        //minSize: '0%',
+                        //maxSize: '100%',
                         sort : 'descending',
-                        gap : 2,
+                        //gap : 2,
                         label: {
                             normal: {
                                 show: true,
@@ -229,7 +227,14 @@
                         itemStyle: {
                             normal: {
                                 borderColor: '#fff',
-                                borderWidth: 1
+                                borderWidth: 1,
+                                label: {
+                                    position: 'inside',
+                                    formatter: '{b} : {c}',
+                                    textStyle: {
+                                        color: '#fff'
+                                     }
+                                 }
                             }
                         },
                         data:loudou_series_data

@@ -272,7 +272,7 @@ func WebBeacon(c *gin.Context) {
 	}
 
 	// cache clicksession by cookie / IP
-	err = caches.NewClickSession(data)
+	err = caches.SetClickSession(data)
 	if err != nil {
 		log.Println(err.Error())
 		return
@@ -395,7 +395,7 @@ func WebBeaconCheck(c *gin.Context) {
 		old_data, err := models.GetClickSession(nil, click_type, trackid)
 		if err == nil && old_data != nil {
 			log.Println("No cache for data and recached")
-			_ = caches.NewClickSession(old_data)
+			_ = caches.SetClickSession(old_data)
 			idStr, _ = caches.GetClickSessionId(click_type, trackid)
 		} else {
 			Error(c, SERVER_ERROR, nil, err.Error())

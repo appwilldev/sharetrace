@@ -3,13 +3,9 @@ package caches
 import (
 	"encoding/json"
 	"fmt"
-	"log"
-	"strings"
-
 	"github.com/appwilldev/sharetrace/cache"
 	"github.com/appwilldev/sharetrace/conf"
 	"github.com/appwilldev/sharetrace/models"
-	"github.com/bitly/go-simplejson"
 )
 
 func init() {
@@ -26,20 +22,6 @@ func GetShareURLModelInfoById(id int64) (*models.ShareURL, error) {
 	fillJsonModelInfo(v, j)
 
 	return v, nil
-}
-
-func GetShareURLJsonModelInfo(id int64) (*simplejson.Json, error) {
-	data, err := cache.Get(conf.DEFAULT_CACHE_DB_NAME, getShareURLInfoCacheKey(id))
-	if err != nil {
-		return nil, err
-	}
-
-	j, err := simplejson.NewFromReader(strings.NewReader(data))
-	if err != nil {
-		return nil, err
-	}
-
-	return j, nil
 }
 
 func GetShareURLIdByUrl(url string) (string, error) {
@@ -59,7 +41,6 @@ func UpdateShareURL(data *models.ShareURL) error {
 func SetShareURL(data *models.ShareURL) error {
 	err := UpdateShareURL(data)
 	if err != nil {
-		log.Println("Failed to cache info %s", err.Error())
 		return fmt.Errorf("Failed to cache info %s", err.Error())
 	}
 	// Set url cache map

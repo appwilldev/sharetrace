@@ -9,7 +9,7 @@ curl -l -H "Content-type: application/json" "http://localhost:8580/1/app/all"
 
 ////////////////////////// 
 
-curl -l -H "Content-type: application/json" -X POST  -d '{"fromid":"8888","appid":"1042901066", "itemid":"13104","share_url":"http://appforvideo.com/v/13104?app=AV_FunnyTime&fromid=8888","appname":"AV_FunnyTime", "channel":"weixin", "des":"test"}' "http://192.168.1.17:8580/1/st/share"
+curl -l -H "Content-type: application/json" -X POST  -d '{"fromid":"8888","appid":"1042901066", "itemid":"13104","share_url":"http://appforvideo.com/v/13104?app=AV_FunnyTime&fromid=8888","appname":"AV_FunnyTime", "channel":"weixin", "des":"test"}' "http://localhost:8580/1/st/share"
 
 curl -l -H "Content-type: application/json" -X POST  -d '{"share_url":"http://appforvideo.com/v/8923?app=AV_FunnyTime&from=8934"}' "http://localhost:8580/1/st/click"
 

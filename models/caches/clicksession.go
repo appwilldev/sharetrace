@@ -3,12 +3,9 @@ package caches
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
-
 	"github.com/appwilldev/sharetrace/cache"
 	"github.com/appwilldev/sharetrace/conf"
 	"github.com/appwilldev/sharetrace/models"
-	"github.com/bitly/go-simplejson"
 )
 
 func init() {
@@ -27,20 +24,6 @@ func GetClickSessionModelInfoById(id int64) (*models.ClickSession, error) {
 	return v, nil
 }
 
-func GetClickSessionJsonModelInfo(id int64) (*simplejson.Json, error) {
-	data, err := cache.Get(conf.DEFAULT_CACHE_DB_NAME, getClickSessionInfoCacheKey(id))
-	if err != nil {
-		return nil, err
-	}
-
-	j, err := simplejson.NewFromReader(strings.NewReader(data))
-	if err != nil {
-		return nil, err
-	}
-
-	return j, nil
-}
-
 func GetClickSessionId(clicktype int, parastr string) (string, error) {
 	if clicktype == conf.CLICK_TYPE_COOKIE {
 		return GetClickSessionIdByCookieid(parastr)
@@ -50,24 +33,25 @@ func GetClickSessionId(clicktype int, parastr string) (string, error) {
 	return "", fmt.Errorf("ClickType Error")
 }
 
-func GetClickSessionIdByCookieid(idStr string) (string, error) {
-	data, err := cache.Get(conf.DEFAULT_CACHE_DB_NAME, getClickSessionIdCacheKeyByCookieid(idStr))
+func GetClickSessionIdByCookieid(str string) (string, error) {
+	data, err := cache.Get(conf.DEFAULT_CACHE_DB_NAME, getClickSessionIdCacheKeyByCookieid(str))
 	if err != nil {
 		return "", err
 	}
 	return data, err
 }
 
-func GetClickSessionIdByIP(IPStr string) (string, error) {
-	data, err := cache.Get(conf.DEFAULT_CACHE_DB_NAME, getClickSessionIdCacheKeyByIP(IPStr))
+// IP can not make sure unique, the latest will overwride the older
+func GetClickSessionIdByIP(str string) (string, error) {
+	data, err := cache.Get(conf.DEFAULT_CACHE_DB_NAME, getClickSessionIdCacheKeyByIP(str))
 	if err != nil {
 		return "", err
 	}
 	return data, err
 }
 
-func GetClickSessionIdByAgentId(idStr string) (string, error) {
-	data, err := cache.Get(conf.DEFAULT_CACHE_DB_NAME, getClickSessionIdCacheKeyByAgentId(idStr))
+func GetClickSessionIdByAgentId(str string) (string, error) {
+	data, err := cache.Get(conf.DEFAULT_CACHE_DB_NAME, getClickSessionIdCacheKeyByAgentId(str))
 	if err != nil {
 		return "", err
 	}
@@ -81,7 +65,7 @@ func UpdateClickSession(data *models.ClickSession) error {
 	return err
 }
 
-func NewClickSession(data *models.ClickSession) error {
+func SetClickSession(data *models.ClickSession) error {
 	err := UpdateClickSession(data)
 	if err != nil {
 		return fmt.Errorf("Failed to cache clicksession info %s", err.Error())

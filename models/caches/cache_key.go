@@ -18,12 +18,12 @@ func getShareURLInfoCacheKey(id int64) string {
 	return fmt.Sprintf("sui_%d", id)
 }
 
-func getShareURLInfoCacheKeyStr(idstr string) string {
-	return "sui_" + idstr
+func getShareURLInfoCacheKeyStr(str string) string {
+	return "sui_" + str
 }
 
-func getShareURLIdCacheKeyByURL(url string) string {
-	return fmt.Sprintf("su_id_by_url_%s", url)
+func getShareURLIdCacheKeyByURL(str string) string {
+	return fmt.Sprintf("su_id_by_url_%s", str)
 }
 
 // clicksession
@@ -31,18 +31,18 @@ func getClickSessionInfoCacheKey(id int64) string {
 	return fmt.Sprintf("csi_%d", id)
 }
 
-func getClickSessionInfoCacheKeyStr(idStr string) string {
-	return "csi_" + idStr
+func getClickSessionInfoCacheKeyStr(str string) string {
+	return "csi_" + str
 }
 
-func getClickSessionIdCacheKeyByCookieid(idStr string) string {
-	return fmt.Sprintf("cs_id_by_cookieid_%s", idStr)
+func getClickSessionIdCacheKeyByCookieid(str string) string {
+	return fmt.Sprintf("cs_id_by_cookieid_%s", str)
 }
 
-func getClickSessionIdCacheKeyByIP(IPStr string) string {
-	return fmt.Sprintf("cs_id_by_agentip_%s", IPStr)
+func getClickSessionIdCacheKeyByIP(str string) string {
+	return fmt.Sprintf("cs_id_by_agentip_%s", str)
 }
 
-func getClickSessionIdCacheKeyByAgentId(idStr string) string {
-	return fmt.Sprintf("cs_id_by_agentid_%s", idStr)
+func getClickSessionIdCacheKeyByAgentId(str string) string {
+	return fmt.Sprintf("cs_id_by_agentid_%s", str)
 }

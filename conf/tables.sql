@@ -37,8 +37,8 @@ CREATE UNIQUE INDEX uidx_su_urlfrom ON share_url(share_url, fromid, itemid, appi
 CREATE SEQUENCE click_session_id START 2016 NO CYCLE;                                        
 CREATE TABLE click_session(
     id BIGINT NOT NULL PRIMARY KEY,                                                 
-    shareid BIGINT  NOT NULL,                                                
-    cookieid VARCHAR(2048) NOT NULL,                                                
+    shareid BIGINT  DEFAULT 0,                                                
+    cookieid VARCHAR(2048) DEFAULT NULL,
     installid  VARCHAR(256) DEFAULT NULL,                                             
     click_type INT DEFAULT 0,                                                           
     agent VARCHAR(1024) DEFAULT NULL,                                             
@@ -47,12 +47,18 @@ CREATE TABLE click_session(
     buttonid VARCHAR(256) DEFAULT NULL,                                             
     url_host VARCHAR(256) DEFAULT NULL,
     click_url VARCHAR(2048) DEFAULT NULL,                                                
-    des TEXT DEFAULT NULL,                                                          
-    status INT DEFAULT 0,                                                           
-    created_utc INT                                                                 
+    des TEXT DEFAULT NULL,
+    status INT DEFAULT 0,
+    created_utc INT
 );                                                                                  
-CREATE UNIQUE INDEX uidx_cs_cookieid ON click_session(cookieid);                                 
+CREATE INDEX idx_cs_cookieid ON click_session(cookieid);                                 
+CREATE INDEX idx_cs_agentid ON click_session(agentid);                                 
 CREATE INDEX idx_cs_shareid ON click_session(shareid);                                 
+
+--alter table click_session alter column cookieid  drop not null;
+--alter table click_session alter column shareid drop not null;
+--alter table click_session alter column cookieid  set default null;
+--alter table click_session alter column shareid  set default 0;
 --ALTER TABLE click_session ADD COLUMN click_type int default 0;
 --ALTER TABLE click_session ADD COLUMN agent varchar(1024) default null;
 --ALTER TABLE click_session ADD COLUMN agentip varchar(256) default null;

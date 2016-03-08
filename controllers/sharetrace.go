@@ -165,10 +165,16 @@ func WebBeacon(c *gin.Context) {
 		log.Println("Error, No share_url para!")
 		return
 	}
+	u, err := url.Parse(share_url)
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
 	idShareStr, err := caches.GetShareURLIdByUrl(share_url)
 	var shareid int64
 	if err != nil {
 		log.Println(err.Error())
+		// not return when redis_nil_value
 	} else {
 		shareid, err = strconv.ParseInt(idShareStr, 10, 64)
 		if err != nil {
@@ -198,6 +204,11 @@ func WebBeacon(c *gin.Context) {
 		}
 	}
 
+	md5Ctx := md5.New()
+	agent_info := fmt.Sprintf("%s_%s_%s", share_url, clientIP, agent)
+	md5Ctx.Write([]byte(agent_info))
+	agentid := hex.EncodeToString(md5Ctx.Sum(nil))
+
 	if click_type == conf.CLICK_TYPE_COOKIE {
 	} else if click_type == conf.CLICK_TYPE_IP {
 		// if cookie forbidden by client, we can use IP
@@ -206,7 +217,13 @@ func WebBeacon(c *gin.Context) {
 		if err == nil && idStr != "" {
 			log.Println("Exist IP:", clientIP)
 			// TODO:没有 cookie，但是同IP， 不同Agent呢？
-			return
+			// if exist stagentid, return
+			_, err = caches.GetClickSessionIdByAgentId(agentid)
+			if err != nil {
+				log.Println("Exist IP but no such agentid:", agentid)
+			} else {
+				return
+			}
 		}
 	}
 
@@ -223,20 +240,15 @@ func WebBeacon(c *gin.Context) {
 	data.Agent = agent
 	data.AgentIP = clientIP
 	data.CreatedUTC = utils.GetNowSecond()
+	data.URLHost = u.Host
+	data.ClickURL = share_url
 
-	cookieid := ""
 	if shareid > 0 {
 		data.Shareid = shareid
-		cookieid = fmt.Sprintf("%s_%d_%d", conf.COOKIE_PREFIX, shareid, id)
-		data.Cookieid = cookieid
+		data.Cookieid = fmt.Sprintf("%s_%d_%d", conf.COOKIE_PREFIX, shareid, id)
 	}
 
-	u, _ := url.Parse(share_url)
-	data.URLHost = u.Host
-	md5Ctx := md5.New()
-	agent_info := fmt.Sprintf("%s_%s_%s", share_url, clientIP, agent)
-	md5Ctx.Write([]byte(agent_info))
-	data.AgentId = hex.EncodeToString(md5Ctx.Sum(nil))
+	data.AgentId = agentid
 
 	log.Println("Webbeacon clicksession data:%s", data)
 
@@ -253,18 +265,16 @@ func WebBeacon(c *gin.Context) {
 		return
 	}
 
-	if cookieid != "" {
-		cookie := new(http.Cookie)
+	cookie := new(http.Cookie)
+	if data.Cookieid != "" {
 		cookie.Name = "stcookieid"
-		// cookie cache 7 days
 		cookie.Expires = time.Now().Add(time.Duration(7*86400) * time.Second)
-		cookie.Value = cookieid
+		cookie.Value = data.Cookieid
 		cookie.Path = "/"
 		http.SetCookie(c.Writer, cookie)
 	}
 
 	if data.AgentId != "" {
-		cookie := new(http.Cookie)
 		cookie.Name = "stagentid"
 		cookie.Value = data.AgentId
 		cookie.Path = "/"
@@ -348,14 +358,21 @@ func WebBeaconCheck(c *gin.Context) {
 
 	appschema := app.AppSchema
 
-	data := gin.H{"appschema": appschema}
-	c.HTML(200, "webbeaconcheck.html", data)
-
 	// TODO get cookie, ip, return , then  write to db
 	idStr := ""
 	old_cookie, err := c.Request.Cookie("stcookieid")
 	click_type := conf.CLICK_TYPE_COOKIE
 	trackid := ""
+
+	//cookie := new(http.Cookie)
+	//cookie.Name = "stcookieid"
+	//cookie.Expires = time.Now().Add(-3600)
+	//cookie.Value = ""
+	//cookie.Path = "/"
+	//http.SetCookie(c.Writer, cookie)
+
+	data := gin.H{"appschema": appschema}
+	c.HTML(200, "webbeaconcheck.html", data)
 
 	if err == nil && old_cookie != nil && old_cookie.Value != "" {
 		click_type = conf.CLICK_TYPE_COOKIE

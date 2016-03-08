@@ -115,19 +115,13 @@ func main() {
 			})
 	}
 
-	userAPIV1 := ginIns.Group("/1/user")
+	stAPIV1 := ginIns.Group("/1/st")
 	{
-		userAPIV1.POST("/register", controllers.Register)
-		userAPIV1.POST("/login", controllers.Login)
-		userAPIV1.POST("/logout", authHandler(), controllers.Logout)
-		userAPIV1.GET("/all", authHandler(), controllers.UserInfoAll)
-	}
-
-	appAPIV1 := ginIns.Group("/1/app")
-	{
-		appAPIV1.POST("/new", authHandler(), controllers.NewApp)
-		appAPIV1.PUT("/update", authHandler(), controllers.UpdateApp)
-		appAPIV1.GET("/all", authHandler(), controllers.AppInfoAll)
+		stAPIV1.POST("/share", authHandler(), controllers.Share)
+		stAPIV1.GET("/webbeacon", controllers.WebBeacon)
+		stAPIV1.GET("/webbeaconbutton", controllers.ClickInstallButton)
+		stAPIV1.GET("/webbeaconcheck", controllers.WebBeaconCheck)
+		stAPIV1.GET("/score", controllers.Score)
 	}
 
 	statsAPIV1 := ginIns.Group("/1/stats")
@@ -136,31 +130,21 @@ func main() {
 		statsAPIV1.GET("/total", controllers.StatsTotal)
 	}
 
-	stAPIV1 := ginIns.Group("/1/st")
-	{
-		stAPIV1.POST("/share", authHandler(), controllers.Share)
-		//stAPIV1.POST("/click", authHandler(), controllers.Click)
-		//stAPIV1.POST("/agentclick", authHandler(), controllers.AgentClick)
-		//stAPIV1.POST("/install", authHandler(), controllers.Install)
-		stAPIV1.GET("/webbeacon", controllers.WebBeacon)
-		stAPIV1.GET("/webbeaconbutton", controllers.ClickInstallButton)
-		stAPIV1.GET("/webbeaconcheck", controllers.WebBeaconCheck)
-		stAPIV1.GET("/score", controllers.Score)
-	}
-
-	ctAPIV1 := ginIns.Group("/1/ct")
-	{
-		ctAPIV1.GET("/webbeacon", controllers.WebBeaconCT)
-	}
+	//ctAPIV1 := ginIns.Group("/1/ct")
+	//{
+	//	ctAPIV1.GET("/webbeacon", controllers.WebBeaconCT)
+	//}
 
 	// op api
 	opAPIGroup := ginIns.Group("/op")
 	{
+		// user
 		opAPIGroup.POST("/user/init", controllers.Register)
 		opAPIGroup.POST("/login", controllers.Login)
 		opAPIGroup.POST("/logout", authHandler(), controllers.Logout)
 		opAPIGroup.GET("/users/:page/:count", authHandler(), controllers.UserInfoAll)
 
+		// app
 		opAPIGroup.GET("/apps/all/:page/:count", authHandler(), controllers.AppInfoAll)
 		opAPIGroup.POST("/app", authHandler(), controllers.NewApp)
 		opAPIGroup.PUT("/app", authHandler(), controllers.UpdateApp)

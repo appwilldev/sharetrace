@@ -1,9 +1,12 @@
 package controllers
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -102,188 +105,6 @@ func Share(c *gin.Context) {
 	c.JSON(200, ret)
 }
 
-//func Click(c *gin.Context) {
-//	var postData struct {
-//		ShareURL string `json:"share_url" binding:"required"`
-//	}
-//	err := c.BindJSON(&postData)
-//	if err != nil {
-//		Error(c, BAD_POST_DATA, nil, err.Error())
-//		return
-//	}
-//
-//	log.Println("Click data:%s", postData)
-//
-//	idStr, err := caches.GetShareURLIdByUrl(postData.ShareURL)
-//	if err != nil {
-//		Error(c, SERVER_ERROR, nil, err.Error())
-//		return
-//	}
-//	log.Println("idStr:", idStr)
-//	shareid, err := strconv.ParseInt(idStr, 10, 64)
-//	if err != nil {
-//		Error(c, SERVER_ERROR, nil, err.Error())
-//		return
-//	}
-//	log.Println("Shareid:", shareid)
-//
-//	data := new(models.ClickSession)
-//	id, err := models.GenerateClickSessionId()
-//	log.Println("Clickid:", id)
-//	data.Id = id
-//	if err != nil {
-//		Error(c, SERVER_ERROR, nil, err.Error())
-//		return
-//	}
-//
-//	data.Shareid = shareid
-//	// generate cookieid
-//	cookieid := fmt.Sprintf("%s_%d_%d", conf.COOKIE_PREFIX, shareid, id)
-//	data.Cookieid = cookieid
-//
-//	data.CreatedUTC = utils.GetNowSecond()
-//
-//	log.Println("Generate data:%s", data)
-//
-//	err = models.InsertDBModel(nil, data)
-//	if err != nil {
-//		Error(c, SERVER_ERROR, nil, nil)
-//		return
-//	}
-//	err = caches.NewClickSession(data)
-//
-//	ret := gin.H{"status": true}
-//	ret["stcookieid"] = cookieid
-//	c.JSON(200, ret)
-//}
-//
-//func AgentClick(c *gin.Context) {
-//	var postData struct {
-//		ShareURL string `json:"share_url" binding:"required"`
-//		AgentIP  string `json:"agent_ip" binding:"required"`
-//		Agent    string `json:"agent"`
-//	}
-//	err := c.BindJSON(&postData)
-//	if err != nil {
-//		Error(c, BAD_POST_DATA, nil, err.Error())
-//		return
-//	}
-//
-//	log.Println("Agent Click data:%s", postData)
-//
-//	idStr, err := caches.GetShareURLIdByUrl(postData.ShareURL)
-//	if err != nil {
-//		Error(c, SERVER_ERROR, nil, err.Error())
-//		return
-//	}
-//	log.Println("idStr:", idStr)
-//	shareid, err := strconv.ParseInt(idStr, 10, 64)
-//	if err != nil {
-//		Error(c, SERVER_ERROR, nil, err.Error())
-//		return
-//	}
-//	log.Println("Shareid:", shareid)
-//
-//	data := new(models.ClickSession)
-//	id, err := models.GenerateClickSessionId()
-//	log.Println("Clickid:", id)
-//	data.Id = id
-//	if err != nil {
-//		Error(c, SERVER_ERROR, nil, err.Error())
-//		return
-//	}
-//
-//	data.Shareid = shareid
-//
-//	cookieid := fmt.Sprintf("st_%d_%d", shareid, id)
-//	data.Cookieid = cookieid
-//
-//	data.ClickType = 1
-//	data.Agent = postData.Agent
-//	data.AgentIP = postData.AgentIP
-//	// todo: generate agentid
-//
-//	data.CreatedUTC = utils.GetNowSecond()
-//
-//	log.Println("Generate data:%s", data)
-//
-//	err = models.InsertDBModel(nil, data)
-//	if err != nil {
-//		Error(c, SERVER_ERROR, nil, nil)
-//		return
-//	}
-//	err = caches.NewClickSession(data)
-//
-//	ret := gin.H{"status": true}
-//	ret["stcookieid"] = cookieid
-//	c.JSON(200, ret)
-//}
-
-//func Install(c *gin.Context) {
-//	var postData struct {
-//		Installid string `json:"installid" binding:"required"`
-//		//ClickType int    `json:"click_type" binding:"required"` -- TOASK
-//		ClickType int    `json:"click_type"`
-//		Trackid   string `json:"trackid"`
-//	}
-//	err := c.BindJSON(&postData)
-//	if err != nil {
-//		Error(c, BAD_POST_DATA, nil, err.Error())
-//		return
-//	}
-//
-//	idStr := ""
-//
-//	idStr, err = caches.GetClickSessionId(postData.ClickType, postData.Trackid)
-//	if err != nil || idStr == "" {
-//		old_data, err := models.GetClickSession(nil, postData.ClickType, postData.Trackid)
-//		if err == nil && old_data != nil {
-//			log.Println("No cache for data and recached:", postData)
-//			_ = caches.NewClickSession(old_data)
-//			idStr, _ = caches.GetClickSessionId(postData.ClickType, postData.Trackid)
-//		} else {
-//			Error(c, SERVER_ERROR, nil, err.Error())
-//			return
-//		}
-//	}
-//
-//	// TODO record new user not from share
-//	log.Println("Get idStr:", idStr)
-//
-//	id, err := strconv.ParseInt(idStr, 10, 64)
-//	if err != nil {
-//		Error(c, SERVER_ERROR, nil, err.Error())
-//		return
-//	}
-//
-//	data, err := caches.GetClickSessionModelInfoById(id)
-//	if err != nil {
-//		Error(c, SERVER_ERROR, nil, err.Error())
-//		return
-//	}
-//
-//	if data.Status == conf.CLICK_SESSION_STATUS_CLICK || data.Installid == "" {
-//		data.Status = conf.CLICK_SESSION_STATUS_INSTALLED
-//		data.Installid = postData.Installid
-//		data.ClickType = postData.ClickType
-//		err = models.UpdateDBModel(nil, data)
-//		if err != nil {
-//			Error(c, SERVER_ERROR, nil, err.Error())
-//			return
-//		}
-//		err = caches.UpdateClickSession(data)
-//		if err != nil {
-//			Error(c, SERVER_ERROR, nil, err.Error())
-//			return
-//		}
-//	} else {
-//		log.Println("Duplicated install notify! Data:", postData)
-//	}
-//
-//	ret := gin.H{"status": true}
-//	c.JSON(200, ret)
-//}
-
 func Score(c *gin.Context) {
 	q := c.Request.URL.Query()
 	userIdStr := q["userid"][0]
@@ -329,11 +150,11 @@ func Score(c *gin.Context) {
 func WebBeacon(c *gin.Context) {
 
 	// if exist stcookieid, return
-	old_cookie, err := c.Request.Cookie("stcookieid")
-	if err == nil {
-		if old_cookie == nil || old_cookie.Value == "" {
+	stcookieid_cookie, stcookieid_err := c.Request.Cookie("stcookieid")
+	if stcookieid_err == nil {
+		if stcookieid_cookie == nil || stcookieid_cookie.Value == "" {
 		} else {
-			log.Println("Exist stcookieid:", old_cookie.Value)
+			log.Println("Exist stcookieid:", stcookieid_cookie.Value)
 			return
 		}
 	}
@@ -346,6 +167,21 @@ func WebBeacon(c *gin.Context) {
 		return
 	}
 	//log.Println("share_url:", share_url)
+	idShareStr, err := caches.GetShareURLIdByUrl(share_url)
+	var shareid int64
+	if err != nil || idShareStr == "" {
+		if err == nil {
+			err = fmt.Errorf("No cache for share url:", share_url)
+		}
+		log.Println(err.Error())
+		// stagentid
+	} else {
+		shareid, err = strconv.ParseInt(idShareStr, 10, 64)
+		if err != nil {
+			log.Println(err.Error())
+			return
+		}
+	}
 
 	// if no clientIP, return
 	clientIP := c.ClientIP()
@@ -371,27 +207,30 @@ func WebBeacon(c *gin.Context) {
 	} else if click_type == conf.CLICK_TYPE_IP {
 		// if cookie forbidden by client, we can use IP
 		idStr, err := caches.GetClickSessionIdByIP(clientIP)
-		// if already exist IP cache, return
+		// if already exist IP cache, recookie, return
 		if err == nil && idStr != "" {
 			log.Println("Exist IP:", clientIP)
+			csid, _ := strconv.ParseInt(idStr, 10, 64)
+			cs, err := models.GetClickSessionById(nil, csid)
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			cookie := new(http.Cookie)
+			cookie.Name = "stcookieid"
+			cookie.Expires = time.Now().Add(time.Duration(7*86400) * time.Second)
+			cookie.Value = cs.Cookieid
+			cookie.Path = "/"
+			http.SetCookie(c.Writer, cookie)
+
+			cookie = new(http.Cookie)
+			cookie.Name = "stagentid"
+			cookie.Value = cs.AgentId
+			cookie.Path = "/"
+			http.SetCookie(c.Writer, cookie)
+
 			return
 		}
-	}
-
-	idShareStr, err := caches.GetShareURLIdByUrl(share_url)
-	if err != nil || idShareStr == "" {
-		if err == nil {
-			err = fmt.Errorf("No cache for share url:", share_url)
-		}
-		log.Println(err.Error())
-		return
-	} else {
-		// stagentid
-	}
-	shareid, err := strconv.ParseInt(idShareStr, 10, 64)
-	if err != nil {
-		log.Println(err.Error())
-		return
 	}
 
 	data := new(models.ClickSession)
@@ -402,9 +241,21 @@ func WebBeacon(c *gin.Context) {
 		return
 	}
 
-	data.Shareid = shareid
-	cookieid := fmt.Sprintf("%s_%d_%d", conf.COOKIE_PREFIX, shareid, id)
-	data.Cookieid = cookieid
+	cookieid := ""
+	if shareid > 0 {
+		data.Shareid = shareid
+		cookieid = fmt.Sprintf("%s_%d_%d", conf.COOKIE_PREFIX, shareid, id)
+		data.Cookieid = cookieid
+	}
+
+	u, _ := url.Parse(share_url)
+	log.Println("url pares host:", u.Host)
+	data.URLHost = u.Host
+	md5Ctx := md5.New()
+	agent_info := fmt.Sprintf("%s_%s_%s", share_url, clientIP, agent)
+	md5Ctx.Write([]byte(agent_info))
+	data.AgentId = hex.EncodeToString(md5Ctx.Sum(nil))
+
 	data.ClickType = click_type
 	data.Agent = agent
 	data.AgentIP = clientIP
@@ -427,27 +278,33 @@ func WebBeacon(c *gin.Context) {
 		return
 	}
 
-	cookie := new(http.Cookie)
-	cookie.Name = "stcookieid"
-	// cookie cache 7 days
-	cookie.Expires = time.Now().Add(time.Duration(7*86400) * time.Second)
-	cookie.Value = cookieid
-	cookie.Path = "/"
-	http.SetCookie(c.Writer, cookie)
+	if cookieid != "" {
+		cookie := new(http.Cookie)
+		cookie.Name = "stcookieid"
+		// cookie cache 7 days
+		cookie.Expires = time.Now().Add(time.Duration(7*86400) * time.Second)
+		cookie.Value = cookieid
+		cookie.Path = "/"
+		http.SetCookie(c.Writer, cookie)
+	}
+
+	if data.AgentId != "" {
+		cookie := new(http.Cookie)
+		cookie.Name = "stagentid"
+		cookie.Value = data.AgentId
+		cookie.Path = "/"
+		http.SetCookie(c.Writer, cookie)
+	}
 
 	return
 }
 
 func ClickInstallButton(c *gin.Context) {
-
-	trackid := ""
-	old_cookie, err := c.Request.Cookie("stcookieid")
-	click_type := conf.CLICK_TYPE_COOKIE
+	agentid := ""
+	old_cookie, err := c.Request.Cookie("stagentid")
 	if err == nil && old_cookie != nil && old_cookie.Value != "" {
-		click_type = conf.CLICK_TYPE_COOKIE
-		trackid = old_cookie.Value
+		agentid = old_cookie.Value
 	} else {
-		click_type = conf.CLICK_TYPE_IP
 		log.Println("err:", err)
 		return
 	}
@@ -460,23 +317,9 @@ func ClickInstallButton(c *gin.Context) {
 		log.Println("buttonid:", buttonid)
 	}
 
-	idStr := ""
-	idStr, _ = caches.GetClickSessionId(click_type, trackid)
-	if idStr == "" {
-		old_data, err := models.GetClickSession(nil, click_type, trackid)
-		if err == nil && old_data != nil {
-			log.Println("No cache for data and recached")
-			_ = caches.NewClickSession(old_data)
-			idStr, _ = caches.GetClickSessionId(click_type, trackid)
-		} else {
-			Error(c, SERVER_ERROR, nil, err.Error())
-			return
-		}
-	}
-
-	if idStr == "" {
-		log.Println("No cache or db! Data:", click_type, trackid)
-		// TODO newuser not from share
+	idStr, err := caches.GetClickSessionIdByAgentId(agentid)
+	if err != nil {
+		log.Println("No cache or db! Data:", agentid)
 		return
 	} else {
 		id, _ := strconv.ParseInt(idStr, 10, 64)

@@ -45,6 +45,7 @@ CREATE TABLE click_session(
     agentip VARCHAR(256) DEFAULT NULL,                                             
     agentid VARCHAR(1024) DEFAULT NULL,                                             
     buttonid VARCHAR(256) DEFAULT NULL,                                             
+    url_host VARCHAR(256) DEFAULT NULL,
     des TEXT DEFAULT NULL,                                                          
     status INT DEFAULT 0,                                                           
     created_utc INT                                                                 
@@ -55,6 +56,7 @@ CREATE INDEX idx_cs_shareid ON click_session(shareid);
 --ALTER TABLE click_session ADD COLUMN agent varchar(1024) default null;
 --ALTER TABLE click_session ADD COLUMN agentip varchar(256) default null;
 --ALTER TABLE click_session ADD COLUMN buttonid varchar(256) default null;
+--ALTER TABLE click_session ADD COLUMN url_host varchar(256) default null;
 --ALTER TABLE click_session ADD COLUMN agentid varchar(1024) default null;
 -- CREATE INDEX idx_cs_date ON click_session(date(to_timestamp(created_utc));
 -- select count(*), date(to_timestamp(created_utc)) from click_session group by date(to_timestamp(created_utc)) order by date(to_timestamp(created_utc));

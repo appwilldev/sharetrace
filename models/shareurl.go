@@ -80,6 +80,7 @@ type ClickSession struct {
 	Des       string `xorm:"des TEXT DEFAULT NULL" json:"des"`
 
 	ButtonId string `xorm:"buttonid VARCHAR(256) DEFAULT NULL" json:"buttonid"`
+	URLHost  string `xorm:"url_host VARCHAR(256) DEFAULT NULL" json:"url_host"`
 
 	Status     int `xorm:"status INT DEFAULT 0" json:"status"`
 	CreatedUTC int `xorm:"created_utc INT" json:"created_utc"`
@@ -133,7 +134,7 @@ func GetClickSessionByIP(s *ModelSession, IPStr string) (*ClickSession, error) {
 		s = newAutoCloseModelsSession()
 	}
 	data := &ClickSession{}
-	has, err := s.Where("agentip=?", IPStr).Get(data)
+	has, err := s.Where("agentip=?", IPStr).OrderBy("id desc").Get(data)
 	// TOASK not only one?
 	if !has || err != nil {
 		return nil, err

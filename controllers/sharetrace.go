@@ -148,13 +148,12 @@ func Score(c *gin.Context) {
 
 // Just return nothing, maybe  set cookie
 func WebBeacon(c *gin.Context) {
-
 	// if exist stcookieid, return
 	stcookieid_cookie, stcookieid_err := c.Request.Cookie("stcookieid")
 	if stcookieid_err == nil {
 		if stcookieid_cookie == nil || stcookieid_cookie.Value == "" {
 		} else {
-			log.Println("Exist stcookieid:", stcookieid_cookie.Value)
+			//log.Println("Exist stcookieid:", stcookieid_cookie.Value)
 			return
 		}
 	}
@@ -163,18 +162,13 @@ func WebBeacon(c *gin.Context) {
 	q := c.Request.URL.Query()
 	share_url := q["share_url"][0]
 	if share_url == "" {
-		log.Println("No share_url para:")
+		log.Println("Error, No share_url para!")
 		return
 	}
-	//log.Println("share_url:", share_url)
 	idShareStr, err := caches.GetShareURLIdByUrl(share_url)
 	var shareid int64
-	if err != nil || idShareStr == "" {
-		if err == nil {
-			err = fmt.Errorf("No cache for share url:", share_url)
-		}
+	if err != nil {
 		log.Println(err.Error())
-		// stagentid
 	} else {
 		shareid, err = strconv.ParseInt(idShareStr, 10, 64)
 		if err != nil {
@@ -190,6 +184,7 @@ func WebBeacon(c *gin.Context) {
 		return
 	}
 
+	// set click_type
 	click_type := conf.CLICK_TYPE_COOKIE
 	agent := c.Request.Header.Get("User-Agent")
 	if agent == "" {
@@ -210,36 +205,24 @@ func WebBeacon(c *gin.Context) {
 		// if already exist IP cache, recookie, return
 		if err == nil && idStr != "" {
 			log.Println("Exist IP:", clientIP)
-			csid, _ := strconv.ParseInt(idStr, 10, 64)
-			cs, err := models.GetClickSessionById(nil, csid)
-			if err != nil {
-				log.Println(err)
-				return
-			}
-			cookie := new(http.Cookie)
-			cookie.Name = "stcookieid"
-			cookie.Expires = time.Now().Add(time.Duration(7*86400) * time.Second)
-			cookie.Value = cs.Cookieid
-			cookie.Path = "/"
-			http.SetCookie(c.Writer, cookie)
-
-			cookie = new(http.Cookie)
-			cookie.Name = "stagentid"
-			cookie.Value = cs.AgentId
-			cookie.Path = "/"
-			http.SetCookie(c.Writer, cookie)
-
+			// TODO:没有 cookie，但是同IP， 不同Agent呢？
 			return
 		}
 	}
 
-	data := new(models.ClickSession)
 	id, err := models.GenerateClickSessionId()
-	data.Id = id
 	if err != nil {
 		log.Println(err.Error())
 		return
 	}
+
+	// insert to db
+	data := new(models.ClickSession)
+	data.Id = id
+	data.ClickType = click_type
+	data.Agent = agent
+	data.AgentIP = clientIP
+	data.CreatedUTC = utils.GetNowSecond()
 
 	cookieid := ""
 	if shareid > 0 {
@@ -249,22 +232,14 @@ func WebBeacon(c *gin.Context) {
 	}
 
 	u, _ := url.Parse(share_url)
-	log.Println("url pares host:", u.Host)
 	data.URLHost = u.Host
 	md5Ctx := md5.New()
 	agent_info := fmt.Sprintf("%s_%s_%s", share_url, clientIP, agent)
 	md5Ctx.Write([]byte(agent_info))
 	data.AgentId = hex.EncodeToString(md5Ctx.Sum(nil))
 
-	data.ClickType = click_type
-	data.Agent = agent
-	data.AgentIP = clientIP
-
-	data.CreatedUTC = utils.GetNowSecond()
-
 	log.Println("Webbeacon clicksession data:%s", data)
 
-	// insert to db
 	err = models.InsertDBModel(nil, data)
 	if err != nil {
 		log.Println(err.Error())
@@ -428,6 +403,5 @@ func WebBeaconCheck(c *gin.Context) {
 		} else {
 			log.Println("Duplicated webbeaconcheck! Data:", trackid)
 		}
-
 	}
 }

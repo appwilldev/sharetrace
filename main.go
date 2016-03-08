@@ -143,6 +143,7 @@ func main() {
 		//stAPIV1.POST("/agentclick", authHandler(), controllers.AgentClick)
 		//stAPIV1.POST("/install", authHandler(), controllers.Install)
 		stAPIV1.GET("/webbeacon", controllers.WebBeacon)
+		stAPIV1.GET("/webbeaconbutton", controllers.ClickInstallButton)
 		stAPIV1.GET("/webbeaconcheck", controllers.WebBeaconCheck)
 		stAPIV1.GET("/score", controllers.Score)
 	}

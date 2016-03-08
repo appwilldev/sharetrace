@@ -385,6 +385,8 @@ func WebBeacon(c *gin.Context) {
 		}
 		log.Println(err.Error())
 		return
+	} else {
+		// stagentid
 	}
 	shareid, err := strconv.ParseInt(idShareStr, 10, 64)
 	if err != nil {
@@ -434,6 +436,73 @@ func WebBeacon(c *gin.Context) {
 	http.SetCookie(c.Writer, cookie)
 
 	return
+}
+
+func ClickInstallButton(c *gin.Context) {
+
+	trackid := ""
+	old_cookie, err := c.Request.Cookie("stcookieid")
+	click_type := conf.CLICK_TYPE_COOKIE
+	if err == nil && old_cookie != nil && old_cookie.Value != "" {
+		click_type = conf.CLICK_TYPE_COOKIE
+		trackid = old_cookie.Value
+	} else {
+		click_type = conf.CLICK_TYPE_IP
+		log.Println("err:", err)
+		return
+	}
+
+	q := c.Request.URL.Query()
+	buttonid := q["buttonid"][0]
+	if buttonid == "" || buttonid == "undefined" {
+		log.Println("No buttonid para:")
+	} else {
+		log.Println("buttonid:", buttonid)
+	}
+
+	idStr := ""
+	idStr, _ = caches.GetClickSessionId(click_type, trackid)
+	if idStr == "" {
+		old_data, err := models.GetClickSession(nil, click_type, trackid)
+		if err == nil && old_data != nil {
+			log.Println("No cache for data and recached")
+			_ = caches.NewClickSession(old_data)
+			idStr, _ = caches.GetClickSessionId(click_type, trackid)
+		} else {
+			Error(c, SERVER_ERROR, nil, err.Error())
+			return
+		}
+	}
+
+	if idStr == "" {
+		log.Println("No cache or db! Data:", click_type, trackid)
+		// TODO newuser not from share
+		return
+	} else {
+		id, _ := strconv.ParseInt(idStr, 10, 64)
+		data, _ := caches.GetClickSessionModelInfoById(id)
+
+		if data.Status == conf.CLICK_SESSION_STATUS_CLICK {
+			data.Status = conf.CLICK_SESSION_STATUS_BUTTON
+			if buttonid != "" {
+				data.ButtonId = buttonid
+			}
+			err = models.UpdateDBModel(nil, data)
+			if err != nil {
+				Error(c, SERVER_ERROR, nil, err.Error())
+				return
+			}
+			err = caches.UpdateClickSession(data)
+			if err != nil {
+				Error(c, SERVER_ERROR, nil, err.Error())
+				return
+			}
+		} else {
+			log.Println("Duplicated clickbutton! Data:", data)
+		}
+
+	}
+
 }
 
 func WebBeaconCheck(c *gin.Context) {

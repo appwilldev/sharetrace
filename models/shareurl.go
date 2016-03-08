@@ -79,6 +79,8 @@ type ClickSession struct {
 	AgentId   string `xorm:"agentid VARCHAR(256) DEFAULT NULL" json:"agentid"`
 	Des       string `xorm:"des TEXT DEFAULT NULL" json:"des"`
 
+	ButtonId string `xorm:"buttonid VARCHAR(256) DEFAULT NULL" json:"buttonid"`
+
 	Status     int `xorm:"status INT DEFAULT 0" json:"status"`
 	CreatedUTC int `xorm:"created_utc INT" json:"created_utc"`
 }

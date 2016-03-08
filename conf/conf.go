@@ -33,6 +33,7 @@ const (
 	UserExpires                    = 7 * 24 * 60 * 60
 	DumpExpiresDuration            = 60
 	CLICK_SESSION_STATUS_INSTALLED = 1
+	CLICK_SESSION_STATUS_BUTTON    = 2
 	CLICK_SESSION_STATUS_CLICK     = 0
 	CLICK_TYPE_COOKIE              = 0
 	CLICK_TYPE_IP                  = 1

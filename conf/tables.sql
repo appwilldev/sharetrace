@@ -32,6 +32,7 @@ CREATE UNIQUE INDEX uidx_su_urlfrom ON share_url(share_url, fromid, itemid, appi
 -- des: click user info:ip, browser, version
 -- app server post appid, fromid, share_url to sharetrace saas
 -- cache click_session(cookieid), click_session(id)
+-- status: click:0, go to appstore: 2, install: 1
 
 CREATE SEQUENCE click_session_id START 2016 NO CYCLE;                                        
 CREATE TABLE click_session(
@@ -43,6 +44,7 @@ CREATE TABLE click_session(
     agent VARCHAR(1024) DEFAULT NULL,                                             
     agentip VARCHAR(256) DEFAULT NULL,                                             
     agentid VARCHAR(1024) DEFAULT NULL,                                             
+    buttonid VARCHAR(256) DEFAULT NULL,                                             
     des TEXT DEFAULT NULL,                                                          
     status INT DEFAULT 0,                                                           
     created_utc INT                                                                 
@@ -52,6 +54,7 @@ CREATE INDEX idx_cs_shareid ON click_session(shareid);
 --ALTER TABLE click_session ADD COLUMN click_type int default 0;
 --ALTER TABLE click_session ADD COLUMN agent varchar(1024) default null;
 --ALTER TABLE click_session ADD COLUMN agentip varchar(256) default null;
+--ALTER TABLE click_session ADD COLUMN buttonid varchar(256) default null;
 --ALTER TABLE click_session ADD COLUMN agentid varchar(1024) default null;
 -- CREATE INDEX idx_cs_date ON click_session(date(to_timestamp(created_utc));
 -- select count(*), date(to_timestamp(created_utc)) from click_session group by date(to_timestamp(created_utc)) order by date(to_timestamp(created_utc));

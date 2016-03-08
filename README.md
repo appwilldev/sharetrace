@@ -45,6 +45,10 @@ curl -l -H "Content-type: application/json"       -X POST        -d '{"fromid":"
 ```
 * 如果是在Safari打开的页面，会在ST的域名(st.apptao.com)下面种下stcookieid，作为跟踪标识
 * 如果是在微信／QQ打开的页面，种下的 stcookieid，无法跟踪，只能采取通过 IP 的方式跟踪
+* 如果要跟踪页面上按钮点击情况, 可以在跳转到AppStore前调用, buttonid用来区分不同buton的点击, 不传则默认为1：
+```
+gotoAppStore(buttonid);
+```
 
 ---
 

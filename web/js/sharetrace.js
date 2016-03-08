@@ -9,8 +9,10 @@ set_stiframe()
 
 
 function gotoAppStore(buttonid){
+    if (buttonid == "undefined"){
+		buttonid = 1;
+    }
     var iframe = document.createElement('iframe');
-    alert(buttonid);
     var stiframe_url="http://st.apptao.com/1/st/webbeaconbutton?buttonid=" + buttonid ;
     iframe.src = stiframe_url;
     document.body.appendChild(iframe);

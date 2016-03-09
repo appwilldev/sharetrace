@@ -89,10 +89,13 @@ func StatsTotal(c *gin.Context) {
 	click = make(map[string]interface{})
 	var install map[string]interface{}
 	install = make(map[string]interface{})
+	var button map[string]interface{}
+	button = make(map[string]interface{})
 
 	data["share"] = share
 	data["click"] = click
 	data["install"] = install
+	data["button"] = button
 
 	for i := 0; i < delta; i++ {
 		time_now_tmp := time_now.AddDate(0, 0, +i)
@@ -101,6 +104,7 @@ func StatsTotal(c *gin.Context) {
 		share[date_tmp], _ = models.GetShareTotalByAppid(nil, appIdStr, date_tmp)
 		click[date_tmp], _ = models.GetClickTotalByAppid(nil, appIdStr, date_tmp)
 		install[date_tmp], _ = models.GetInstallTotalByAppid(nil, appIdStr, date_tmp)
+		button[date_tmp], _ = models.GetButtonTotalByAppid(nil, appIdStr, date_tmp)
 	}
 
 	ret["data"] = data

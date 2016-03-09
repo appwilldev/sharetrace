@@ -84,3 +84,24 @@ func GetInstallTotalByAppid(s *ModelSession, appid string, date string) (int64, 
 
 	return total, nil
 }
+
+func GetButtonTotalByAppid(s *ModelSession, appid string, date string) (int64, error) {
+	var (
+		total int64
+		err   error
+	)
+	if s == nil {
+		s = newAutoCloseModelsSession()
+	}
+
+	data := new(ShareClick)
+	var session *xorm.Session
+	session = s.Join("INNER", "click_session", "share_url.id=click_session.shareid")
+	total, err = session.Where("appid=?", appid).And("(click_session.buttonid is not null and click_session.status = 2) or (click_session.status = 1)").And("date(to_timestamp(click_session.created_utc))=?", date).Count(data)
+
+	if err != nil {
+		return -1, err
+	}
+
+	return total, nil
+}

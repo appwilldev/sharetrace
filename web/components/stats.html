@@ -30,11 +30,18 @@
 <input id="datepicker_end" class="datetimepicker" type="text" size="20"> 
 <button type="button" onclick="search()">查询</button>
 </div>
+<div style="width: 600px; margin-left:20px;">
+<span style="font-size:15px">
+名词解释：Share:分享URL | Click:点击URL | Button:点击安装按钮 | Install:安装App
+<span>
+</div>
 
 <br/>
 <br/>
 
 <div id="main" style="width: 600px;height:400px;"></div>
+<br/>
+<br/>
 <div id="loudou" style="width: 600px;height:400px;"></div>
 <script type="text/javascript">
     // 基于准备好的dom，初始化echarts实例
@@ -66,6 +73,7 @@
         var appid=url_vars["appid"];
         var ret_data;
         var legend_data = new Array();
+        var loudou_legend_data = new Array();
         var xAxis_data = new Array();
         var series_data = new Array();
         var loudou_series_data = new Array();
@@ -92,30 +100,31 @@
             total_dict= {};
 
             //console.log(series_data);
-            var total_share = 0;
-            for (var key in ret_data.data["share"]){
+            var total_click= 0;
+            for (var key in ret_data.data["click"]){
             	xAxis_data.push(key);
-                total_share = total_share + ret_data.data["share"][key];
+                total_click= total_click+ ret_data.data["click"][key];
             }
-            console.log("total_share", total_share);
+            console.log("total_click", total_click);
 
         	for (var key in ret_data.data) {
                 legend_data.push(key);
+                loudou_legend_data.push(key);
                 total_dict[key]=0;
                 var series_line = {};
                 series_line["name"] = key;
                 series_line["type"] = "line";
-                if (key == "share") {
-                    series_line["itemStyle"] = {normal: { label: { show:true },color:'#ffd700'}};
-                }
+                //if (key == "share") {
+                //    series_line["itemStyle"] = {normal: { label: { show:true },color:'#ffd700'}};
+                //}
 
-                if (key == "click") {
-                    series_line["itemStyle"] = {normal: { label: { show:true },color:'#add8e6'}};
-                }
+                //if (key == "click") {
+                //    series_line["itemStyle"] = {normal: { label: { show:true },color:'#add8e6'}};
+                //}
 
-                if (key == "install") {
-                    series_line["itemStyle"] = {normal: { label: { show:true },color:'#ff6347'}};
-                }
+                //if (key == "install") {
+                //    series_line["itemStyle"] = {normal: { label: { show:true },color:'#ff6347'}};
+                //}
 
                 //series_line["stack"] = "总量";
                 series_line["data"] = new Array();
@@ -125,7 +134,8 @@
                 }
                 //console.log(series_line);
                 series_data.push(series_line);
-                loudou_series_data.push({value:total_dict[key],percent:parseInt(total_dict[key]*100/total_share), name:key});
+                //loudou_series_data.push({value:total_dict[key],percent:parseInt(total_dict[key]*100/total_share), name:key});
+                loudou_series_data.push({value:parseInt(total_dict[key]*100/total_click), name:key});
             }
 
 
@@ -170,11 +180,12 @@
 
             loudou_option = {
                 title : {
-                    text:'总数转化漏斗'
+                    text:'转化漏斗',
+                    subtext:'以Click为基准'
                 },
                 tooltip : {
                     trigger: 'item',
-                    formatter: "{a} <br/>{b} : {c}"
+                    formatter: "{a} <br/>{b} : {c}%"
                 },
                 toolbox: {
                     show : true,
@@ -187,7 +198,7 @@
                 },
                 legend: {
                     //data : ['展现','点击','访问','咨询','订单']
-                    data:legend_data
+                    data:loudou_legend_data
                 },
                 calculable : true,
                 series : [
@@ -230,7 +241,7 @@
                                 borderWidth: 1,
                                 label: {
                                     position: 'inside',
-                                    formatter: '{b} : {c}',
+                                    formatter: '{b} : {c}%',
                                     textStyle: {
                                         color: '#fff'
                                      }

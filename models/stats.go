@@ -143,3 +143,43 @@ func GetButtonTotalByHost(s *ModelSession, host string, date string) (int64, err
 
 	return total, nil
 }
+
+func GetTotalByHostPhone(s *ModelSession, host string, date string, phone string) (int64, error) {
+	var (
+		total int64
+		err   error
+	)
+	if s == nil {
+		s = newAutoCloseModelsSession()
+	}
+
+	data := new(ClickSession)
+	total, err = s.Where("url_host=?", host).And("date(to_timestamp(created_utc))=?", date).And("agent like ?", `%`+phone+`%`).Count(data)
+
+	if err != nil {
+		return -1, err
+	}
+
+	return total, nil
+}
+
+func GetTotalByHostiPhone(s *ModelSession, host string, date string, phone string) (int64, error) {
+	var (
+		total int64
+		err   error
+	)
+	if s == nil {
+		s = newAutoCloseModelsSession()
+	}
+
+	data := new(ClickSession)
+	//total, err = s.Where("url_host=?", host).And("date(to_timestamp(created_utc))=?", date).And("agent like ?", `%iPhone OS%`).And("agent like ?", `%`+phone+`%`).Count(data)
+	condition := "url_host=? and  date(to_timestamp(created_utc))=? and (agent like ? or agent like ?) and agent like ?"
+	total, err = s.Where(condition, host, date, `%iPhone OS%`, `%iPad%`, phone).Count(data)
+
+	if err != nil {
+		return -1, err
+	}
+
+	return total, nil
+}

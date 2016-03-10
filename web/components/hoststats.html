@@ -42,14 +42,21 @@
 <div id="main" style="width: 600px;height:400px;"></div>
 <br/>
 <br/>
-<div id="total" style="width: 600px;height:400px;"></div>
+
+<div id="phone" style="width: 600px;height:400px;"></div>
 <br/>
 <br/>
+
+<div id="browser" style="width: 600px;height:400px;"></div>
+<br/>
+<br/>
+
 <div id="loudou" style="width: 600px;height:400px;"></div>
 <script type="text/javascript">
     // 基于准备好的dom，初始化echarts实例
     var mainChart = echarts.init(document.getElementById('main'));
-    var totalChart = echarts.init(document.getElementById('total'));
+    var phoneChart = echarts.init(document.getElementById('phone'));
+    var browserChart = echarts.init(document.getElementById('browser'));
     var loudouChart = echarts.init(document.getElementById('loudou'));
 
     var time_start, time_end;
@@ -78,10 +85,13 @@
         var ret_data;
         var legend_data = new Array();
         var loudou_legend_data = new Array();
+        var pat_legend_data_phone = new Array();
+        var pat_legend_data_browser = new Array();
         var xAxis_data = new Array();
         var series_data = new Array();
         var loudou_series_data = new Array();
-        var total_series_data = new Array();
+        var pat_series_data_phone = new Array();
+        var pat_series_data_browser = new Array();
         var url = "/1/stats/host?host=" + host;
 
         if (time_start > 0){
@@ -114,7 +124,15 @@
 
         	for (var key in ret_data.data) {
                 legend_data.push(key);
-                loudou_legend_data.push(key);
+                if (key == 'iphone' || key == 'ipad' || key == 'android' || key == 'window' || key == 'phone_else'){
+                    pat_legend_data_phone.push(key);
+                }
+                if (key == 'safari' || key == 'wechat' || key == 'qq' || key == 'browser_else'){
+                    pat_legend_data_browser.push(key);
+                }
+                if (key == 'click' || key == 'button'){
+                    loudou_legend_data.push(key);
+                }
                 total_dict[key]=0;
                 var series_line = {};
                 series_line["name"] = key;
@@ -127,10 +145,17 @@
                     }
                 }
                 series_data.push(series_line);
-                loudou_series_data.push({value:parseInt(total_dict[key]*100/total_click), name:key});
-                total_series_data.push({value:total_dict[key], name:key});
-            }
+                if (key == 'iphone' || key == 'ipad' || key == 'android' || key == 'window' || key == 'phone_else'){
+                    pat_series_data_phone.push({value:total_dict[key], name:key});
+                }
+                if (key == 'safari' || key == 'wechat' || key == 'qq' || key == 'browser_else'){
+                    pat_series_data_browser.push({value:total_dict[key], name:key});
+                }
+                if (key == 'click' || key == 'button') {
+                    loudou_series_data.push({value:parseInt(total_dict[key]*100/total_click), name:key});
+                }
 
+            }
 
             main_option = {
                 title: {
@@ -172,9 +197,9 @@
 
 
 
-           total_option = {
+           phone_option = {
                title : {
-                   text: '总数统计',
+                   text: '机型统计',
                    x:'center'
                },
                tooltip : {
@@ -184,14 +209,14 @@
                legend: {
                    orient: 'vertical',
                    left: 'left',
-                   data:legend_data
+                   data:pat_legend_data_phone
                },
                series : [
                    {
                        type: 'pie',
                        radius : '55%',
                        center: ['50%', '60%'],
-                       data: total_series_data,
+                       data: pat_series_data_phone,
                        itemStyle: {
                            emphasis: {
                                shadowBlur: 10,
@@ -202,7 +227,41 @@
                    }
                ]
            };
-           totalChart.setOption(total_option);
+           phoneChart.setOption(phone_option);
+
+
+           browser_option = {
+               title : {
+                   text: '浏览器统计',
+                   x:'center'
+               },
+               tooltip : {
+                   trigger: 'item',
+                   formatter: "{a} <br/>{b} : {c}"
+               },
+               legend: {
+                   orient: 'vertical',
+                   left: 'left',
+                   data:pat_legend_data_browser
+               },
+               series : [
+                   {
+                       type: 'pie',
+                       radius : '55%',
+                       center: ['50%', '60%'],
+                       data: pat_series_data_browser,
+                       itemStyle: {
+                           emphasis: {
+                               shadowBlur: 10,
+                               shadowOffsetX: 0,
+                               shadowColor: 'rgba(0, 0, 0, 0.5)'
+                           }
+                       }
+                   }
+               ]
+           };
+           browserChart.setOption(browser_option);
+
 
 
 

@@ -42,14 +42,14 @@
 <div id="main" style="width: 600px;height:400px;"></div>
 <br/>
 <br/>
-<div id="total" style="width: 600px;height:400px;"></div>
+<div id="phone" style="width: 600px;height:400px;"></div>
 <br/>
 <br/>
 <div id="loudou" style="width: 600px;height:400px;"></div>
 <script type="text/javascript">
     // 基于准备好的dom，初始化echarts实例
     var mainChart = echarts.init(document.getElementById('main'));
-    var totalChart = echarts.init(document.getElementById('total'));
+    var phoneChart = echarts.init(document.getElementById('phone'));
     var loudouChart = echarts.init(document.getElementById('loudou'));
 
     var time_start, time_end;
@@ -77,7 +77,9 @@
         var appid=url_vars["appid"];
         var ret_data;
         var legend_data = new Array();
-        var loudou_legend_data = new Array();
+        var loudou_legend_data= new Array();
+        var pat_legend_data_phone = new Array();
+        var pat_legend_data_browser = new Array();
         var xAxis_data = new Array();
         var series_data = new Array();
         var loudou_series_data = new Array();
@@ -115,7 +117,15 @@
 
         	for (var key in ret_data.data) {
                 legend_data.push(key);
-                loudou_legend_data.push(key);
+                if (key == 'iphone' or key == 'ipad' or key == 'android' or key == 'window'){
+                    pat_legend_data_phone.push(key);
+                }
+                if (key == 'safari' or key == 'wechat' or key == 'qq'){
+                    pat_legend_data_browser.push(key);
+                }
+                if (key == 'click' or key == 'button'){
+                    loudou_legend_data.push(key);
+                }
                 total_dict[key]=0;
                 var series_line = {};
                 series_line["name"] = key;
@@ -128,9 +138,18 @@
                     }
                 }
                 series_data.push(series_line);
-                loudou_series_data.push({value:parseInt(total_dict[key]*100/total_click), name:key});
-                total_series_data.push({value:total_dict[key], name:key});
+                if (key == 'iphone' or key == 'ipad' or key == 'android' or key == 'window'){
+                    pat_series_data_phone.push({value:total_dict[key], name:key});
+                }
+                if (key == 'safari' or key == 'wechat' or key == 'qq'){
+                    pat_series_data_browser.push({value:total_dict[key], name:key});
+                }
+                if (key == 'click' or key == 'button') {
+                    loudou_series_data.push({value:parseInt(total_dict[key]*100/total_click), name:key});
+                }
             }
+
+            console.log("pat_legend_data_phone:", pat_legend_data_phone);
 
 
             main_option = {
@@ -173,9 +192,9 @@
 
 
 
-           total_option = {
+           phone_option = {
                title : {
-                   text: '总数统计',
+                   text: '机型统计',
                    x:'center'
                },
                tooltip : {
@@ -185,14 +204,14 @@
                legend: {
                    orient: 'vertical',
                    left: 'left',
-                   data:legend_data
+                   data:pat_legend_data_phone
                },
                series : [
                    {
                        type: 'pie',
                        radius : '55%',
                        center: ['50%', '60%'],
-                       data: total_series_data,
+                       data: phone_series_data,
                        itemStyle: {
                            emphasis: {
                                shadowBlur: 10,
@@ -203,7 +222,7 @@
                    }
                ]
            };
-           totalChart.setOption(total_option);
+           phoneChart.setOption(phone_option);
 
 
 

@@ -157,6 +157,17 @@ func StatsHost(c *gin.Context) {
 	click := make([]interface{}, 0)
 	button := make([]interface{}, 0)
 
+	iphone := make([]interface{}, 0)
+	ipad := make([]interface{}, 0)
+	android := make([]interface{}, 0)
+	window := make([]interface{}, 0)
+	phone_else := make([]interface{}, 0)
+
+	safari := make([]interface{}, 0)
+	wechat := make([]interface{}, 0)
+	qq := make([]interface{}, 0)
+	browser_else := make([]interface{}, 0)
+
 	for i := 0; i < delta; i++ {
 		time_now_tmp := time_now.AddDate(0, 0, +i)
 		year, month, day := time_now_tmp.Date()
@@ -172,11 +183,66 @@ func StatsHost(c *gin.Context) {
 		button_tmp[date_tmp] = button_total
 		button = append(button, button_tmp)
 
+		iphone_tmp := make(map[string]interface{}, 1)
+		iphone_total, _ := models.GetTotalByHostPhone(nil, host, date_tmp, "iPhone OS")
+		iphone_tmp[date_tmp] = iphone_total
+		iphone = append(iphone, iphone_tmp)
+
+		ipad_tmp := make(map[string]interface{}, 1)
+		ipad_total, _ := models.GetTotalByHostPhone(nil, host, date_tmp, "iPad")
+		ipad_tmp[date_tmp] = ipad_total
+		ipad = append(ipad, ipad_tmp)
+
+		android_tmp := make(map[string]interface{}, 1)
+		android_total, _ := models.GetTotalByHostPhone(nil, host, date_tmp, "Android")
+		android_tmp[date_tmp] = android_total
+		android = append(android, android_tmp)
+
+		window_tmp := make(map[string]interface{}, 1)
+		window_total, _ := models.GetTotalByHostPhone(nil, host, date_tmp, "Window")
+		window_tmp[date_tmp] = window_total
+		window = append(window, window_tmp)
+
+		phone_else_tmp := make(map[string]interface{}, 1)
+		phone_else_total := click_total - iphone_total - ipad_total - android_total - window_total
+		phone_else_tmp[date_tmp] = phone_else_total
+		phone_else = append(phone_else, phone_else_tmp)
+
+		safari_tmp := make(map[string]interface{}, 1)
+		safari_total, _ := models.GetTotalByHostiPhone(nil, host, date_tmp, "Safari")
+		safari_tmp[date_tmp] = safari_total
+		safari = append(safari, safari_tmp)
+
+		wechat_tmp := make(map[string]interface{}, 1)
+		wechat_total, _ := models.GetTotalByHostPhone(nil, host, date_tmp, "MicroMessenger")
+		wechat_tmp[date_tmp] = wechat_total
+		wechat = append(wechat, wechat_tmp)
+
+		qq_tmp := make(map[string]interface{}, 1)
+		qq_total, _ := models.GetTotalByHostPhone(nil, host, date_tmp, "QQ")
+		qq_tmp[date_tmp] = qq_total
+		qq = append(qq, qq_tmp)
+
+		browser_else_tmp := make(map[string]interface{}, 1)
+		browser_else_total := click_total - safari_total - wechat_total - qq_total
+		browser_else_tmp[date_tmp] = browser_else_total
+		browser_else = append(browser_else, browser_else_tmp)
+
 	}
 	data["click"] = click
 	data["button"] = button
 
+	data["iphone"] = iphone
+	data["ipad"] = ipad
+	data["android"] = android
+	data["window"] = window
+	data["phone_else"] = phone_else
+
+	data["safari"] = safari
+	data["wechat"] = wechat
+	data["qq"] = qq
+	data["browser_else"] = browser_else
+
 	ret["data"] = data
 	c.JSON(200, ret)
-
 }

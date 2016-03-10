@@ -61,6 +61,7 @@ var Apps = function (resolve, reject) {
                                     "appid": vm.app.appid,
                                     "appname": vm.app.appname,
                                     "appschema": vm.app.appschema,
+                                    "apphsot": vm.app.apphost,
                                     "appicon": vm.app.icon
                                 }),
                                 credentials: 'same-origin'
@@ -82,6 +83,7 @@ var Apps = function (resolve, reject) {
                                     "appid": vm.app.appid,
                                     "appname": vm.app.appname,
                                     "appschema": vm.app.appschema,
+                                    "apphost": vm.app.apphost,
                                     "icon": vm.app.icon
                                 }),
                                 credentials: 'same-origin'
@@ -104,6 +106,7 @@ var Apps = function (resolve, reject) {
                             "appid": "",
                             "appname": "",
                             "appschema": "",
+                            "apphost": "",
                             "icon": "",
                         };
                         this.modal_title = '增加应用';
@@ -125,7 +128,14 @@ var Apps = function (resolve, reject) {
                     	console.log(url);
                     	window.open(url);
 
+                    },
+                    show_app_data_host: function (app) {
+                    	var url = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + "/web/components/stats.html?host=" + app.apphost;
+                    	console.log(url);
+                    	window.open(url);
+
                     }
+
                 }
             });
         });

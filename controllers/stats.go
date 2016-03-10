@@ -110,3 +110,55 @@ func StatsTotal(c *gin.Context) {
 	ret["data"] = data
 	c.JSON(200, ret)
 }
+
+func StatsHost(c *gin.Context) {
+	q := c.Request.URL.Query()
+	hostStr := q["host"][0]
+
+	var delta int
+	delta = 7
+	time_now := time.Now().AddDate(0, 0, -delta+1)
+
+	var t_start int64
+	if len(q["start"]) > 0 {
+		t_start_str := q["start"][0]
+		t_start, _ = strconv.ParseInt(t_start_str, 10, 64)
+		start_utc := time.Unix(t_start, 0)
+		time_now = start_utc
+	}
+
+	var t_end int64
+	if len(q["end"]) > 0 {
+		t_end_str := q["end"][0]
+		t_end, _ = strconv.ParseInt(t_end_str, 10, 64)
+	}
+
+	if t_start > 0 && t_end > 0 {
+		delta = int((t_end - t_start) / (24 * 3600))
+	}
+
+	ret := gin.H{"status": true}
+
+	var data map[string]interface{}
+	data = make(map[string]interface{})
+
+	var click map[string]interface{}
+	click = make(map[string]interface{})
+	var button map[string]interface{}
+	button = make(map[string]interface{})
+
+	data["click"] = click
+	data["button"] = button
+
+	for i := 0; i < delta; i++ {
+		time_now_tmp := time_now.AddDate(0, 0, +i)
+		year, month, day := time_now_tmp.Date()
+		date_tmp := fmt.Sprintf("%d-%d-%d", year, month, day)
+		click[date_tmp], _ = models.GetClickTotalByHost(nil, hostStr, date_tmp)
+		button[date_tmp], _ = models.GetButtonTotalByHost(nil, hostStr, date_tmp)
+	}
+
+	ret["data"] = data
+	c.JSON(200, ret)
+
+}

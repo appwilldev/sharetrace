@@ -90,6 +90,7 @@ CREATE TABLE app_info (
     appid VARCHAR(256) NOT NULL,
     appname  VARCHAR(256) NOT NULL,
     appschema VARCHAR(256) NOT NULL,
+    apphost VARCHAR(256) DEFAULT NULL,
     appicon VARCHAR(2048) DEFAULT NULL,
     userid BIGINT NOT NULL, 
     des TEXT DEFAULT NULL,                                                          
@@ -97,6 +98,8 @@ CREATE TABLE app_info (
     created_utc INT NOT NULL
 );
 CREATE UNIQUE INDEX uidx_ai_appid ON app_info(appid);                                 
+--Alter table app_info add column apphost varchar(256) default null
+
 -- 同appid， 同ida，只算一个? 客户端要判断，用户是否已经安装过了
 -- 用户安装了，删除了，又安装了, 怎么算
 

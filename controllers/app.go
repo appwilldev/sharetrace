@@ -14,6 +14,7 @@ type NewAppPostData struct {
 	Appid     string `json:"appid" binding:"required"`
 	AppName   string `json:"appname" binding:"required"`
 	AppSchema string `json:"appschema" binding:"required"`
+	AppHost   string `json:"apphost" binding:"required"`
 	AppIcon   string `json:"appicon"`
 }
 
@@ -47,6 +48,7 @@ func NewApp(c *gin.Context) {
 	appInfo.Appid = reqData.Appid
 	appInfo.AppName = reqData.AppName
 	appInfo.AppSchema = reqData.AppSchema
+	appInfo.AppHost = reqData.AppHost
 	appInfo.Userid = userid
 	appInfo.AppIcon = reqData.AppIcon
 	appInfo.CreatedUTC = utils.GetNowSecond()
@@ -65,6 +67,7 @@ type UpdateAppPostData struct {
 	Appid     string `json:"appid"`
 	AppName   string `json:"appname"`
 	AppSchema string `json:"appschema"`
+	AppHost   string `json:"apphost"`
 	AppIcon   string `json:"appicon"`
 }
 
@@ -85,6 +88,7 @@ func UpdateApp(c *gin.Context) {
 	appInfo.Appid = reqData.Appid
 	appInfo.AppName = reqData.AppName
 	appInfo.AppSchema = reqData.AppSchema
+	appInfo.AppHost = reqData.AppHost
 	appInfo.AppIcon = reqData.AppIcon
 
 	err = models.UpdateDBModel(nil, appInfo)
@@ -105,7 +109,11 @@ func AppInfoAll(c *gin.Context) {
 
 	var res []*models.AppInfo
 	user, _ := models.GetUserInfoById(nil, userid)
-	res, total, _ := models.GetAppInfoListByUserid(nil, userid)
+	res, total, err := models.GetAppInfoListByUserid(nil, userid)
+	if err != nil {
+		Error(c, SERVER_ERROR, nil, err.Error())
+		return
+	}
 	if user.Name == "admin" {
 		res, total, _ = models.GetAppInfoAll(nil)
 		resLen := len(res)

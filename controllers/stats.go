@@ -166,6 +166,7 @@ func StatsHost(c *gin.Context) {
 	safari := make([]interface{}, 0)
 	wechat := make([]interface{}, 0)
 	qq := make([]interface{}, 0)
+	chrome := make([]interface{}, 0)
 	browser_else := make([]interface{}, 0)
 
 	for i := 0; i < delta; i++ {
@@ -223,6 +224,11 @@ func StatsHost(c *gin.Context) {
 		qq_tmp[date_tmp] = qq_total
 		qq = append(qq, qq_tmp)
 
+		chrome_tmp := make(map[string]interface{}, 1)
+		chrome_total, _ := models.GetTotalByHostPhone(nil, host, date_tmp, "Chrome")
+		chrome_tmp[date_tmp] = chrome_total
+		chrome = append(chrome, chrome_tmp)
+
 		browser_else_tmp := make(map[string]interface{}, 1)
 		browser_else_total := click_total - safari_total - wechat_total - qq_total
 		browser_else_tmp[date_tmp] = browser_else_total
@@ -241,6 +247,7 @@ func StatsHost(c *gin.Context) {
 	data["safari"] = safari
 	data["wechat"] = wechat
 	data["qq"] = qq
+	data["chrome"] = chrome
 	data["browser_else"] = browser_else
 
 	ret["data"] = data

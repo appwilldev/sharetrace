@@ -124,7 +124,7 @@ var Apps = function (resolve, reject) {
                         router.go('/apps')
                     },
                     show_app_data: function (app) {
-                    	var url = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + "/web/components/stats.html?appid=" + app.appid;
+                    	var url = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + "/web/components/stats.html?appid=" + app.appid + "&appname=" + app.appname;
                     	console.log(url);
                     	window.open(url);
 

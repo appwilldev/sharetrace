@@ -76,7 +76,8 @@
         // 指定图表的配置项和数据
         var url_vars = $.getUrlVars();                                           
         var appid=url_vars["appid"];
-        $("#stattitle").html(appid);
+        var appname=url_vars["appname"];
+        $("#stattitle").html(appname);
         var ret_data;
         var legend_data = new Array();
         var loudou_legend_data = new Array();

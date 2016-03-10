@@ -83,29 +83,41 @@ func StatsTotal(c *gin.Context) {
 	var data map[string]interface{}
 	data = make(map[string]interface{})
 
-	var share map[string]interface{}
-	share = make(map[string]interface{})
-	var click map[string]interface{}
-	click = make(map[string]interface{})
-	var install map[string]interface{}
-	install = make(map[string]interface{})
-	var button map[string]interface{}
-	button = make(map[string]interface{})
-
-	data["share"] = share
-	data["click"] = click
-	data["install"] = install
-	data["button"] = button
+	share := make([]interface{}, 0)
+	click := make([]interface{}, 0)
+	button := make([]interface{}, 0)
+	install := make([]interface{}, 0)
 
 	for i := 0; i < delta; i++ {
 		time_now_tmp := time_now.AddDate(0, 0, +i)
 		year, month, day := time_now_tmp.Date()
 		date_tmp := fmt.Sprintf("%d-%d-%d", year, month, day)
-		share[date_tmp], _ = models.GetShareTotalByAppid(nil, appIdStr, date_tmp)
-		click[date_tmp], _ = models.GetClickTotalByAppid(nil, appIdStr, date_tmp)
-		install[date_tmp], _ = models.GetInstallTotalByAppid(nil, appIdStr, date_tmp)
-		button[date_tmp], _ = models.GetButtonTotalByAppid(nil, appIdStr, date_tmp)
+
+		share_tmp := make(map[string]interface{}, 1)
+		share_total, _ := models.GetShareTotalByAppid(nil, appIdStr, date_tmp)
+		share_tmp[date_tmp] = share_total
+		share = append(share, share_tmp)
+
+		click_tmp := make(map[string]interface{}, 1)
+		click_total, _ := models.GetClickTotalByAppid(nil, appIdStr, date_tmp)
+		click_tmp[date_tmp] = click_total
+		click = append(click, click_tmp)
+
+		button_tmp := make(map[string]interface{}, 1)
+		button_total, _ := models.GetButtonTotalByAppid(nil, appIdStr, date_tmp)
+		button_tmp[date_tmp] = button_total
+		button = append(button, button_tmp)
+
+		install_tmp := make(map[string]interface{}, 1)
+		install_total, _ := models.GetInstallTotalByAppid(nil, appIdStr, date_tmp)
+		install_tmp[date_tmp] = install_total
+		install = append(install, install_tmp)
 	}
+
+	data["share"] = share
+	data["click"] = click
+	data["install"] = install
+	data["button"] = button
 
 	ret["data"] = data
 	c.JSON(200, ret)
@@ -113,7 +125,7 @@ func StatsTotal(c *gin.Context) {
 
 func StatsHost(c *gin.Context) {
 	q := c.Request.URL.Query()
-	hostStr := q["host"][0]
+	host := q["host"][0]
 
 	var delta int
 	delta = 7
@@ -142,21 +154,27 @@ func StatsHost(c *gin.Context) {
 	var data map[string]interface{}
 	data = make(map[string]interface{})
 
-	var click map[string]interface{}
-	click = make(map[string]interface{})
-	var button map[string]interface{}
-	button = make(map[string]interface{})
-
-	data["click"] = click
-	data["button"] = button
+	click := make([]interface{}, 0)
+	button := make([]interface{}, 0)
 
 	for i := 0; i < delta; i++ {
 		time_now_tmp := time_now.AddDate(0, 0, +i)
 		year, month, day := time_now_tmp.Date()
 		date_tmp := fmt.Sprintf("%d-%d-%d", year, month, day)
-		click[date_tmp], _ = models.GetClickTotalByHost(nil, hostStr, date_tmp)
-		button[date_tmp], _ = models.GetButtonTotalByHost(nil, hostStr, date_tmp)
+
+		click_tmp := make(map[string]interface{}, 1)
+		click_total, _ := models.GetClickTotalByHost(nil, host, date_tmp)
+		click_tmp[date_tmp] = click_total
+		click = append(click, click_tmp)
+
+		button_tmp := make(map[string]interface{}, 1)
+		button_total, _ := models.GetButtonTotalByHost(nil, host, date_tmp)
+		button_tmp[date_tmp] = button_total
+		button = append(button, button_tmp)
+
 	}
+	data["click"] = click
+	data["button"] = button
 
 	ret["data"] = data
 	c.JSON(200, ret)

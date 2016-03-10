@@ -104,13 +104,14 @@
         	ret_data = data;
             total_dict= {};
 
-            //console.log(series_data);
             var total_click= 0;
-            for (var key in ret_data.data["click"]){
-            	xAxis_data.push(key);
-                total_click= total_click+ ret_data.data["click"][key];
+            for (var i=0;i<ret_data.data["click"].length;i++){
+                for (var key in ret_data.data["click"][i]){
+                	xAxis_data.push(key);
+                    total_click= total_click+ ret_data.data["click"][i][key];
+                }
             }
-            console.log("total_click", total_click);
+            //console.log("total_click", total_click);
 
         	for (var key in ret_data.data) {
                 legend_data.push(key);
@@ -119,27 +120,14 @@
                 var series_line = {};
                 series_line["name"] = key;
                 series_line["type"] = "line";
-                //if (key == "share") {
-                //    series_line["itemStyle"] = {normal: { label: { show:true },color:'#ffd700'}};
-                //}
-
-                //if (key == "click") {
-                //    series_line["itemStyle"] = {normal: { label: { show:true },color:'#add8e6'}};
-                //}
-
-                //if (key == "install") {
-                //    series_line["itemStyle"] = {normal: { label: { show:true },color:'#ff6347'}};
-                //}
-
-                //series_line["stack"] = "总量";
                 series_line["data"] = new Array();
-                for (var datekey in ret_data.data[key]){
-                	series_line["data"].push(ret_data.data[key][datekey]);
-                    total_dict[key]=total_dict[key] + ret_data.data[key][datekey];
+                for (var i=0;i<ret_data.data[key].length;i++){
+                    for (var datekey in ret_data.data[key][i]){
+                    	series_line["data"].push(ret_data.data[key][i][datekey]);
+                        total_dict[key]=total_dict[key] + ret_data.data[key][i][datekey];
+                    }
                 }
-                //console.log(series_line);
                 series_data.push(series_line);
-                //loudou_series_data.push({value:total_dict[key],percent:parseInt(total_dict[key]*100/total_share), name:key});
                 loudou_series_data.push({value:parseInt(total_dict[key]*100/total_click), name:key});
                 total_series_data.push({value:total_dict[key], name:key});
             }

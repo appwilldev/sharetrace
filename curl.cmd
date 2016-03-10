@@ -30,4 +30,6 @@ SELECT count(*) FROM "share_url" INNER JOIN "click_session" ON share_url.id=clic
 SELECT count(*), (date(to_timestamp(click_session.created_utc)))  FROM "share_url" INNER JOIN "click_session" ON share_url.id=click_session.shareid WHERE ((appid='123') AND (installid is not null)) group by date(to_timestamp(click_session.created_utc)) ;
 
 
+SELECT count(*) FROM "click_session" WHERE (url_host='i.apptao.com') AND (date(to_timestamp(created_utc))='2016-3-10')
+
 

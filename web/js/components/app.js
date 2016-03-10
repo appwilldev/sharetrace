@@ -130,7 +130,7 @@ var Apps = function (resolve, reject) {
 
                     },
                     show_app_data_host: function (app) {
-                    	var url = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + "/web/components/stats.html?host=" + app.apphost;
+                    	var url = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + "/web/components/hoststats.html?host=" + app.apphost;
                     	console.log(url);
                     	window.open(url);
 

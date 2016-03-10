@@ -24,13 +24,12 @@
 <body>
 
 
-<div style="width: 600px; margin-left:120px; ">
+<div style="width: 1200px; margin-left:120px; ">
+<h3 id="stattitle"></h3>
 <input id="datepicker_start" class="datetimepicker" type="text" size="20"> 
 -
 <input id="datepicker_end" class="datetimepicker" type="text" size="20"> 
 <button type="button" onclick="search()">查询</button>
-</div>
-<div style="width: 600px; margin-left:20px;">
 <span style="font-size:15px">
 名词解释：Click:点击URL | Button:点击安装按钮 
 <span>
@@ -39,19 +38,19 @@
 <br/>
 <br/>
 
-<div id="main" style="width: 600px;height:400px;"></div>
+<div id="main" style="width: 1200px;height:400px;"></div>
 <br/>
 <br/>
 
-<div id="phone" style="width: 600px;height:400px;"></div>
+<div id="phone" style="width: 1200px;height:400px;"></div>
 <br/>
 <br/>
 
-<div id="browser" style="width: 600px;height:400px;"></div>
+<div id="browser" style="width: 1200px;height:400px;"></div>
 <br/>
 <br/>
 
-<div id="loudou" style="width: 600px;height:400px;"></div>
+<div id="loudou" style="width: 1200px;height:400px;"></div>
 <script type="text/javascript">
     // 基于准备好的dom，初始化echarts实例
     var mainChart = echarts.init(document.getElementById('main'));
@@ -82,6 +81,7 @@
         // 指定图表的配置项和数据
         var url_vars = $.getUrlVars();                                           
         var host=url_vars["host"];
+        $("#stattitle").html(host);
         var ret_data;
         var legend_data = new Array();
         var loudou_legend_data = new Array();

@@ -25,6 +25,7 @@
 
 
 <div style="width: 600px; margin-left:120px; ">
+<h3 id="stattitle"></h3>
 <input id="datepicker_start" class="datetimepicker" type="text" size="20"> 
 -
 <input id="datepicker_end" class="datetimepicker" type="text" size="20"> 
@@ -75,6 +76,7 @@
         // 指定图表的配置项和数据
         var url_vars = $.getUrlVars();                                           
         var appid=url_vars["appid"];
+        $("#stattitle").html(appid);
         var ret_data;
         var legend_data = new Array();
         var loudou_legend_data = new Array();

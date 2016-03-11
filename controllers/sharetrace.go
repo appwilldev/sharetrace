@@ -162,6 +162,7 @@ func WebBeacon(c *gin.Context) {
 	}
 	idShareStr, err := caches.GetShareURLIdByUrl(share_url)
 	var shareid int64
+	shareid = 0
 	if err != nil {
 		log.Println(err.Error())
 		// not return when redis_nil_value, for domain trace
@@ -202,10 +203,36 @@ func WebBeacon(c *gin.Context) {
 	//log.Println("agentid:", agentid)
 	_, err = caches.GetClickSessionIdByAgentId(agentid)
 	if err != nil {
-		//log.Println("No such agentid, need create new clicksession:", agentid)
+		log.Println("No such agentid, need create new clicksession:", agentid)
 	} else {
-		// TODO need reset cookie?
-		//log.Println("Exist agentid")
+		log.Println("Exist agentid")
+		// if exist stcookieid, return
+		stagentid_cookie, stagentid_err := c.Request.Cookie("stagentid")
+		if stagentid_err == nil {
+			if stagentid_cookie == nil || stagentid_cookie.Value == "" {
+			} else {
+				//log.Println("Exist stagentid:", stagentid_cookie.Value)
+				return
+			}
+		} else {
+			// need reset cookie and overwrite older agentid for buton click
+			old_data, _ := models.GetClickSessionByAgentId(nil, agentid)
+			log.Println("get old_data by agentid:", old_data)
+			cookie := new(http.Cookie)
+			if click_type == conf.CLICK_TYPE_COOKIE && old_data.Cookieid != "" {
+				cookie.Name = "stcookieid"
+				cookie.Value = old_data.Cookieid
+				cookie.Path = "/"
+				http.SetCookie(c.Writer, cookie)
+			}
+			if old_data.AgentId != "" {
+				cookie.Name = "stagentid"
+				cookie.Value = old_data.AgentId
+				cookie.Path = "/"
+				http.SetCookie(c.Writer, cookie)
+			}
+			return
+		}
 		return
 	}
 

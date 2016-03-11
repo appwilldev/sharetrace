@@ -143,6 +143,19 @@ func GetClickSessionByIP(s *ModelSession, IPStr string) (*ClickSession, error) {
 	return data, nil
 }
 
+func GetClickSessionByAgentId(s *ModelSession, str string) (*ClickSession, error) {
+	if s == nil {
+		s = newAutoCloseModelsSession()
+	}
+	data := &ClickSession{}
+	has, err := s.Where("agentid=?", str).OrderBy("id desc").Get(data)
+	// TOASK not only one?
+	if !has || err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
 //////////////////// User Share Info
 type ShareClick struct {
 	ShareURL     `xorm:"extends"`

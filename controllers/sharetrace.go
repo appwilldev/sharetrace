@@ -148,16 +148,6 @@ func Score(c *gin.Context) {
 
 // Just return nothing, maybe  set cookie
 func WebBeacon(c *gin.Context) {
-	// if exist stcookieid, return
-	stcookieid_cookie, stcookieid_err := c.Request.Cookie("stcookieid")
-	if stcookieid_err == nil {
-		if stcookieid_cookie == nil || stcookieid_cookie.Value == "" {
-		} else {
-			//log.Println("Exist stcookieid:", stcookieid_cookie.Value)
-			return
-		}
-	}
-
 	// if no share_url para, return
 	q := c.Request.URL.Query()
 	share_url := q["share_url"][0]
@@ -174,7 +164,7 @@ func WebBeacon(c *gin.Context) {
 	var shareid int64
 	if err != nil {
 		log.Println(err.Error())
-		// not return when redis_nil_value
+		// not return when redis_nil_value, for domain trace
 	} else {
 		shareid, err = strconv.ParseInt(idShareStr, 10, 64)
 		if err != nil {
@@ -209,22 +199,41 @@ func WebBeacon(c *gin.Context) {
 	md5Ctx.Write([]byte(agent_info))
 	agentid := hex.EncodeToString(md5Ctx.Sum(nil))
 
+	//log.Println("agentid:", agentid)
+	_, err = caches.GetClickSessionIdByAgentId(agentid)
+	if err != nil {
+		//log.Println("No such agentid, need create new clicksession:", agentid)
+	} else {
+		// TODO need reset cookie?
+		//log.Println("Exist agentid")
+		return
+	}
+
 	if click_type == conf.CLICK_TYPE_COOKIE {
+		// if exist stcookieid, return
+		//stcookieid_cookie, stcookieid_err := c.Request.Cookie("stcookieid")
+		//if stcookieid_err == nil {
+		//	if stcookieid_cookie == nil || stcookieid_cookie.Value == "" {
+		//	} else {
+		//		//log.Println("Exist stcookieid:", stcookieid_cookie.Value)
+		//		return
+		//	}
+		//}
 	} else if click_type == conf.CLICK_TYPE_IP {
 		// if cookie forbidden by client, we can use IP
-		idStr, err := caches.GetClickSessionIdByIP(clientIP)
-		// if already exist IP cache, recookie, return
-		if err == nil && idStr != "" {
-			log.Println("Exist IP:", clientIP)
-			// TODO:没有 cookie，但是同IP， 不同Agent呢？
-			// if exist stagentid, return
-			_, err = caches.GetClickSessionIdByAgentId(agentid)
-			if err != nil {
-				log.Println("Exist IP but no such agentid:", agentid)
-			} else {
-				return
-			}
-		}
+		//idStr, err := caches.GetClickSessionIdByIP(clientIP)
+		//// if already exist IP cache, recookie, return
+		//if err == nil && idStr != "" {
+		//	log.Println("Exist IP:", clientIP)
+		//	// TODO:没有 cookie，但是同IP， 不同Agent呢？
+		//	// if exist stagentid, return
+		//	_, err = caches.GetClickSessionIdByAgentId(agentid)
+		//	if err != nil {
+		//		log.Println("Exist IP but no such agentid:", agentid)
+		//	} else {
+		//		return
+		//	}
+		//}
 	}
 
 	id, err := models.GenerateClickSessionId()
@@ -266,9 +275,9 @@ func WebBeacon(c *gin.Context) {
 	}
 
 	cookie := new(http.Cookie)
-	if data.Cookieid != "" {
+	if click_type == conf.CLICK_TYPE_COOKIE && data.Cookieid != "" {
 		cookie.Name = "stcookieid"
-		cookie.Expires = time.Now().Add(time.Duration(7*86400) * time.Second)
+		//cookie.Expires = time.Now().Add(time.Duration(7*86400) * time.Second)
 		cookie.Value = data.Cookieid
 		cookie.Path = "/"
 		http.SetCookie(c.Writer, cookie)

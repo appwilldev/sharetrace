@@ -119,30 +119,44 @@ func Score(c *gin.Context) {
 	var data map[string]interface{}
 	data = make(map[string]interface{})
 	var total = float64(0.0)
+
+	var new_dataList = make([]*models.ShareClick, 0)
+	time_now := time.Now()
+	year, month, day := time_now.Date()
+	date_now := fmt.Sprintf("%d-%d-%d", year, month, day)
+	total_today := 0.0
 	for _, row := range dataList {
-		row.ClickSession.Des = "用户：" + row.ClickSession.Cookieid + " 点击了用户ID:" + row.ShareURL.Fromid + "的分享链接:" + row.ShareURL.ShareURL
-		if row.ClickSession.Installid != "" {
-			row.ClickSession.Des = "推荐下载 获得100分: " + row.ClickSession.Des
-			total = total + 100
-		} else {
-			row.ClickSession.Des = "分享被点击 获得1分: " + row.ClickSession.Des
-			total = total + 1
-		}
+		des := "用户 " + row.ClickSession.Cookieid + " 点击了链接:" + row.ShareURL.ShareURL + " 然后安装了App"
+
 		created_utc := time.Unix(int64(row.ClickSession.CreatedUTC), 0)
 		year, mon, day := created_utc.Date()
 		hour, min, sec := created_utc.Clock()
+		date_tmp := fmt.Sprintf("%d-%d-%d", year, month, day)
+
+		if row.ClickSession.Installid != "" {
+			row.ClickSession.Des = "下载成功 获得1.00元: " + des
+			total = total + 100
+			if date_tmp == date_now {
+				total_today = total_today + 100
+			}
+		} else {
+			continue
+		}
 		s := fmt.Sprintf("%d-%d-%d %02d:%02d:%02d\n", year, mon, day, hour, min, sec)
-		row.ClickSession.Des = row.ClickSession.Des + s
+		row.ClickSession.Des = row.ClickSession.Des + "       " + s
 		row.ScoreDesc = row.ClickSession.Des
-
+		new_dataList = append(new_dataList, row)
 	}
-	data["total"] = total
-	data["res"] = dataList
+	data["total_today"] = fmt.Sprintf("%.2f", total_today/100.0)
+	data["total"] = fmt.Sprintf("%.2f", total/100.0)
+	used := 0.0
+	data["total_left"] = fmt.Sprintf("%.2f", total/100.0-used)
+	data["res"] = new_dataList
 
-	ret := gin.H{"status": true}
-	ret["data"] = data
-	c.JSON(200, ret)
-	//c.HTML(200, "mymoney.html", data)
+	//ret := gin.H{"status": true}
+	//ret["data"] = data
+	//c.JSON(200, ret)
+	c.HTML(200, "score.html", data)
 	return
 }
 

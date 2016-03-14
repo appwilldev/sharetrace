@@ -152,7 +152,7 @@ func main() {
 
 	}
 
-	ginIns.LoadHTMLFiles("./templates/webbeaconcheck.html")
+	ginIns.LoadHTMLFiles("./templates/webbeaconcheck.html", "./templates/score.html")
 
 	gracehttp.Serve(&http.Server{Addr: conf.HttpAddr, Handler: ginIns})
 }

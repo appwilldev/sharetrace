@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>收益统计</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="dns-prefetch" href="//res.wx.qq.com">
+    <link rel="dns-prefetch" href="//mmbiz.qpic.cn">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <script src="../../web/lib/jquery-2.1.4.min.js"></script>
+    <script src="../../web/lib/jquery.cookie.js"></script>
+    <!--[if lt IE 9]>
+    <link rel="stylesheet" type="text/css" href="http://res.wx.qq.com/mmbizwap/zh_CN/htmledition/style/page/appmsg/page_mp_article_improve_pc23b0e8.css">
+    <![endif]-->
+
+    <script language="JavaScript">
+        function utc2bjtime(time_utc){
+            var d = new Date(time_utc * 1000);
+            var tmp_time = d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日'; 
+            tmp_time = tmp_time + " " + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds(); 
+            return tmp_time;
+       }  
+    </script>
+
+    <style type="text/css" media="screen">
+*{
+  margin:0;
+}
+body {
+  background:#1d1e24;
+  font-family: "Helvetica Neue";
+}
+  @media screen and (min-device-width: 450px) {
+  body {
+    margin: 0 15% 0 15%;
+  }
+}
+
+.cell {
+  flex:1;
+  flex-direction: row ;
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+}
+.desc {
+  margin:0 10px 0 10px;
+}
+.desc > h3 {
+  color: white;
+}
+.desc > p{
+  color: #989aa2;
+}
+.author {
+  float:right;
+  display:table;
+  margin-top:10px;
+}
+.author > .name {
+  color:#6885ff;
+  padding-right: 10px;
+
+  display: table-cell;
+  vertical-align: middle;
+}
+.author > .avatar {
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+}
+.author_comment {
+  float:left;
+  display:table;
+  margin-top:10px;
+}
+.author_comment > .name {
+  color:#6885ff;
+  padding-right: 10px;
+
+  display: table-cell;
+  vertical-align: middle;
+}
+.author_comment > .avatar {
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+}
+.more {
+  height: 240px;
+  width: 100%;
+  background-size:cover;
+  background-color: white;
+  transition: opacity .5s; opacity: 1;
+  display:table;
+}
+.more > .title {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  background:#000;
+  color:white;
+  filter:alpha(Opacity=70);
+  opacity: 0.7;
+}
+.btn-share {
+  background-color:#ffcd65;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+}
+.btn-share > img {
+  max-width: 100%;
+  height: 64px;
+}
+
+.cell > textarea{
+  float:left;
+  display:table;
+  margin-top:20px;
+}
+.textarea_button{
+  float:right;
+}
+
+    </style>
+  </head>
+
+  <body class="zh_CN " ontouchstart="">
+
+    {{if .res}}
+    <div class="cell" style="height:20px;padding-top:10px;">
+        <span style="color:#fe6639;text-align:center;">今日收益:{{.total_today}}元</span>
+        <span style="color:#fe6639;text-align:center;">总收益:{{.total}}元</span>
+        <span style="color:#fe6639;text-align:center;">剩余收益:{{.total_left}}元</span>
+    </div>
+    <div class="cell" style="height:65px;">
+    </div>
+
+    {{range .res}}
+    <div class="cell desc">
+      <p>{{.ClickSession.Des}}</p>
+      <br/>
+    </div>
+    {{end}}
+    {{end}}
+
+
+    <script type="text/javascript">
+  window.onload = function() {
+    'use strict';
+    //document.body.style.paddingBottom = document.getElementById('btn-share').offsetHeight + 'px';
+  };
+
+    </script>
+  </body>
+</html>
+

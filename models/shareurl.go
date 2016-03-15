@@ -84,6 +84,7 @@ type ClickSession struct {
 	ClickURL string `xorm:"click_url VARCHAR(2048) DEFAULT NULL" json:"click_url"`
 
 	Status     int `xorm:"status INT DEFAULT 0" json:"status"`
+	InstallUTC int `xorm:"install_utc INT DEFAULT NULL" json:"install_utc"`
 	CreatedUTC int `xorm:"created_utc INT" json:"created_utc"`
 }
 

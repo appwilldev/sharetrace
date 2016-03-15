@@ -460,6 +460,7 @@ func WebBeaconCheck(c *gin.Context) {
 			data.Installid = installid
 			data.ClickType = click_type
 			data.Status = conf.CLICK_SESSION_STATUS_INSTALLED
+			data.InstallUTC = utils.GetNowSecond()
 			err = models.UpdateDBModel(nil, data)
 			if err != nil {
 				Error(c, SERVER_ERROR, nil, err.Error())

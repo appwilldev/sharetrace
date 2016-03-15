@@ -49,6 +49,7 @@ CREATE TABLE click_session(
     click_url VARCHAR(2048) DEFAULT NULL,                                                
     des TEXT DEFAULT NULL,
     status INT DEFAULT 0,
+    install_utc INT DEFAULT NULL,
     created_utc INT
 );                                                                                  
 CREATE INDEX idx_cs_cookieid ON click_session(cookieid);                                 
@@ -59,6 +60,7 @@ CREATE INDEX idx_cs_shareid ON click_session(shareid);
 --alter table click_session alter column shareid drop not null;
 --alter table click_session alter column cookieid  set default null;
 --alter table click_session alter column shareid  set default 0;
+--ALTER TABLE click_session ADD COLUMN install_utc int default NULL;
 --ALTER TABLE click_session ADD COLUMN click_type int default 0;
 --ALTER TABLE click_session ADD COLUMN agent varchar(1024) default null;
 --ALTER TABLE click_session ADD COLUMN agentip varchar(256) default null;
@@ -114,8 +116,8 @@ CREATE TABLE click_trace(
     agentip VARCHAR(256) DEFAULT NULL,
     agentid VARCHAR(1024) DEFAULT NULL,                                             
     des TEXT DEFAULT NULL,                                                          
-    status INT DEFAULT 0,                                                           
-    created_utc INT                                                                 
-);                                                                                  
+    status INT DEFAULT 0,
+    created_utc INT
+    );                                                                                  
 CREATE UNIQUE INDEX uidx_ct_agentid ON click_trace(agentid);
  

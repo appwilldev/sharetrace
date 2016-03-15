@@ -61,7 +61,11 @@ var Apps = function (resolve, reject) {
                                     "appid": vm.app.appid,
                                     "appname": vm.app.appname,
                                     "appschema": vm.app.appschema,
-                                    "apphsot": vm.app.apphost,
+                                    "apphost": vm.app.apphost,
+                                    "status": parseInt(vm.app.status),
+                                    "share_click_money": parseInt(vm.app.share_click_money),
+                                    "share_install_money": parseInt(vm.app.share_install_money),
+                                    "install_money": parseInt(vm.app.install_money),
                                     "appicon": vm.app.icon
                                 }),
                                 credentials: 'same-origin'
@@ -84,6 +88,10 @@ var Apps = function (resolve, reject) {
                                     "appname": vm.app.appname,
                                     "appschema": vm.app.appschema,
                                     "apphost": vm.app.apphost,
+                                    "status": parseInt(vm.app.status),
+                                    "share_click_money": parseInt(vm.app.share_click_money),
+                                    "share_install_money": parseInt(vm.app.share_install_money),
+                                    "install_money": parseInt(vm.app.install_money),
                                     "icon": vm.app.icon
                                 }),
                                 credentials: 'same-origin'
@@ -107,6 +115,10 @@ var Apps = function (resolve, reject) {
                             "appname": "",
                             "appschema": "",
                             "apphost": "",
+                            "status": "",
+                            "share_click_money": "",
+                            "share_install_money": "",
+                            "install_money": "",
                             "icon": "",
                         };
                         this.modal_title = '增加应用';

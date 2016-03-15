@@ -11,11 +11,15 @@ import (
 )
 
 type NewAppPostData struct {
-	Appid     string `json:"appid" binding:"required"`
-	AppName   string `json:"appname" binding:"required"`
-	AppSchema string `json:"appschema" binding:"required"`
-	AppHost   string `json:"apphost" binding:"required"`
-	AppIcon   string `json:"appicon"`
+	Appid             string `json:"appid" binding:"required"`
+	AppName           string `json:"appname" binding:"required"`
+	AppSchema         string `json:"appschema" binding:"required"`
+	AppHost           string `json:"apphost" binding:"required"`
+	Status            int    `json:"status "`
+	ShareClickMoney   int    `json:"share_click_money"`
+	ShareInstallMoney int    `json:"share_install_money"`
+	InstallMoney      int    `json:"install_money"`
+	AppIcon           string `json:"appicon"`
 }
 
 func NewApp(c *gin.Context) {
@@ -49,6 +53,10 @@ func NewApp(c *gin.Context) {
 	appInfo.AppName = reqData.AppName
 	appInfo.AppSchema = reqData.AppSchema
 	appInfo.AppHost = reqData.AppHost
+	appInfo.ShareClickMoney = reqData.ShareClickMoney
+	appInfo.ShareInstallMoney = reqData.ShareClickMoney
+	appInfo.InstallMoney = reqData.InstallMoney
+	appInfo.Status = reqData.Status
 	appInfo.Userid = userid
 	appInfo.AppIcon = reqData.AppIcon
 	appInfo.CreatedUTC = utils.GetNowSecond()
@@ -63,12 +71,16 @@ func NewApp(c *gin.Context) {
 }
 
 type UpdateAppPostData struct {
-	Id        int64  `json:"id" binding:"required"`
-	Appid     string `json:"appid"`
-	AppName   string `json:"appname"`
-	AppSchema string `json:"appschema"`
-	AppHost   string `json:"apphost"`
-	AppIcon   string `json:"appicon"`
+	Id                int64  `json:"id" binding:"required"`
+	Appid             string `json:"appid"`
+	AppName           string `json:"appname"`
+	AppSchema         string `json:"appschema"`
+	AppHost           string `json:"apphost"`
+	Status            int    `json:"status"`
+	ShareClickMoney   int    `json:"share_click_money"`
+	ShareInstallMoney int    `json:"share_install_money"`
+	InstallMoney      int    `json:"install_money"`
+	AppIcon           string `json:"appicon"`
 }
 
 func UpdateApp(c *gin.Context) {
@@ -89,6 +101,12 @@ func UpdateApp(c *gin.Context) {
 	appInfo.AppName = reqData.AppName
 	appInfo.AppSchema = reqData.AppSchema
 	appInfo.AppHost = reqData.AppHost
+
+	appInfo.ShareClickMoney = reqData.ShareClickMoney
+	appInfo.ShareInstallMoney = reqData.ShareInstallMoney
+	appInfo.InstallMoney = reqData.InstallMoney
+	appInfo.Status = reqData.Status
+
 	appInfo.AppIcon = reqData.AppIcon
 
 	err = models.UpdateDBModel(nil, appInfo)

@@ -108,16 +108,38 @@ func Share(c *gin.Context) {
 func Score(c *gin.Context) {
 	q := c.Request.URL.Query()
 	userIdStr := q["userid"][0]
-	userId, _ := strconv.ParseInt(userIdStr, 10, 64)
-	log.Println("Score userId:", userId)
+	//userId, _ := strconv.ParseInt(userIdStr, 10, 64)
+	//log.Println("Score userId:", userId)
 
 	appIdStr := q["appid"][0]
-	appId, _ := strconv.ParseInt(appIdStr, 10, 64)
-	log.Println("Score appId:", appId)
+	//appId, _ := strconv.ParseInt(appIdStr, 10, 64)
+	//log.Println("Score appId:", appId)
+
+	appDB, err := models.GetAppInfoByAppid(nil, appIdStr)
+	if err != nil {
+		Error(c, DATA_NOT_FOUND, nil, nil)
+		return
+	}
+
+	award_str := "APP当前奖励规则："
+	if appDB.Status == 0 {
+		award_str = "很抱歉，APP暂时没有奖励规则哦, 请您继续关注!"
+	} else {
+		if appDB.ShareClickMoney > 0 {
+			award_str = fmt.Sprintf("%s%s%.2f元;", award_str, "分享带来的点击每次奖励分享者", float64(appDB.ShareClickMoney/100))
+		}
+		if appDB.ShareInstallMoney > 0 {
+			award_str = fmt.Sprintf("%s%s%.2f元;", award_str, "分享带来的安装每次奖励分享者", float64(appDB.ShareInstallMoney/100))
+		}
+		if appDB.InstallMoney > 0 {
+			award_str = fmt.Sprintf("%s%s%.2f元;", award_str, "分享带来的安装每次奖励安装者", float64(appDB.ShareInstallMoney/100))
+		}
+	}
 
 	dataList, _ := models.GetShareClickListOfAppUser(nil, appIdStr, userIdStr)
 	var data map[string]interface{}
 	data = make(map[string]interface{})
+	data["award_str"] = award_str
 	var total = float64(0.0)
 
 	var new_dataList = make([]*models.ShareClick, 0)
@@ -435,6 +457,7 @@ func WebBeaconCheck(c *gin.Context) {
 		trackid = c.ClientIP()
 	}
 
+	log.Println("Install trackid:", trackid)
 	idStr, _ = caches.GetClickSessionId(click_type, trackid)
 	if idStr == "" {
 		old_data, err := models.GetClickSession(nil, click_type, trackid)
@@ -454,23 +477,70 @@ func WebBeaconCheck(c *gin.Context) {
 		return
 	} else {
 		id, _ := strconv.ParseInt(idStr, 10, 64)
-		data, _ := caches.GetClickSessionModelInfoById(id)
+		cs_data, _ := caches.GetClickSessionModelInfoById(id)
 
-		if data.Status == conf.CLICK_SESSION_STATUS_CLICK {
-			data.Installid = installid
-			data.ClickType = click_type
-			data.Status = conf.CLICK_SESSION_STATUS_INSTALLED
-			data.InstallUTC = utils.GetNowSecond()
-			err = models.UpdateDBModel(nil, data)
+		if cs_data.Status == conf.CLICK_SESSION_STATUS_CLICK {
+			cs_data.Installid = installid
+			cs_data.ClickType = click_type
+			cs_data.Status = conf.CLICK_SESSION_STATUS_INSTALLED
+			cs_data.InstallUTC = utils.GetNowSecond()
+			err = models.UpdateDBModel(nil, cs_data)
 			if err != nil {
 				Error(c, SERVER_ERROR, nil, err.Error())
 				return
 			}
-			err = caches.UpdateClickSession(data)
+			err = caches.UpdateClickSession(cs_data)
 			if err != nil {
 				Error(c, SERVER_ERROR, nil, err.Error())
 				return
 			}
+			// TODO add money for user
+			if app.Status == 1 {
+				if app.ShareInstallMoney > 0 {
+					// TODO 再判断一下是否已经给过钱了
+					id, err := models.GenerateAppuserMoneyId()
+					if err != nil {
+						log.Println(err.Error())
+						return
+					}
+					apm_data := new(models.AppuserMoney)
+					apm_data.Id = id
+					apm_data.Appid = app.Appid
+					apm_data.Appuserid = installid
+					apm_data.ClickSessionID = cs_data.Id
+					apm_data.MoneyType = conf.MONEY_TYPE_INSTALL_SHARER
+					apm_data.Money = app.ShareInstallMoney
+					apm_data.CreatedUTC = utils.GetNowSecond()
+					apm_data.Des = "分享链接吸引用户" + cs_data.Installid + "安装了App"
+					err = models.InsertDBModel(nil, apm_data)
+					if err != nil {
+						Error(c, SERVER_ERROR, nil, err.Error())
+						return
+					}
+				}
+				if app.InstallMoney > 0 {
+					id, err := models.GenerateAppuserMoneyId()
+					if err != nil {
+						log.Println(err.Error())
+						return
+					}
+					apm_data := new(models.AppuserMoney)
+					apm_data.Id = id
+					apm_data.Appid = app.Appid
+					apm_data.Appuserid = installid
+					apm_data.ClickSessionID = cs_data.Id
+					apm_data.MoneyType = conf.MONEY_TYPE_INSTALL_INSTALLER
+					apm_data.CreatedUTC = utils.GetNowSecond()
+					apm_data.Money = app.InstallMoney
+					apm_data.Des = "通过点击分享链接安装了App"
+					err = models.InsertDBModel(nil, apm_data)
+					if err != nil {
+						Error(c, SERVER_ERROR, nil, err.Error())
+						return
+					}
+				}
+			}
+
 		} else {
 			log.Println("Duplicated webbeaconcheck! Data:", trackid)
 		}

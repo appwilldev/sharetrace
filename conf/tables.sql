@@ -95,21 +95,75 @@ CREATE TABLE app_info (
     apphost VARCHAR(256) DEFAULT NULL,
     appicon VARCHAR(2048) DEFAULT NULL,
     userid BIGINT NOT NULL, 
-    des TEXT DEFAULT NULL,                                                          
-    status INT DEFAULT 0,                                                           
+
+    yue int DEFAULT 0,
+    share_click_money int DEFAULT 0,
+    share_install_money int DEFAULT 0,
+    install_money int DEFAULT 0,
+
+    des TEXT DEFAULT NULL,
+    status INT DEFAULT 0,
     created_utc INT NOT NULL
 );
 CREATE UNIQUE INDEX uidx_ai_appid ON app_info(appid);                                 
---Alter table app_info add column apphost varchar(256) default null
-
+--Alter table app_info add column apphost varchar(256) default null;
+--Alter table app_info add column yue int default 0; 
+--Alter table app_info add column share_click_money int default 0; 
+--Alter table app_info add column share_install_money int default 0; 
+--Alter table app_info add column install_money int default 0; 
 -- 同appid， 同ida，只算一个? 客户端要判断，用户是否已经安装过了
 -- 用户安装了，删除了，又安装了, 怎么算
+
+CREATE SEQUENCE appuser_money_id START 2016 NO CYCLE;
+CREATE TABLE appuser_money(
+    id BIGINT NOT NULL PRIMARY KEY,
+    appid VARCHAR(256) NOT NULL,
+    appuserid VARCHAR(256) NOT NULL,
+
+    click_session_id BIGINT DEFAULT NULL,
+    user_order_id BIGINT DEFAULT NULL,
+
+    money_type int default 0,
+    money int default 0,
+    money_status int default 0,
+
+    des TEXT DEFAULT NULL,
+    status INT DEFAULT 0,
+    created_utc INT NOT NULL
+);
+CREATE INDEX idx_aum_appid ON appuser_money(appid);                                    
+CREATE INDEX idx_aum_appuserid ON appuser_money(appuserid);                                    
+CREATE INDEX idx_aum_click_session_id ON appuser_money(click_session_id);                                    
+CREATE INDEX idx_aum_user_order_id ON appuser_money(user_order_id);                                    
+CREATE INDEX idx_aum_status ON appuser_money(status);                                    
+CREATE INDEX idx_aum_created_utc ON appuser_money(created_utc);
+
+CREATE SEQUENCE userorder_id START 2016 NO CYCLE;
+CREATE TABLE user_order(
+    id BIGINT NOT NULL PRIMARY KEY,
+    appid VARCHAR(256) NOT NULL,
+    appuserid VARCHAR(256) NOT NULL,
+    order_type int default 0,
+    order_money int default 0,
+    order_status int default 0,
+
+    phoneno VARCHAR(256) DEFAULT NULL,
+    cardnum VARCHAR(256) DEFAULT NULL,
+    cardid VARCHAR(256) DEFAULT NULL,
+    order_ret_info TEXT DEFAULT NULL,
+
+    des TEXT DEFAULT NULL,
+    status INT DEFAULT 0,
+    created_utc INT NOT NULL
+};
+
+
 
 -- ShareTrace 简化版本 ClickTrace
 -- agentid：  md5(click_url, agent, agentip)
 CREATE SEQUENCE click_trace_id START 2016 NO CYCLE;
 CREATE TABLE click_trace(
-    id BIGINT NOT NULL PRIMARY KEY,                                                 
+    id BIGINT NOT NULL PRIMARY KEY,
     click_url VARCHAR(1024) DEFAULT NULL,
     url_host VARCHAR(256) DEFAULT NULL,
     agent VARCHAR(1024) DEFAULT NULL,

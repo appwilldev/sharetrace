@@ -7,13 +7,19 @@ func GenerateAppInfoId() (int64, error) {
 }
 
 type AppInfo struct {
-	Id         int64  `xorm:"id INT PK NOT NULL" json:"id"`
-	Appid      string `xorm:"appid VARCHAR(256) NOT NULL" json:"appid"`
-	AppName    string `xorm:"appname VARCHAR(256) NOT NULL" json:"appname"`
-	AppSchema  string `xorm:"appschema VARCHAR(256) NOT NULL" json:"appschema"`
-	AppHost    string `xorm:"apphost VARCHAR(256) DEFAULT NULL" json:"apphost"`
-	AppIcon    string `xorm:"appicon VARCHAR(2048) DEFAULT NULL" json:"appicon"`
-	Userid     int64  `xorm:"userid VARCHAR(256) DEFAULT NULL" json:"userid"`
+	Id        int64  `xorm:"id INT PK NOT NULL" json:"id"`
+	Appid     string `xorm:"appid VARCHAR(256) NOT NULL" json:"appid"`
+	AppName   string `xorm:"appname VARCHAR(256) NOT NULL" json:"appname"`
+	AppSchema string `xorm:"appschema VARCHAR(256) NOT NULL" json:"appschema"`
+	AppHost   string `xorm:"apphost VARCHAR(256) DEFAULT NULL" json:"apphost"`
+	AppIcon   string `xorm:"appicon VARCHAR(2048) DEFAULT NULL" json:"appicon"`
+	Userid    int64  `xorm:"userid VARCHAR(256) DEFAULT NULL" json:"userid"`
+
+	Yue               int `xorm:"yue INT DEFAULT 0" json:"yue"`
+	ShareClickMoney   int `xorm:"share_click_money INT DEFAULT 0" json:"share_click_money"`
+	ShareInstallMoney int `xorm:"share_install_money INT DEFAULT 0" json:"share_install_money"`
+	InstallMoney      int `xorm:"install_money INT DEFAULT 0" json:"install_money"`
+
 	Des        string `xorm:"des TEXT  DEFAULT NULL" json:"des"`
 	Status     int    `xorm:"status INT NOT NULL" json:"status"`
 	CreatedUTC int    `xorm:"created_utc INT NOT NULL" json:"created_utc"`

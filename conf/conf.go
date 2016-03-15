@@ -38,6 +38,9 @@ const (
 	CLICK_TYPE_COOKIE              = 0
 	CLICK_TYPE_IP                  = 1
 	COOKIE_PREFIX                  = "st"
+	MONEY_TYPE_CLICK_SHARER        = 1
+	MONEY_TYPE_INSTALL_SHARER      = 2
+	MONEY_TYPE_INSTALL_INSTALLER   = 3
 )
 
 var (

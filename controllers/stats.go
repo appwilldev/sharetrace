@@ -34,7 +34,7 @@ func StatsShare(c *gin.Context) {
 		hour, min, sec := created_utc.Clock()
 		s := fmt.Sprintf("%d-%d-%d %02d:%02d:%02d\n", year, mon, day, hour, min, sec)
 		row.ClickSession.Des = row.ClickSession.Des + s
-		row.ScoreDesc = row.ClickSession.Des
+		row.ScoreDes = row.ClickSession.Des
 
 	}
 	data["total"] = total

@@ -150,6 +150,10 @@ func main() {
 		opAPIGroup.POST("/app", authHandler(), controllers.NewApp)
 		opAPIGroup.PUT("/app", authHandler(), controllers.UpdateApp)
 
+		// JHHF: Juhe Hua Fei
+		opAPIGroup.GET("yue", controllers.Remaining)
+		opAPIGroup.GET("telcheck", controllers.TelCheck)
+
 	}
 
 	ginIns.LoadHTMLFiles("./templates/webbeaconcheck.html", "./templates/score.html")

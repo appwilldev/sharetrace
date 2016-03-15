@@ -160,7 +160,8 @@ func GetClickSessionByAgentId(s *ModelSession, str string) (*ClickSession, error
 type ShareClick struct {
 	ShareURL     `xorm:"extends"`
 	ClickSession `xorm:"extends"`
-	ScoreDesc    string `xorm:"des TEXT DEFAULT NULL" json:"des"`
+	Score        string `xorm:"score VARCHAR(256) DEFAULT NULL" json:"score"`
+	ScoreDes     string `xorm:"des TEXT DEFAULT NULL" json:"des"`
 }
 
 func (ShareClick) TableName() string {

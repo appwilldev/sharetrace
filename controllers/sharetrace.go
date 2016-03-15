@@ -135,7 +135,9 @@ func Score(c *gin.Context) {
 
 		if row.ClickSession.Installid != "" {
 			row.ClickSession.Des = "下载成功 获得1.00元: " + des
-			total = total + 100
+			score := 100.0
+			row.Score = fmt.Sprintf("%.2f", score/100.0)
+			total = total + score
 			if date_tmp == date_now {
 				total_today = total_today + 100
 			}
@@ -144,8 +146,9 @@ func Score(c *gin.Context) {
 		}
 		s := fmt.Sprintf("%d-%d-%d %02d:%02d:%02d\n", year, mon, day, hour, min, sec)
 		row.ClickSession.Des = row.ClickSession.Des + "       " + s
-		row.ScoreDesc = row.ClickSession.Des
+		row.ScoreDes = row.ClickSession.Des
 		new_dataList = append(new_dataList, row)
+		log.Println("row:", row)
 	}
 	data["total_today"] = fmt.Sprintf("%.2f", total_today/100.0)
 	data["total"] = fmt.Sprintf("%.2f", total/100.0)

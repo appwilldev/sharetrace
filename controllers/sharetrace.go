@@ -136,39 +136,44 @@ func Score(c *gin.Context) {
 		}
 	}
 
-	dataList, _ := models.GetShareClickListOfAppUser(nil, appIdStr, userIdStr)
+	//dataList, _ := models.GetShareClickListOfAppUser(nil, appIdStr, userIdStr)
+	dataList, _, _ := models.GetAppuserMoneyListByUserid(nil, appIdStr, userIdStr)
 	var data map[string]interface{}
 	data = make(map[string]interface{})
 	data["award_str"] = award_str
 	var total = float64(0.0)
 
-	var new_dataList = make([]*models.ShareClick, 0)
+	//var new_dataList = make([]*models.ShareClick, 0)
+	var new_dataList = make([]*models.AppuserMoney, 0)
 	time_now := time.Now()
 	year, month, day := time_now.Date()
 	date_now := fmt.Sprintf("%d-%d-%d", year, month, day)
 	total_today := 0.0
+	log.Println("---1")
 	for _, row := range dataList {
-		des := "用户 " + row.ClickSession.Cookieid + " 点击了链接:" + row.ShareURL.ShareURL + " 然后安装了App"
+		log.Println("row:", row)
+		//des := "用户 " + row.ClickSession.Cookieid + " 点击了链接:" + row.ShareURL.ShareURL + " 然后安装了App"
 
-		created_utc := time.Unix(int64(row.ClickSession.CreatedUTC), 0)
+		created_utc := time.Unix(int64(row.CreatedUTC), 0)
 		year, mon, day := created_utc.Date()
 		hour, min, sec := created_utc.Clock()
 		date_tmp := fmt.Sprintf("%d-%d-%d", year, month, day)
 
-		if row.ClickSession.Installid != "" {
-			row.ClickSession.Des = "下载成功 获得1.00元: " + des
-			score := 100.0
-			row.Score = fmt.Sprintf("%.2f", score/100.0)
-			total = total + score
-			if date_tmp == date_now {
-				total_today = total_today + 100
-			}
-		} else {
-			continue
+		//if row.ClickSession.Installid != "" {
+		//	//row.ClickSession.Des = "下载成功 获得1.00元: " + des
+		//	//score := 100.0
+		//	//row.Score = fmt.Sprintf("%.2f", score/100.0)
+		//	total = total + score
+		if date_tmp == date_now {
+			total_today = total_today + float64(row.Money)
 		}
+		//} else {
+		//	continue
+		//}
 		s := fmt.Sprintf("%d-%d-%d %02d:%02d:%02d\n", year, mon, day, hour, min, sec)
-		row.ClickSession.Des = row.ClickSession.Des + "       " + s
-		row.ScoreDes = row.ClickSession.Des
+		//row.ClickSession.Des = row.ClickSession.Des + "       " + s
+		//row.ScoreDes = row.ClickSession.Des
+		row.Des = row.Des + s
 		new_dataList = append(new_dataList, row)
 		log.Println("row:", row)
 	}
@@ -477,7 +482,15 @@ func WebBeaconCheck(c *gin.Context) {
 		return
 	} else {
 		id, _ := strconv.ParseInt(idStr, 10, 64)
+		log.Println("csid:", id)
 		cs_data, _ := caches.GetClickSessionModelInfoById(id)
+		log.Println("cs_data:", cs_data)
+		if cs_data.Shareid <= 0 {
+			Error(c, SERVER_ERROR, nil, err.Error())
+			return
+		}
+		su_data, _ := caches.GetShareURLModelInfoById(cs_data.Shareid)
+		log.Println("su_data:", su_data)
 
 		if cs_data.Status == conf.CLICK_SESSION_STATUS_CLICK {
 			cs_data.Installid = installid
@@ -494,10 +507,9 @@ func WebBeaconCheck(c *gin.Context) {
 				Error(c, SERVER_ERROR, nil, err.Error())
 				return
 			}
-			// TODO add money for user
 			if app.Status == 1 {
 				if app.ShareInstallMoney > 0 {
-					// TODO 再判断一下是否已经给过钱了
+					// TODO 再判断一下是否已经给过钱了, 根据账号里面的钱判断是否还够,需要减掉分发的钱
 					id, err := models.GenerateAppuserMoneyId()
 					if err != nil {
 						log.Println(err.Error())
@@ -506,7 +518,7 @@ func WebBeaconCheck(c *gin.Context) {
 					apm_data := new(models.AppuserMoney)
 					apm_data.Id = id
 					apm_data.Appid = app.Appid
-					apm_data.Appuserid = installid
+					apm_data.Appuserid = su_data.Fromid
 					apm_data.ClickSessionID = cs_data.Id
 					apm_data.MoneyType = conf.MONEY_TYPE_INSTALL_SHARER
 					apm_data.Money = app.ShareInstallMoney

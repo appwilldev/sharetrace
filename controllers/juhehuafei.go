@@ -5,11 +5,15 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/appwilldev/sharetrace/conf"
+	"github.com/appwilldev/sharetrace/models"
+	"github.com/appwilldev/sharetrace/utils"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 )
 
@@ -20,6 +24,45 @@ import (
 
 const OPENID_JUHE = "JHe639b4ea7c06d3513125eaea4aea95ce"
 const APPKEY_HUAFEI = "44636e2c2810178b075b3344fd8d2d4d" //您申请的APPKEY
+
+func HuaFeiChongZhi(c *gin.Context) {
+	var postData struct {
+		Appid     string `json:"appid" binding:"required"`
+		Appuserid string `json:"appuserid" binding:"required"` // IDFA
+		Phoneno   string `json:"phoneno" binding:"required"`
+		Cardnum   string `json:"cardnum" binding:"required"`
+	}
+	err := c.BindJSON(&postData)
+	if err != nil {
+		Error(c, BAD_POST_DATA, nil, err.Error())
+		return
+	}
+
+	id, err := models.GenerateAppuserOrderId()
+	if err != nil {
+		log.Println(err.Error())
+		Error(c, SERVER_ERROR, nil, err.Error())
+		return
+	}
+
+	apo_data := new(models.AppuserOrder)
+	apo_data.Id = id
+	apo_data.Appid = postData.Appid
+	apo_data.Appuserid = postData.Appuserid
+	apo_data.OrderType = conf.ORDER_TYPE_HUAFEI
+	apo_data.OrderMoney, _ = strconv.ParseFloat(postData.Cardnum, 64)
+	apo_data.OrderStatus = conf.ORDER_STATUS_INIT
+	apo_data.Phoneno = postData.Phoneno
+	apo_data.Cardnum = postData.Cardnum
+	apo_data.CreatedUTC = utils.GetNowSecond()
+	apo_data.Des = "用户使用了账户余额充值话费"
+	err = models.InsertDBModel(nil, apo_data)
+	if err != nil {
+		log.Println(err.Error())
+		Error(c, SERVER_ERROR, nil, err.Error())
+		return
+	}
+}
 
 func Remaining(c *gin.Context) {
 	JHHFYue()

@@ -116,9 +116,9 @@ func Score(c *gin.Context) {
 		return
 	}
 
-	award_str := "APP当前奖励规则："
+	award_str := "App当前奖励规则："
 	if appDB.Status == 0 || appDB.Yue < 1000 {
-		award_str = "很抱歉，APP暂时没有奖励规则哦, 请您继续关注!"
+		award_str = "很抱歉，App暂时没有奖励规则哦, 请您继续关注!"
 	} else {
 		//if appDB.ShareClickMoney > 0 {
 		//	award_str = fmt.Sprintf("%s分享获得点击, 每次奖励分享者%.2f元, 目前最多还可以有%d份奖励;", award_str, float64(appDB.ShareClickMoney/100), appDB.Yue/appDB.ShareClickMoney)
@@ -156,9 +156,11 @@ func Score(c *gin.Context) {
 			total_today = total_today + float64(row.Money)
 		}
 		s := fmt.Sprintf("%d-%d-%d %02d:%02d:%02d\n", year, mon, day, hour, min, sec)
-		row.Des = row.Des + s
+		row.Des = row.Des + "      " + s
 		row.Money = float64(row.Money / 100.0)
 	}
+	data["appid"] = appIdStr
+	data["appuserid"] = userIdStr
 	data["total_today"] = fmt.Sprintf("%.2f", total_today/100.0)
 	data["total"] = fmt.Sprintf("%.2f", total/100.0)
 	used := 0.0

@@ -122,6 +122,7 @@ func main() {
 		stAPIV1.GET("/webbeaconbutton", controllers.ClickInstallButton)
 		stAPIV1.GET("/webbeaconcheck", controllers.WebBeaconCheck)
 		stAPIV1.GET("/score", controllers.Score)
+		stAPIV1.POST("/hfcz", controllers.HuaFeiChongZhi)
 	}
 
 	statsAPIV1 := ginIns.Group("/1/stats")

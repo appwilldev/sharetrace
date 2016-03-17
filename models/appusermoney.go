@@ -140,7 +140,7 @@ func AddAwardToAppUser(s *ModelSession, app *AppInfo, cs_data *ClickSession) err
 		}
 		if app.Yue < 0 {
 			err = fmt.Errorf("Not enough Yue Error")
-			log.Println("!!!Commit Error:", err.Error())
+			log.Println(err.Error())
 			s.Rollback()
 			return err
 		}

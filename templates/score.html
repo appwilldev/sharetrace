@@ -51,7 +51,7 @@ body {
         <span style="color:#fe6639;">总收益:{{.total}}元</span>
         </div>
         <div class="col-xs-4">
-        <span style="color:#fe6639;">剩余收益:{{.total_left}}元</span>
+        <span style="color:#fe6639;">账户余额:{{.total_left}}元</span>
         </div>
     </div>
 
@@ -62,12 +62,39 @@ body {
     {{.award_str}}
     </div>
 
-    <div class="col-xs-12">
-    <div class="col-xs-4"></div>
-    <div class="col-xs-4">
-    <span style="color:#fe6639;">收益明细</span>
+    <!--- 手机充值 -->
+    <div class="col-xs-12" style="height:50px;">
+
+        <div class="row">
+            <div class="col-xs-4">
+                手机号:<input type="text" value="15801295156" placeholder="请输入手机号码" id="phoneno" required="">
+            </div>
+
+            <div class="col-xs-4">
+            <select id="cardnum">
+              <option value="5">5元</option>
+              <option value="10">10元</option>
+              <option value="20">20元</option>
+              <option value="30">30元</option>
+              <option value="50">50元</option>
+            </select>
+            </div>
+
+            <div class="col-xs-4">
+                <button class="btn btn-default" type="submit" onclick="save()">充值</button>
+            </div>
+
+        </div>
+
     </div>
-    <div class="col-xs-4"></div>
+    <!--- 手机充值 End-->
+
+    <div class="col-xs-12">
+    <div class="col-xs-4">
+    <span style="color:#fe6639;">收益</span>
+    </div>
+    <div class="col-xs-8">
+    <span style="color:#fe6639;">详细</span>
     </div>
 
     {{range .res}}
@@ -88,6 +115,45 @@ body {
   window.onload = function() {
     'use strict';
   };
+
+  var balance = parseFloat({{.total_left}});
+  var appid = {{.appid}};
+  var appuserid = {{.appuserid}};
+  function save() {
+      var data = {
+          appid: appid,
+          appuserid: appuserid,
+          phoneno: $('#phoneno').val(),
+          cardnum: $('#cardnum').val()
+      };
+      if(data.cardnum== 10 && balance < 11){
+        alert('您的余额不够提现 ' + data.cardnum+ ' 元!');
+        return false;
+      }
+      if (balance < data.cardnum) {
+          alert('您的余额不够提现 ' + data.cardnum+ ' 元!');
+          return false;
+      }
+      var reg = /^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/;
+
+      if (!reg.test(data.phoneno)) {
+          alert('请输入正确的电话号码');
+          return false;
+      }
+
+      // TODO
+      //alert(data.phoneno + '话费' + data.cardnum+ '元充值申请成功，请关注您的话费余额！');
+      $.post("/1/st/hfcz", JSON.stringify(data), function (data) {
+          console.log("hfcz data:", data);
+          if (data.status == 1) {
+              alert('话费提现申请成功，请关注您的话费余额！');
+          } else {
+              alert(data.info);
+          }
+      })
+  }
+
+
 
 </script>
 </body>

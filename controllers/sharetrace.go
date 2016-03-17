@@ -468,8 +468,6 @@ func WebBeaconCheck(c *gin.Context) {
 			Error(c, SERVER_ERROR, nil, err.Error())
 			return
 		}
-		su_data, _ := caches.GetShareURLModelInfoById(cs_data.Shareid)
-		log.Println("su_data:", su_data)
 
 		if cs_data.Status == conf.CLICK_SESSION_STATUS_CLICK {
 			cs_data.Installid = installid
@@ -486,57 +484,10 @@ func WebBeaconCheck(c *gin.Context) {
 				Error(c, SERVER_ERROR, nil, err.Error())
 				return
 			}
-			if app.Status == 1 && app.Yue > 1000 {
-				if app.ShareInstallMoney > 0 {
-					// TODO 需要用事务处理， 再判断一下是否已经给过钱了, 根据账号里面的钱判断是否还够,需要减掉分发的钱
-					id, err := models.GenerateAppuserMoneyId()
-					if err != nil {
-						log.Println(err.Error())
-						return
-					}
-					apm_data := new(models.AppuserMoney)
-					apm_data.Id = id
-					apm_data.Appid = app.Appid
-					apm_data.Appuserid = su_data.Fromid
-					apm_data.ClickSessionID = cs_data.Id
-					apm_data.MoneyType = conf.MONEY_TYPE_INSTALL_SHARER
-					apm_data.Money = float64(app.ShareInstallMoney)
-					apm_data.CreatedUTC = utils.GetNowSecond()
-					apm_data.Des = "分享链接吸引用户" + cs_data.Installid + "安装了App"
-					err = models.InsertDBModel(nil, apm_data)
-					if err != nil {
-						Error(c, SERVER_ERROR, nil, err.Error())
-						return
-					}
-					app.Yue = app.Yue - app.ShareInstallMoney
-				}
-				if app.InstallMoney > 0 {
-					id, err := models.GenerateAppuserMoneyId()
-					if err != nil {
-						log.Println(err.Error())
-						return
-					}
-					apm_data := new(models.AppuserMoney)
-					apm_data.Id = id
-					apm_data.Appid = app.Appid
-					apm_data.Appuserid = installid
-					apm_data.ClickSessionID = cs_data.Id
-					apm_data.MoneyType = conf.MONEY_TYPE_INSTALL_INSTALLER
-					apm_data.CreatedUTC = utils.GetNowSecond()
-					apm_data.Money = float64(app.InstallMoney)
-					apm_data.Des = "通过点击分享链接安装了App"
-					err = models.InsertDBModel(nil, apm_data)
-					if err != nil {
-						Error(c, SERVER_ERROR, nil, err.Error())
-						return
-					}
-					app.Yue = app.Yue - app.ShareInstallMoney
-				}
-				err = models.UpdateDBModel(nil, app)
-				if err != nil {
-					Error(c, SERVER_ERROR, nil, err.Error())
-					return
-				}
+
+			err := models.AddAwardToAppUser(nil, app, cs_data)
+			if err != nil {
+				// TODO, set important error log
 			}
 
 		} else {

@@ -1,6 +1,11 @@
 package models
 
-import ()
+import (
+	"fmt"
+	"github.com/appwilldev/sharetrace/conf"
+	"github.com/appwilldev/sharetrace/utils"
+	"log"
+)
 
 func GenerateAppuserMoneyId() (int64, error) {
 	return generateSequenceValue("appuser_money_id")
@@ -66,4 +71,84 @@ func GetAppuserMoneyListByUserid(s *ModelSession, appid string, appuserid string
 	}
 
 	return dataList, total, nil
+}
+
+func AddAwardToAppUser(s *ModelSession, app *AppInfo, cs_data *ClickSession) error {
+
+	if s == nil {
+		s = NewModelSession()
+	}
+	defer s.Close()
+
+	su_data, _ := GetShareURLById(nil, cs_data.Shareid)
+	if app.Status == 1 && app.Yue > 1000 {
+		err := s.Begin()
+		if app.ShareInstallMoney > 0 {
+			id, err := GenerateAppuserMoneyId()
+			if err != nil {
+				log.Println(err.Error())
+				s.Rollback()
+				return err
+			}
+			apm_data := new(AppuserMoney)
+			apm_data.Id = id
+			apm_data.Appid = app.Appid
+			apm_data.Appuserid = su_data.Fromid
+			apm_data.ClickSessionID = cs_data.Id
+			apm_data.MoneyType = conf.MONEY_TYPE_INSTALL_SHARER
+			apm_data.Money = float64(app.ShareInstallMoney)
+			apm_data.CreatedUTC = utils.GetNowSecond()
+			apm_data.Des = "分享链接吸引用户" + cs_data.Installid + "安装了App"
+			err = InsertDBModel(s, apm_data)
+			if err != nil {
+				log.Println(err.Error())
+				s.Rollback()
+				return err
+			}
+			app.Yue = app.Yue - app.ShareInstallMoney
+		}
+
+		if app.InstallMoney > 0 {
+			id, err := GenerateAppuserMoneyId()
+			if err != nil {
+				log.Println(err.Error())
+				s.Rollback()
+				return err
+			}
+			apm_data := new(AppuserMoney)
+			apm_data.Id = id
+			apm_data.Appid = app.Appid
+			apm_data.Appuserid = cs_data.Installid
+			apm_data.ClickSessionID = cs_data.Id
+			apm_data.MoneyType = conf.MONEY_TYPE_INSTALL_INSTALLER
+			apm_data.CreatedUTC = utils.GetNowSecond()
+			apm_data.Money = float64(app.InstallMoney)
+			apm_data.Des = "通过点击分享链接安装了App"
+			err = InsertDBModel(s, apm_data)
+			if err != nil {
+				log.Println(err.Error())
+				s.Rollback()
+				return err
+			}
+			app.Yue = app.Yue - app.ShareInstallMoney
+		}
+		err = UpdateDBModel(s, app)
+		if err != nil {
+			log.Println(err.Error())
+			s.Rollback()
+			return err
+		}
+		if app.Yue < 0 {
+			err = fmt.Errorf("Not enough Yue Error")
+			log.Println("!!!Commit Error:", err.Error())
+			s.Rollback()
+			return err
+		}
+		err = s.Commit()
+		if err != nil {
+			log.Println("!!!Commit Error:", err.Error())
+			return err
+		}
+	}
+	return nil
 }

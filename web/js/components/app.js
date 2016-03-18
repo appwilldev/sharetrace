@@ -66,7 +66,7 @@ var Apps = function (resolve, reject) {
                                     //"share_click_money": parseInt(vm.app.share_click_money),
                                     "share_install_money": parseFloat(vm.app.share_install_money),
                                     "install_money": parseFloat(vm.app.install_money),
-                                    "appicon": vm.app.icon
+                                    //"appicon": vm.app.icon
                                 }),
                                 credentials: 'same-origin'
                             }).then(function (response) {
@@ -92,7 +92,7 @@ var Apps = function (resolve, reject) {
                                     //"share_click_money": parseInt(vm.app.share_click_money),
                                     "share_install_money": parseFloat(vm.app.share_install_money),
                                     "install_money": parseFloat(vm.app.install_money),
-                                    "icon": vm.app.icon
+                                    //"icon": vm.app.icon
                                 }),
                                 credentials: 'same-origin'
                             }).then(function (response) {

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+
+    <title>收益统计</title>
+
+    <link href="../../web/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <script src="../../web/lib/jquery-2.1.4.min.js"></script>
+    <script src="../../web/lib/jquery.cookie.js"></script>
+
+</head>
+
+<body class="zh_CN " ontouchstart="">
+
+{{if .res}}
+    <!--- 收益总信息 -->
+    <div class="container" style="height:80px;padding-top:10px;background-color:#fe6639">
+        <div class="row">
+            <div class="col-xs-4">
+                <p class="text-center" style="color:#ffffff;">今日收益</p>
+            </div>
+            <div class="col-xs-4">
+                <p class="text-center" style="color:#ffffff;">总收益</p>
+            </div>
+            <div class="col-xs-4">
+                <p class="text-center" style="color:#ffffff;">账户余额</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-4 text-center">
+                <p class="text-center" style="color:#ffffff;">{{.total_today}}元</p>
+            </div>
+            <div class="col-xs-4">
+                <p class="text-center" style="color:#ffffff;">{{.total}}元</p>
+            </div>
+            <div class="col-xs-4">
+                <p class="text-center" style="color:#ffffff;">{{.total_left}}元</p>
+            </div>
+        </div>
+
+    </div>
+    <!--- 收益总信息 end-->
+
+    <div class="row" style="height:40px;padding-top:10px;">
+        <div class="col-xs-1">
+        </div>
+        <div class="col-xs-10">
+        <p class="text-left" style="color:#fe6639;"> {{.award_str}}</p>
+        </div>
+        <div class="col-xs-1">
+        </div>
+    </div>
+
+    <!--- 手机充值 -->
+    <div class="container" style="height:80px;padding-top:10px;">
+        <div class="row" style="height:45px;">
+            <div class="col-xs-8">
+                <p class="text-center"><input type="text" placeholder="请输入手机号码" id="phoneno" required=""></p>
+            </div>
+            <div class="col-xs-4">
+                <p class="text-center">
+                <select id="cardnum">
+                  <option value="5">5元</option>
+                  <option value="10">10元</option>
+                  <option value="20">20元</option>
+                  <option value="30">30元</option>
+                  <option value="50">50元</option>
+                </select>
+                </p>
+
+            </div>
+        </div>
+
+        <div class="row" style="height:35px;">
+            <div class="row">
+                <p class="text-center" ><button class="btn btn-default" style="width:200px;background-color:#0066ff;border-radius:20px;text-align:center;vertical-align:middle;font:normal 14px Georgia, sans-serif;" type="submit" onclick="save()"><span style="color:#ffffff">话&nbsp;&nbsp;费&nbsp;&nbsp;充&nbsp;&nbsp;值</span></button></p>
+            </div>
+        </div>
+    </div>
+    <!--- 手机充值 End-->
+<hr/>
+
+    <!--- 收支明细-->
+    <div class="container" style="height:60px;padding-top:0px;">
+        <div class="row">
+            <div class="col-xs-3">
+                <p class="text-center" style="color:#fe6639;">收支</p>
+            </div>
+            <div class="col-xs-9">
+                <p class="text-center" style="color:#fe6639;">详细</p>
+            </div>
+        </div>
+
+        {{range .res}}
+        <div class="row">
+            <div class="col-xs-3">
+              <p class="text-center">{{.Money}}</p>
+            </div>
+            <div class="col-xs-9">
+              <p class="text-left">{{.Des}}</p>
+            </div>
+        </div>
+        {{end}}<!-- range .res -->
+    </div>
+    <!--- 收支明细 End-->
+
+{{end}}<!-- if .res -->
+
+
+<script type="text/javascript">
+  window.onload = function() {
+    'use strict';
+  };
+
+  var balance = parseFloat({{.total_left}});
+  var appid = {{.appid}};
+  var appuserid = {{.appuserid}};
+  function save() {
+      var data = {
+          appid: appid,
+          appuserid: appuserid,
+          phoneno: $('#phoneno').val(),
+          cardnum: $('#cardnum').val()
+      };
+      if (balance < data.cardnum) {
+          alert('您的余额不够! 请分享到朋友圈邀请朋友下载App赚取收益吧');
+          return false;
+      }
+      var reg = /^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/;
+
+      if (!reg.test(data.phoneno)) {
+          alert('请输入正确的电话号码');
+          return false;
+      }
+
+      var truthBeTold = confirm("你确定要给 " + data.phoneno + " 充值 " + data.cardnum + " 元吗？");
+      if (truthBeTold) {
+      } else {
+      	return
+      }
+
+      $.post("/1/st/hfcz", JSON.stringify(data), function (data) {
+          console.log("hfcz data:", data);
+          if (data.status == true) {
+              alert('话费充值成功，请关注您的话费余额和短信！');
+              window.location.reload();
+          } else {
+              alert(data.msg);
+          }
+      })
+  }
+
+
+
+</script>
+</body>
+</html>
+

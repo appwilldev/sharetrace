@@ -21,25 +21,25 @@
     <div class="container" style="height:80px;padding-top:10px;background-color:#fe6639">
         <div class="row">
             <div class="col-xs-4">
-                <p class="text-center" style="color:#ffffff;">今日收益</p>
+                <p class="text-center" style="color:#ffffff;">今日积分</p>
             </div>
             <div class="col-xs-4">
-                <p class="text-center" style="color:#ffffff;">总收益</p>
+                <p class="text-center" style="color:#ffffff;">总积分</p>
             </div>
             <div class="col-xs-4">
-                <p class="text-center" style="color:#ffffff;">账户余额</p>
+                <p class="text-center" style="color:#ffffff;">剩余积分</p>
             </div>
         </div>
 
         <div class="row">
             <div class="col-xs-4 text-center">
-                <p class="text-center" style="color:#ffffff;">{{.total_today}}元</p>
+                <p class="text-center" style="color:#ffffff;">{{.total_today}}分</p>
             </div>
             <div class="col-xs-4">
-                <p class="text-center" style="color:#ffffff;">{{.total}}元</p>
+                <p class="text-center" style="color:#ffffff;">{{.total}}分</p>
             </div>
             <div class="col-xs-4">
-                <p class="text-center" style="color:#ffffff;">{{.total_left}}元</p>
+                <p class="text-center" style="color:#ffffff;">{{.total_left}}分</p>
             </div>
         </div>
 
@@ -89,7 +89,7 @@
     <div class="container" style="height:60px;padding-top:0px;">
         <div class="row">
             <div class="col-xs-3">
-                <p class="text-center" style="color:#fe6639;">收支</p>
+                <p class="text-center" style="color:#fe6639;">积分</p>
             </div>
             <div class="col-xs-9">
                 <p class="text-center" style="color:#fe6639;">详细</p>
@@ -136,6 +136,12 @@
       if (!reg.test(data.phoneno)) {
           alert('请输入正确的电话号码');
           return false;
+      }
+
+      var truthBeTold = confirm("你确定要给 " + data.phoneno + " 充值 " + data.cardnum + " 元吗？");
+      if (truthBeTold) {
+      } else {
+      	return
       }
 
       $.post("/1/st/hfcz", JSON.stringify(data), function (data) {

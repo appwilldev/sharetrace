@@ -97,7 +97,7 @@ func AddAwardToAppUser(s *ModelSession, app *AppInfo, cs_data *ClickSession) err
 			aum_data.MoneyType = conf.MONEY_TYPE_INSTALL_SHARER
 			aum_data.Money = float64(app.ShareInstallMoney)
 			aum_data.CreatedUTC = utils.GetNowSecond()
-			aum_data.Des = "分享链接吸引用户" + cs_data.Installid + "安装了App"
+			aum_data.Des = "分享链接为App带来了新用户" + cs_data.Installid
 			err = InsertDBModel(s, aum_data)
 			if err != nil {
 				s.Rollback()
@@ -170,7 +170,7 @@ func AddOrderToAppUser(s *ModelSession, appid string, appuserid string, phoneno 
 	auo_data.Phoneno = phoneno
 	auo_data.Cardnum = cardnum
 	auo_data.CreatedUTC = utils.GetNowSecond()
-	auo_data.Des = "用户使用了账户余额充值话费"
+	auo_data.Des = "使用了账户余额充值话费"
 	err = InsertDBModel(s, auo_data)
 	if err != nil {
 		s.Rollback()
@@ -191,7 +191,7 @@ func AddOrderToAppUser(s *ModelSession, appid string, appuserid string, phoneno 
 	aum_data.Money, _ = strconv.ParseFloat(cardnum, 64)
 	aum_data.Money = aum_data.Money * 100.0
 	aum_data.CreatedUTC = utils.GetNowSecond()
-	aum_data.Des = "用户使用收益进行话费充值"
+	aum_data.Des = "使用了账户余额充值话费"
 	err = InsertDBModel(s, aum_data)
 	if err != nil {
 		s.Rollback()

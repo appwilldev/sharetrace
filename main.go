@@ -121,7 +121,8 @@ func main() {
 		stAPIV1.GET("/webbeacon", controllers.WebBeacon)
 		stAPIV1.GET("/webbeaconbutton", controllers.ClickInstallButton)
 		stAPIV1.GET("/webbeaconcheck", controllers.WebBeaconCheck)
-		stAPIV1.GET("/score", controllers.Score)
+		stAPIV1.GET("/score", controllers.AppUserScore)
+		stAPIV1.GET("/money", controllers.AppUserMoney)
 		stAPIV1.POST("/hfcz", controllers.HuaFeiChongZhi)
 	}
 
@@ -156,7 +157,7 @@ func main() {
 
 	}
 
-	ginIns.LoadHTMLFiles("./templates/webbeaconcheck.html", "./templates/score.html")
+	ginIns.LoadHTMLFiles("./templates/webbeaconcheck.html", "./templates/appuserscore.html", "./templates/appusermoney.html")
 
 	gracehttp.Serve(&http.Server{Addr: conf.HttpAddr, Handler: ginIns})
 }

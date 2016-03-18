@@ -116,18 +116,18 @@ func Score(c *gin.Context) {
 		return
 	}
 
-	award_str := "App当前奖励规则："
+	award_str := "奖励规则："
 	if appDB.Status == 0 || appDB.Yue < 1000 {
-		award_str = "很抱歉，App暂时没有奖励规则哦, 请您继续关注!"
+		award_str = "分享暂时没有奖励规则哦, 请您继续关注!"
 	} else {
 		//if appDB.ShareClickMoney > 0 {
 		//	award_str = fmt.Sprintf("%s分享获得点击, 每次奖励分享者%.2f元, 目前最多还可以有%d份奖励;", award_str, float64(appDB.ShareClickMoney/100), appDB.Yue/appDB.ShareClickMoney)
 		//}
 		if appDB.ShareInstallMoney > 0 && appDB.InstallMoney > 0 {
-			award_str = fmt.Sprintf("%s分享获得安装, 每次奖励分享者%.2f元, 奖励安装者%.2f元,  目前最多还可以有%d份奖励;", award_str, float64(appDB.ShareInstallMoney)/100.0, float64(appDB.InstallMoney)/100.0, appDB.Yue/(appDB.ShareInstallMoney+appDB.InstallMoney))
+			award_str = fmt.Sprintf("%s分享获得安装, 奖励分享者%.2f元, 安装者%.2f元,  还有%d份奖励;", award_str, float64(appDB.ShareInstallMoney)/100.0, float64(appDB.InstallMoney)/100.0, appDB.Yue/(appDB.ShareInstallMoney+appDB.InstallMoney))
 		} else {
 			if appDB.ShareInstallMoney > 0 {
-				award_str = fmt.Sprintf("%s分享获得安装, 每次奖励分享者%.2f元, 目前最多还可以有%d份奖励;", award_str, float64(appDB.ShareInstallMoney)/100.0, appDB.Yue/appDB.ShareInstallMoney)
+				award_str = fmt.Sprintf("%s分享获得安装, 每次奖励分享者%.2f元, 还有%d份奖励;", award_str, float64(appDB.ShareInstallMoney)/100.0, appDB.Yue/appDB.ShareInstallMoney)
 			}
 			if appDB.InstallMoney > 0 {
 				award_str = fmt.Sprintf("%s分享获得安装, 每次奖励安装者%.2f元, 目前最多还可以有%d份奖励;", award_str, float64(appDB.InstallMoney)/100.0, appDB.Yue/appDB.InstallMoney)
@@ -145,6 +145,7 @@ func Score(c *gin.Context) {
 	year, month, day := time_now.Date()
 	date_now := fmt.Sprintf("%d-%d-%d", year, month, day)
 	total_today := 0.0
+	used := 0.0
 	for _, row := range dataList {
 		created_utc := time.Unix(int64(row.CreatedUTC), 0)
 		year, mon, day := created_utc.Date()
@@ -153,14 +154,15 @@ func Score(c *gin.Context) {
 
 		if row.MoneyType == conf.MONEY_TYPE_HFCZ {
 			row.Money = -float64(row.Money / 100.0)
+			used = used + row.Money
 		} else {
 			row.Money = float64(row.Money / 100.0)
+			if date_tmp == date_now {
+				total_today = total_today + float64(row.Money)
+			}
+			total = total + float64(row.Money)
 		}
 
-		total = total + float64(row.Money)
-		if date_tmp == date_now {
-			total_today = total_today + float64(row.Money)
-		}
 		s := fmt.Sprintf("%d-%d-%d %02d:%02d:%02d\n", year, mon, day, hour, min, sec)
 		row.Des = row.Des + "      " + s
 	}
@@ -168,8 +170,7 @@ func Score(c *gin.Context) {
 	data["appuserid"] = userIdStr
 	data["total_today"] = fmt.Sprintf("%.2f", total_today)
 	data["total"] = fmt.Sprintf("%.2f", total)
-	used := 0.0
-	data["total_left"] = fmt.Sprintf("%.2f", total-used)
+	data["total_left"] = fmt.Sprintf("%.2f", total+used)
 	data["res"] = dataList
 
 	c.HTML(200, "score.html", data)

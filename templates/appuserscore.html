@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
 
-    <title>收益统计</title>
+    <title>我的积分</title>
 
     <link href="../../web/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <script src="../../web/lib/jquery-2.1.4.min.js"></script>
@@ -14,7 +14,7 @@
 
 </head>
 
-<body class="zh_CN " ontouchstart="">
+<body> 
 
 {{if .res}}
     <!--- 收益总信息 -->
@@ -46,7 +46,8 @@
     </div>
     <!--- 收益总信息 end-->
 
-    <div class="row" style="height:40px;padding-top:10px;">
+    <div class="container" style="height:40px;padding-top:10px;">
+    <div class="row">
         <div class="col-xs-1">
         </div>
         <div class="col-xs-10">
@@ -54,6 +55,7 @@
         </div>
         <div class="col-xs-1">
         </div>
+    </div>
     </div>
 
     <!--- 手机充值 -->
@@ -77,9 +79,7 @@
         </div>
 
         <div class="row" style="height:35px;">
-            <div class="row">
-                <p class="text-center" ><button class="btn btn-default" style="width:200px;background-color:#0066ff;border-radius:20px;text-align:center;vertical-align:middle;font:normal 14px Georgia, sans-serif;" type="submit" onclick="save()"><span style="color:#ffffff">话&nbsp;&nbsp;费&nbsp;&nbsp;充&nbsp;&nbsp;值</span></button></p>
-            </div>
+            <p class="text-center" ><button class="btn btn-default" style="width:200px;background-color:#0066ff;border-radius:20px;text-align:center;vertical-align:middle;font:normal 14px Georgia, sans-serif;" type="submit" onclick="save()"><span style="color:#ffffff">话&nbsp;&nbsp;费&nbsp;&nbsp;充&nbsp;&nbsp;值</span></button></p>
         </div>
     </div>
     <!--- 手机充值 End-->

@@ -188,7 +188,7 @@ func AppUserScore(c *gin.Context) {
 		return
 	}
 
-	award_str := ""
+	award_str := "100积分=1元;"
 	if appDB.Status == 0 || appDB.Yue < 1000 {
 		award_str = ""
 	} else {
@@ -196,7 +196,7 @@ func AppUserScore(c *gin.Context) {
 			award_str = fmt.Sprintf("%s分享获得点击, 每次奖励分享者%d分;", award_str, appDB.ShareClickMoney)
 		}
 		if appDB.ShareInstallMoney > 0 {
-			award_str = fmt.Sprintf("%s分享获得安装, 每次奖励分享者%d分", award_str, appDB.ShareInstallMoney)
+			award_str = fmt.Sprintf("%s分享获得安装, 每次奖励分享者%d分;", award_str, appDB.ShareInstallMoney)
 		}
 	}
 

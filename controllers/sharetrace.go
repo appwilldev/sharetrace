@@ -116,7 +116,7 @@ func Score(c *gin.Context) {
 		return
 	}
 
-	award_str := "奖励规则："
+	award_str := ""
 	if appDB.Status == 0 || appDB.Yue < 1000 {
 		award_str = "分享暂时没有奖励规则哦, 请您继续关注!"
 	} else {
@@ -124,13 +124,13 @@ func Score(c *gin.Context) {
 		//	award_str = fmt.Sprintf("%s分享获得点击, 每次奖励分享者%.2f元, 目前最多还可以有%d份奖励;", award_str, float64(appDB.ShareClickMoney/100), appDB.Yue/appDB.ShareClickMoney)
 		//}
 		if appDB.ShareInstallMoney > 0 && appDB.InstallMoney > 0 {
-			award_str = fmt.Sprintf("%s分享获得安装, 奖励分享者%.2f元, 安装者%.2f元,  还有%d份奖励;", award_str, float64(appDB.ShareInstallMoney)/100.0, float64(appDB.InstallMoney)/100.0, appDB.Yue/(appDB.ShareInstallMoney+appDB.InstallMoney))
+			award_str = fmt.Sprintf("%s分享获得安装, 奖励分享者%.2f元, 安装者%.2f元，还有%d份奖励", award_str, float64(appDB.ShareInstallMoney)/100.0, float64(appDB.InstallMoney)/100.0, appDB.Yue/(appDB.ShareInstallMoney+appDB.InstallMoney))
 		} else {
 			if appDB.ShareInstallMoney > 0 {
-				award_str = fmt.Sprintf("%s分享获得安装, 每次奖励分享者%.2f元, 还有%d份奖励;", award_str, float64(appDB.ShareInstallMoney)/100.0, appDB.Yue/appDB.ShareInstallMoney)
+				award_str = fmt.Sprintf("%s分享获得安装, 奖励分享者%.2f元, 还有%d份奖励", award_str, float64(appDB.ShareInstallMoney)/100.0, appDB.Yue/appDB.ShareInstallMoney)
 			}
 			if appDB.InstallMoney > 0 {
-				award_str = fmt.Sprintf("%s分享获得安装, 每次奖励安装者%.2f元, 目前最多还可以有%d份奖励;", award_str, float64(appDB.InstallMoney)/100.0, appDB.Yue/appDB.InstallMoney)
+				award_str = fmt.Sprintf("%s分享获得安装, 奖励安装者%.2f元, 还有%d份奖励", award_str, float64(appDB.InstallMoney)/100.0, appDB.Yue/appDB.InstallMoney)
 			}
 		}
 	}
@@ -495,7 +495,8 @@ func WebBeaconCheck(c *gin.Context) {
 
 			err := models.AddAwardToAppUser(nil, app, cs_data)
 			if err != nil {
-				// TODO, set important error log
+				Error(c, SERVER_ERROR, nil, err.Error())
+				return
 			}
 
 		} else {

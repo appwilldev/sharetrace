@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/appwilldev/sharetrace/conf"
 	"github.com/appwilldev/sharetrace/models"
-	"github.com/appwilldev/sharetrace/utils"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"log"
@@ -38,30 +37,13 @@ func HuaFeiChongZhi(c *gin.Context) {
 		return
 	}
 
-	id, err := models.GenerateAppuserOrderId()
+	err = models.AddOrderToAppUser(nil, postData.Appid, postData.Appuserid, postData.Phoneno, postData.Cardnum)
 	if err != nil {
-		log.Println(err.Error())
 		Error(c, SERVER_ERROR, nil, err.Error())
 		return
 	}
 
-	apo_data := new(models.AppuserOrder)
-	apo_data.Id = id
-	apo_data.Appid = postData.Appid
-	apo_data.Appuserid = postData.Appuserid
-	apo_data.OrderType = conf.ORDER_TYPE_HUAFEI
-	apo_data.OrderMoney, _ = strconv.ParseFloat(postData.Cardnum, 64)
-	apo_data.OrderStatus = conf.ORDER_STATUS_INIT
-	apo_data.Phoneno = postData.Phoneno
-	apo_data.Cardnum = postData.Cardnum
-	apo_data.CreatedUTC = utils.GetNowSecond()
-	apo_data.Des = "用户使用了账户余额充值话费"
-	err = models.InsertDBModel(nil, apo_data)
-	if err != nil {
-		log.Println(err.Error())
-		Error(c, SERVER_ERROR, nil, err.Error())
-		return
-	}
+	Success(c, nil)
 }
 
 func TelCheck(c *gin.Context) {
@@ -298,27 +280,6 @@ func hfczOrderStaTask() {
 								log.Println(err.Error())
 								return
 							}
-							id, err := models.GenerateAppuserMoneyId()
-							if err != nil {
-								log.Println(err.Error())
-								return
-							}
-							apm_data := new(models.AppuserMoney)
-							apm_data.Id = id
-							apm_data.Appid = row.Appid
-							apm_data.Appuserid = row.Appuserid
-							apm_data.UserOrderID = row.Id
-							apm_data.MoneyType = conf.MONEY_TYPE_HFCZ
-							apm_data.Money, _ = strconv.ParseFloat(row.Cardnum, 64)
-							apm_data.Money = apm_data.Money * 100.0
-							apm_data.CreatedUTC = utils.GetNowSecond()
-							apm_data.Des = "用户使用收益进行话费充值"
-							err = models.InsertDBModel(nil, apm_data)
-							if err != nil {
-								log.Println(err.Error())
-								return
-							}
-
 						}
 					}
 					fmt.Printf("接口返回result字段是:\r\n%v", netReturn["result"])
@@ -332,10 +293,11 @@ func hfczOrderStaTask() {
 
 func handleHFCZTask() {
 	for true {
-		hfczOrderStaTask()
-		hfczOnlineOrderTask()
+		// TODO hack
+		//hfczOrderStaTask()
+		//hfczOnlineOrderTask()
 		log.Println("handleHFCZTask sleeping...")
-		time.Sleep(10 * time.Second)
+		time.Sleep(100 * time.Second)
 	}
 }
 

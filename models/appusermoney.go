@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/appwilldev/sharetrace/conf"
 	"github.com/appwilldev/sharetrace/utils"
-	"log"
+	"strconv"
 )
 
 func GenerateAppuserMoneyId() (int64, error) {
@@ -86,22 +86,20 @@ func AddAwardToAppUser(s *ModelSession, app *AppInfo, cs_data *ClickSession) err
 		if app.ShareInstallMoney > 0 {
 			id, err := GenerateAppuserMoneyId()
 			if err != nil {
-				log.Println(err.Error())
 				s.Rollback()
 				return err
 			}
-			apm_data := new(AppuserMoney)
-			apm_data.Id = id
-			apm_data.Appid = app.Appid
-			apm_data.Appuserid = su_data.Fromid
-			apm_data.ClickSessionID = cs_data.Id
-			apm_data.MoneyType = conf.MONEY_TYPE_INSTALL_SHARER
-			apm_data.Money = float64(app.ShareInstallMoney)
-			apm_data.CreatedUTC = utils.GetNowSecond()
-			apm_data.Des = "分享链接吸引用户" + cs_data.Installid + "安装了App"
-			err = InsertDBModel(s, apm_data)
+			aum_data := new(AppuserMoney)
+			aum_data.Id = id
+			aum_data.Appid = app.Appid
+			aum_data.Appuserid = su_data.Fromid
+			aum_data.ClickSessionID = cs_data.Id
+			aum_data.MoneyType = conf.MONEY_TYPE_INSTALL_SHARER
+			aum_data.Money = float64(app.ShareInstallMoney)
+			aum_data.CreatedUTC = utils.GetNowSecond()
+			aum_data.Des = "分享链接吸引用户" + cs_data.Installid + "安装了App"
+			err = InsertDBModel(s, aum_data)
 			if err != nil {
-				log.Println(err.Error())
 				s.Rollback()
 				return err
 			}
@@ -111,22 +109,20 @@ func AddAwardToAppUser(s *ModelSession, app *AppInfo, cs_data *ClickSession) err
 		if app.InstallMoney > 0 {
 			id, err := GenerateAppuserMoneyId()
 			if err != nil {
-				log.Println(err.Error())
 				s.Rollback()
 				return err
 			}
-			apm_data := new(AppuserMoney)
-			apm_data.Id = id
-			apm_data.Appid = app.Appid
-			apm_data.Appuserid = cs_data.Installid
-			apm_data.ClickSessionID = cs_data.Id
-			apm_data.MoneyType = conf.MONEY_TYPE_INSTALL_INSTALLER
-			apm_data.CreatedUTC = utils.GetNowSecond()
-			apm_data.Money = float64(app.InstallMoney)
-			apm_data.Des = "通过点击分享链接安装了App"
-			err = InsertDBModel(s, apm_data)
+			aum_data := new(AppuserMoney)
+			aum_data.Id = id
+			aum_data.Appid = app.Appid
+			aum_data.Appuserid = cs_data.Installid
+			aum_data.ClickSessionID = cs_data.Id
+			aum_data.MoneyType = conf.MONEY_TYPE_INSTALL_INSTALLER
+			aum_data.CreatedUTC = utils.GetNowSecond()
+			aum_data.Money = float64(app.InstallMoney)
+			aum_data.Des = "通过点击分享链接安装了App"
+			err = InsertDBModel(s, aum_data)
 			if err != nil {
-				log.Println(err.Error())
 				s.Rollback()
 				return err
 			}
@@ -134,21 +130,77 @@ func AddAwardToAppUser(s *ModelSession, app *AppInfo, cs_data *ClickSession) err
 		}
 		err = UpdateDBModel(s, app)
 		if err != nil {
-			log.Println(err.Error())
 			s.Rollback()
 			return err
 		}
 		if app.Yue < 0 {
 			err = fmt.Errorf("Not enough Yue Error")
-			log.Println(err.Error())
 			s.Rollback()
 			return err
 		}
 		err = s.Commit()
 		if err != nil {
-			log.Println("!!!Commit Error:", err.Error())
 			return err
 		}
+	}
+	return nil
+}
+
+func AddOrderToAppUser(s *ModelSession, appid string, appuserid string, phoneno string, cardnum string) error {
+
+	if s == nil {
+		s = NewModelSession()
+	}
+	defer s.Close()
+
+	// 下单后，立马扣钱
+	// TODO 检查是否有足够的余额,
+	auo_id, err := GenerateAppuserOrderId()
+	if err != nil {
+		return err
+	}
+
+	auo_data := new(AppuserOrder)
+	auo_data.Id = auo_id
+	auo_data.Appid = appid
+	auo_data.Appuserid = appuserid
+	auo_data.OrderType = conf.ORDER_TYPE_HUAFEI
+	auo_data.OrderMoney, _ = strconv.ParseFloat(cardnum, 64)
+	auo_data.OrderStatus = conf.ORDER_STATUS_INIT
+	auo_data.Phoneno = phoneno
+	auo_data.Cardnum = cardnum
+	auo_data.CreatedUTC = utils.GetNowSecond()
+	auo_data.Des = "用户使用了账户余额充值话费"
+	err = InsertDBModel(s, auo_data)
+	if err != nil {
+		s.Rollback()
+		return err
+	}
+
+	aum_id, err := GenerateAppuserMoneyId()
+	if err != nil {
+		s.Rollback()
+		return err
+	}
+	aum_data := new(AppuserMoney)
+	aum_data.Id = aum_id
+	aum_data.Appid = appid
+	aum_data.Appuserid = appuserid
+	aum_data.UserOrderID = auo_id
+	aum_data.MoneyType = conf.MONEY_TYPE_HFCZ
+	aum_data.Money, _ = strconv.ParseFloat(cardnum, 64)
+	aum_data.Money = aum_data.Money * 100.0
+	aum_data.CreatedUTC = utils.GetNowSecond()
+	aum_data.Des = "用户使用收益进行话费充值"
+	err = InsertDBModel(s, aum_data)
+	if err != nil {
+		s.Rollback()
+		return err
+	}
+
+	err = s.Commit()
+	if err != nil {
+		return err
 	}
 	return nil
 }

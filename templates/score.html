@@ -127,12 +127,8 @@
           phoneno: $('#phoneno').val(),
           cardnum: $('#cardnum').val()
       };
-      if(data.cardnum== 10 && balance < 11){
-        alert('您的余额不够提现 ' + data.cardnum+ ' 元!');
-        return false;
-      }
       if (balance < data.cardnum) {
-          alert('您的余额不够提现 ' + data.cardnum+ ' 元!');
+          alert('您的余额不够! 请分享到朋友圈邀请朋友下载App赚取收益吧');
           return false;
       }
       var reg = /^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/;
@@ -142,14 +138,13 @@
           return false;
       }
 
-      // TODO
-      //alert(data.phoneno + '话费' + data.cardnum+ '元充值申请成功，请关注您的话费余额！');
       $.post("/1/st/hfcz", JSON.stringify(data), function (data) {
           console.log("hfcz data:", data);
-          if (data.status == 1) {
-              alert('话费提现申请成功，请关注您的话费余额！');
+          if (data.status == true) {
+              alert('话费充值成功，请关注您的话费余额和短信！');
+              window.location.reload();
           } else {
-              alert(data.info);
+              alert(data.msg);
           }
       })
   }

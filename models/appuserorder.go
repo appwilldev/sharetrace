@@ -72,6 +72,26 @@ func GetAppuserOrderListByUserid(s *ModelSession, appid string, appuserid string
 	return dataList, total, nil
 }
 
+func GetAppuserOrderListByOrderStatus(s *ModelSession, status int) ([]*AppuserOrder, int64, error) {
+	var (
+		total    int64
+		dataList = make([]*AppuserOrder, 0)
+		err      error
+	)
+	if s == nil {
+		s = newAutoCloseModelsSession()
+	}
+
+	total, _ = s.Count(new(AppuserOrder))
+	err = s.Where("order_status=?", status).OrderBy("id desc").Find(&dataList)
+
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return dataList, total, nil
+}
+
 func AddConsumeToAppUser(s *ModelSession, app *AppInfo, appuserid string, phoneno string, cardnum string) {
 	if s == nil {
 		s = NewModelSession()

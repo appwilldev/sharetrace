@@ -141,7 +141,7 @@ CREATE INDEX idx_aum_created_utc ON appuser_money(created_utc);
 -- order_type 0: 话费充值， 1:支付宝提现
 -- order_status 0:init, 1:成功， 9:撤销
 
-CREATE SEQUENCE appuser_order_id START 2016 NO CYCLE;
+CREATE SEQUENCE appuser_order_id START 10002016 NO CYCLE;
 CREATE TABLE appuser_order(
     id BIGINT NOT NULL PRIMARY KEY,
     appid VARCHAR(256) NOT NULL,

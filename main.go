@@ -152,7 +152,6 @@ func main() {
 		opAPIGroup.PUT("/app", authHandler(), controllers.UpdateApp)
 
 		// JHHF: Juhe Hua Fei
-		opAPIGroup.GET("yue", controllers.Remaining)
 		opAPIGroup.GET("telcheck", controllers.TelCheck)
 
 	}

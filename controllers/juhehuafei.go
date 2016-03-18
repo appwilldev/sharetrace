@@ -64,52 +64,11 @@ func HuaFeiChongZhi(c *gin.Context) {
 	}
 }
 
-func Remaining(c *gin.Context) {
-	JHHFYue()
-}
-
 func TelCheck(c *gin.Context) {
 	q := c.Request.URL.Query()
 	phoneno := q["phoneno"][0]
 	cardnum := q["cardnum"][0]
 	JHHFTelCheck(phoneno, cardnum)
-	JHHFTelQuery(phoneno, cardnum)
-}
-
-//1.账户余额查询
-func JHHFYue() {
-	//请求地址
-	juheURL := "http://op.juhe.cn/ofpay/mobile/yue"
-
-	//初始化参数
-	param := url.Values{}
-
-	//配置请求参数,方法内部已处理urlencode问题,中文参数可以直接传参
-	time_now := time.Now()
-	timestamp := fmt.Sprintf("%d", time_now.Unix())
-	log.Println("timestamp:", timestamp)
-	param.Set("timestamp", timestamp) //当前时间戳，如：1432788379
-	param.Set("key", APPKEY_HUAFEI)   //应用APPKEY_HUAFEI(应用详细页查询)
-
-	md5Ctx := md5.New()
-	md5_org_str := fmt.Sprintf("%s%s%s", OPENID_JUHE, APPKEY_HUAFEI, timestamp)
-	log.Println("md5_org_str:", md5_org_str)
-	md5Ctx.Write([]byte(md5_org_str))
-	sign := hex.EncodeToString(md5Ctx.Sum(nil))
-
-	param.Set("sign", sign) //校验值
-
-	//发送请求
-	data, err := Get(juheURL, param)
-	if err != nil {
-		fmt.Errorf("请求失败,错误信息:\r\n%v", err)
-	} else {
-		var netReturn map[string]interface{}
-		json.Unmarshal(data, &netReturn)
-		if netReturn["error_code"].(float64) == 0 {
-			fmt.Printf("接口返回result字段是:\r\n%v", netReturn["result"])
-		}
-	}
 }
 
 //2.订单状态查询
@@ -146,57 +105,6 @@ func JHHFOrderSta(orderid string) {
 	}
 }
 
-//3.历史订单列表检索
-func JHHFOrderList() {
-	//请求地址
-	juheURL := "http://op.juhe.cn/ofpay/mobile/orderlist"
-
-	//初始化参数
-	param := url.Values{}
-
-	//配置请求参数,方法内部已处理urlencode问题,中文参数可以直接传参
-	param.Set("page", "")           //当前页数，默认1
-	param.Set("pagesize", "")       //每页显示条数，默认50，最大100
-	param.Set("mobilephone", "")    //检索指定手机号码
-	param.Set("orderid", "")        //需要检索的商户订单号
-	param.Set("key", APPKEY_HUAFEI) //应用APPKEY_HUAFEI(应用详细页查询)
-
-	//发送请求
-	data, err := Get(juheURL, param)
-	if err != nil {
-		fmt.Errorf("请求失败,错误信息:\r\n%v", err)
-	} else {
-		var netReturn map[string]interface{}
-		json.Unmarshal(data, &netReturn)
-		if netReturn["error_code"].(float64) == 0 {
-			fmt.Printf("接口返回result字段是:\r\n%v", netReturn["result"])
-		}
-	}
-}
-
-//4.状态回调配置
-//func JHHF() {
-//	//请求地址
-//	juheURL := "充值接口测试完毕，联系在线客服进行回调配置"
-//
-//	//初始化参数
-//	param := url.Values{}
-//
-//	//配置请求参数,方法内部已处理urlencode问题,中文参数可以直接传参
-//
-//	//发送请求
-//	data, err := Post(juheURL, param)
-//	if err != nil {
-//		fmt.Errorf("请求失败,错误信息:\r\n%v", err)
-//	} else {
-//		var netReturn map[string]interface{}
-//		json.Unmarshal(data, &netReturn)
-//		if netReturn["error_code"].(float64) == 0 {
-//			fmt.Printf("接口返回result字段是:\r\n%v", netReturn["result"])
-//		}
-//	}
-//}
-
 //5.检测手机号码是否能充值
 //{
 //    "reason": "允许充值的手机号码及金额",
@@ -225,32 +133,6 @@ func JHHFTelCheck(phoneno string, cardnum string) {
 		if netReturn["error_code"].(float64) == 0 {
 			fmt.Printf("接口返回:\r\n%v", netReturn)
 			//fmt.Printf("接口返回result字段是:\r\n%v", netReturn["result"])
-		}
-	}
-}
-
-//6.根据手机号和面值查询商品信息
-func JHHFTelQuery(phoneno string, cardnum string) {
-	//请求地址
-	juheURL := "http://op.juhe.cn/ofpay/mobile/telquery"
-
-	//初始化参数
-	param := url.Values{}
-
-	//配置请求参数,方法内部已处理urlencode问题,中文参数可以直接传参
-	param.Set("phoneno", phoneno)   //手机号码
-	param.Set("cardnum", cardnum)   //充值金额,目前可选：5、10、20、30、50、100、300
-	param.Set("key", APPKEY_HUAFEI) //应用APPKEY_HUAFEI(应用详细页查询)
-
-	//发送请求
-	data, err := Get(juheURL, param)
-	if err != nil {
-		fmt.Errorf("请求失败,错误信息:\r\n%v", err)
-	} else {
-		var netReturn map[string]interface{}
-		json.Unmarshal(data, &netReturn)
-		if netReturn["error_code"].(float64) == 0 {
-			fmt.Printf("接口返回result字段是:\r\n%v", netReturn["result"])
 		}
 	}
 }
@@ -294,7 +176,7 @@ func JHHFOnlineOrder(phoneno string, cardnum string, orderid string) {
 	//发送请求
 	data, err := Get(juheURL, param)
 	if err != nil {
-		fmt.Errorf("请求失败,错误信息:\r\n%v", err)
+		fmt.Errorf("充值请求失败,错误信息:\r\n%v", err)
 	} else {
 		var netReturn map[string]interface{}
 		json.Unmarshal(data, &netReturn)
@@ -331,4 +213,113 @@ func Post(apiURL string, params url.Values) (rs []byte, err error) {
 	}
 	defer resp.Body.Close()
 	return ioutil.ReadAll(resp.Body)
+}
+
+// task to online order
+func hfczOnlineOrderTask() {
+	dataList, _, err := models.GetAppuserOrderListByOrderStatus(nil, conf.ORDER_STATUS_INIT)
+	if err != nil {
+		log.Println("err:", err)
+		return
+	}
+	for _, row := range dataList {
+		juheURL := "http://op.juhe.cn/ofpay/mobile/onlineorder"
+		param := url.Values{}
+		param.Set("phoneno", row.Phoneno)
+		param.Set("cardnum", row.Cardnum)
+		param.Set("orderid", fmt.Sprintf("%d", row.Id))
+		param.Set("key", APPKEY_HUAFEI)
+
+		//校验值，md5(OpenID+key+phoneno+cardnum+orderid)
+		md5Ctx := md5.New()
+		md5_org_str := fmt.Sprintf("%s%s%s%s%d", OPENID_JUHE, APPKEY_HUAFEI, row.Phoneno, row.Cardnum, row.Id)
+		log.Println("md5_org_str:", md5_org_str)
+		md5Ctx.Write([]byte(md5_org_str))
+		sign := hex.EncodeToString(md5Ctx.Sum(nil))
+		param.Set("sign", sign)
+
+		data, err := Get(juheURL, param)
+		log.Println("data:", string(data))
+		if err != nil {
+			fmt.Errorf("请求失败,错误信息:\r\n%v", err)
+		} else {
+			var netReturn map[string]interface{}
+			json.Unmarshal(data, &netReturn)
+			if netReturn["error_code"].(float64) == 0 {
+				if netReturn["result"] != nil {
+					result := netReturn["result"].(map[string]interface{})
+					if result["game_state"] != nil {
+						if result["game_state"] == strconv.Itoa(conf.ORDER_STATUS_DOING) {
+							row.OrderStatus = conf.ORDER_STATUS_DOING
+							row.Des = string(data)
+							err = models.UpdateDBModel(nil, row)
+							if err != nil {
+								log.Println(err.Error())
+								return
+							}
+						}
+					}
+					fmt.Printf("接口返回result字段是:\r\n%v", netReturn["result"])
+				}
+			} else {
+				log.Println("JUHE API Error Return:", netReturn)
+			}
+		}
+	}
+}
+
+func hfczOrderStaTask() {
+	dataList, _, err := models.GetAppuserOrderListByOrderStatus(nil, conf.ORDER_STATUS_DOING)
+	if err != nil {
+		log.Println("err:", err)
+		return
+	}
+	for _, row := range dataList {
+		juheURL := "http://op.juhe.cn/ofpay/mobile/ordersta"
+		param := url.Values{}
+		param.Set("orderid", fmt.Sprintf("%d", row.Id))
+		param.Set("key", APPKEY_HUAFEI)
+
+		data, err := Get(juheURL, param)
+		if err != nil {
+			fmt.Errorf("请求失败,错误信息:\r\n%v", err)
+		} else {
+			var netReturn map[string]interface{}
+			json.Unmarshal(data, &netReturn)
+			if netReturn["error_code"].(float64) == 0 {
+				if netReturn["result"] != nil {
+					result := netReturn["result"].(map[string]interface{})
+					if result["game_state"] != nil {
+						log.Println("---1   ", result["game_state"], "  ", strconv.Itoa(conf.ORDER_STATUS_DOING))
+						if result["game_state"] == strconv.Itoa(conf.ORDER_STATUS_SUCCESS) {
+							log.Println("---2")
+							row.OrderStatus = conf.ORDER_STATUS_SUCCESS
+							row.Des = string(data)
+							err = models.UpdateDBModel(nil, row)
+							if err != nil {
+								log.Println(err.Error())
+								return
+							}
+						}
+					}
+					fmt.Printf("接口返回result字段是:\r\n%v", netReturn["result"])
+				}
+			} else {
+				log.Println("JUHE API Error Return:", netReturn)
+			}
+		}
+	}
+}
+
+func handleHFCZTask() {
+	for true {
+		hfczOrderStaTask()
+		hfczOnlineOrderTask()
+		log.Println("handleHFCZTask sleeping...")
+		time.Sleep(10 * time.Second)
+	}
+}
+
+func init() {
+	go handleHFCZTask()
 }

@@ -43,7 +43,8 @@ const (
 	MONEY_TYPE_INSTALL_INSTALLER   = 3
 	ORDER_TYPE_HUAFEI              = 0
 	ORDER_TYPE_ZHIFUBAO            = 1
-	ORDER_STATUS_INIT              = 0
+	ORDER_STATUS_INIT              = -1
+	ORDER_STATUS_DOING             = 0
 	ORDER_STATUS_SUCCESS           = 1
 	ORDER_STATUS_CANCEL            = 9
 )

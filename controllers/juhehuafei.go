@@ -290,9 +290,7 @@ func hfczOrderStaTask() {
 				if netReturn["result"] != nil {
 					result := netReturn["result"].(map[string]interface{})
 					if result["game_state"] != nil {
-						log.Println("---1   ", result["game_state"], "  ", strconv.Itoa(conf.ORDER_STATUS_DOING))
 						if result["game_state"] == strconv.Itoa(conf.ORDER_STATUS_SUCCESS) {
-							log.Println("---2")
 							row.OrderStatus = conf.ORDER_STATUS_SUCCESS
 							row.Des = string(data)
 							err = models.UpdateDBModel(nil, row)
@@ -300,6 +298,27 @@ func hfczOrderStaTask() {
 								log.Println(err.Error())
 								return
 							}
+							id, err := models.GenerateAppuserMoneyId()
+							if err != nil {
+								log.Println(err.Error())
+								return
+							}
+							apm_data := new(models.AppuserMoney)
+							apm_data.Id = id
+							apm_data.Appid = row.Appid
+							apm_data.Appuserid = row.Appuserid
+							apm_data.UserOrderID = row.Id
+							apm_data.MoneyType = conf.MONEY_TYPE_HFCZ
+							apm_data.Money, _ = strconv.ParseFloat(row.Cardnum, 64)
+							apm_data.Money = apm_data.Money * 100.0
+							apm_data.CreatedUTC = utils.GetNowSecond()
+							apm_data.Des = "用户使用收益进行话费充值"
+							err = models.InsertDBModel(nil, apm_data)
+							if err != nil {
+								log.Println(err.Error())
+								return
+							}
+
 						}
 					}
 					fmt.Printf("接口返回result字段是:\r\n%v", netReturn["result"])

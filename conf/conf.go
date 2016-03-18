@@ -41,6 +41,7 @@ const (
 	MONEY_TYPE_CLICK_SHARER        = 1
 	MONEY_TYPE_INSTALL_SHARER      = 2
 	MONEY_TYPE_INSTALL_INSTALLER   = 3
+	MONEY_TYPE_HFCZ                = 4
 	ORDER_TYPE_HUAFEI              = 0
 	ORDER_TYPE_ZHIFUBAO            = 1
 	ORDER_STATUS_INIT              = -1

@@ -151,20 +151,25 @@ func Score(c *gin.Context) {
 		hour, min, sec := created_utc.Clock()
 		date_tmp := fmt.Sprintf("%d-%d-%d", year, month, day)
 
+		if row.MoneyType == conf.MONEY_TYPE_HFCZ {
+			row.Money = -float64(row.Money / 100.0)
+		} else {
+			row.Money = float64(row.Money / 100.0)
+		}
+
 		total = total + float64(row.Money)
 		if date_tmp == date_now {
 			total_today = total_today + float64(row.Money)
 		}
 		s := fmt.Sprintf("%d-%d-%d %02d:%02d:%02d\n", year, mon, day, hour, min, sec)
 		row.Des = row.Des + "      " + s
-		row.Money = float64(row.Money / 100.0)
 	}
 	data["appid"] = appIdStr
 	data["appuserid"] = userIdStr
-	data["total_today"] = fmt.Sprintf("%.2f", total_today/100.0)
-	data["total"] = fmt.Sprintf("%.2f", total/100.0)
+	data["total_today"] = fmt.Sprintf("%.2f", total_today)
+	data["total"] = fmt.Sprintf("%.2f", total)
 	used := 0.0
-	data["total_left"] = fmt.Sprintf("%.2f", total/100.0-used)
+	data["total_left"] = fmt.Sprintf("%.2f", total-used)
 	data["res"] = dataList
 
 	c.HTML(200, "score.html", data)

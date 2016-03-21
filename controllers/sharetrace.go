@@ -40,6 +40,8 @@ func Share(c *gin.Context) {
 	old_idStr, err := caches.GetShareURLIdByUrl(postData.ShareURL)
 	if err == nil && old_idStr != "" {
 		log.Println("Exist cahche:%s", postData.ShareURL)
+		ret := gin.H{"status": true}
+		c.JSON(200, ret)
 		return
 	} else {
 		if old_idStr != "" {
@@ -61,6 +63,8 @@ func Share(c *gin.Context) {
 			if err != nil {
 				log.Println("Failed to cache info %s", err.Error())
 			}
+			ret := gin.H{"status": true}
+			c.JSON(200, ret)
 			return
 		}
 	}

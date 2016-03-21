@@ -142,10 +142,7 @@
           return false;
       }
 
-      // TODO
-      //alert(data.phoneno + '话费' + data.cardnum+ '元充值申请成功，请关注您的话费余额！');
       $.post("/1/st/hfcz", JSON.stringify(data), function (data) {
-          console.log("hfcz data:", data);
           if (data.status == 1) {
               alert('话费提现申请成功，请关注您的话费余额！');
           } else {

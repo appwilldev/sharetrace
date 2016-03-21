@@ -193,14 +193,17 @@ func AppUserScore(c *gin.Context) {
 	}
 
 	award_str := "100积分=1元;"
-	if appDB.Status == 0 || appDB.Yue < 1000 {
+	if appDB.Status == 0 {
 		award_str = ""
 	} else {
 		if appDB.ShareClickMoney > 0 {
-			award_str = fmt.Sprintf("%s分享获得点击, 每次奖励分享者%d分;", award_str, appDB.ShareClickMoney)
+			award_str = fmt.Sprintf("%s分享获得点击, 奖励分享者%d分;", award_str, appDB.ShareClickMoney)
 		}
 		if appDB.ShareInstallMoney > 0 {
-			award_str = fmt.Sprintf("%s分享获得安装, 每次奖励分享者%d分;", award_str, appDB.ShareInstallMoney)
+			award_str = fmt.Sprintf("%s分享获得安装, 奖励分享者%d分;", award_str, appDB.ShareInstallMoney)
+		}
+		if appDB.InstallMoney > 0 {
+			award_str = fmt.Sprintf("%s安装者%d分;", award_str, appDB.ShareInstallMoney)
 		}
 	}
 
@@ -417,6 +420,14 @@ func WebBeacon(c *gin.Context) {
 		http.SetCookie(c.Writer, cookie)
 	}
 
+	// TODO add appusermoney
+	if shareid > 0 {
+		err := models.AddClickAwardToAppUser(nil, data)
+		if err != nil {
+			log.Println("AddClickAwardToAppUser Error:", err.Error())
+		}
+	}
+
 	return
 }
 
@@ -562,7 +573,7 @@ func WebBeaconCheck(c *gin.Context) {
 				return
 			}
 
-			err := models.AddAwardToAppUser(nil, app, cs_data)
+			err := models.AddInstallAwardToAppUser(nil, app, cs_data)
 			if err != nil {
 				Error(c, SERVER_ERROR, nil, err.Error())
 				return

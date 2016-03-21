@@ -63,9 +63,9 @@ var Apps = function (resolve, reject) {
                                     "appschema": vm.app.appschema,
                                     "apphost": vm.app.apphost,
                                     "status": parseInt(vm.app.status),
-                                    //"share_click_money": parseInt(vm.app.share_click_money),
-                                    "share_install_money": parseFloat(vm.app.share_install_money),
-                                    "install_money": parseFloat(vm.app.install_money),
+                                    "share_click_money": parseInt(vm.app.share_click_money),
+                                    "share_install_money": parseInt(vm.app.share_install_money),
+                                    "install_money": parseInt(vm.app.install_money),
                                     //"appicon": vm.app.icon
                                 }),
                                 credentials: 'same-origin'
@@ -89,9 +89,9 @@ var Apps = function (resolve, reject) {
                                     "appschema": vm.app.appschema,
                                     "apphost": vm.app.apphost,
                                     "status": parseInt(vm.app.status),
-                                    //"share_click_money": parseInt(vm.app.share_click_money),
-                                    "share_install_money": parseFloat(vm.app.share_install_money),
-                                    "install_money": parseFloat(vm.app.install_money),
+                                    "share_click_money": parseInt(vm.app.share_click_money),
+                                    "share_install_money": parseInt(vm.app.share_install_money),
+                                    "install_money": parseInt(vm.app.install_money),
                                     //"icon": vm.app.icon
                                 }),
                                 credentials: 'same-origin'
@@ -116,7 +116,7 @@ var Apps = function (resolve, reject) {
                             "appschema": "",
                             "apphost": "",
                             "status": "",
-                            //"share_click_money": "",
+                            "share_click_money": "",
                             "share_install_money": "",
                             "install_money": "",
                             "icon": "",
@@ -148,6 +148,9 @@ var Apps = function (resolve, reject) {
 
                     },
                     show_app_money: function (app) {
+                    	if (app.status != '1'){
+                    		alert("APP 需要 1,先打开奖励开关，2,设置奖励机制 才能有积分数据哦");
+                        }
                     	var url = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + "/web/components/moneystats.html?appid=" + app.appid + "&appname=" + app.appname;
                     	console.log(url);
                     	window.open(url);

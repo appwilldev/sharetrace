@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fmt"
+	//"fmt"
 	"github.com/appwilldev/sharetrace/conf"
 	"github.com/appwilldev/sharetrace/utils"
 	"strconv"
@@ -73,7 +73,7 @@ func GetAppuserMoneyListByUserid(s *ModelSession, appid string, appuserid string
 	return dataList, total, nil
 }
 
-func AddAwardToAppUser(s *ModelSession, app *AppInfo, cs_data *ClickSession) error {
+func AddClickAwardToAppUser(s *ModelSession, cs_data *ClickSession) error {
 
 	if s == nil {
 		s = NewModelSession()
@@ -81,7 +81,51 @@ func AddAwardToAppUser(s *ModelSession, app *AppInfo, cs_data *ClickSession) err
 	defer s.Close()
 
 	su_data, _ := GetShareURLById(nil, cs_data.Shareid)
-	if app.Status == 1 && app.Yue > 1000 {
+	app, _ := GetAppInfoByAppid(nil, su_data.Appid)
+	//if app.Status == 1 && app.Yue > 1000 {
+	if app.Status == 1 {
+		err := s.Begin()
+		if app.ShareClickMoney > 0 {
+			id, err := GenerateAppuserMoneyId()
+			if err != nil {
+				s.Rollback()
+				return err
+			}
+			aum_data := new(AppuserMoney)
+			aum_data.Id = id
+			aum_data.Appid = app.Appid
+			aum_data.Appuserid = su_data.Fromid
+			aum_data.ClickSessionID = cs_data.Id
+			aum_data.MoneyType = conf.MONEY_TYPE_INSTALL_SHARER
+			aum_data.Money = float64(app.ShareClickMoney)
+			aum_data.CreatedUTC = utils.GetNowSecond()
+			aum_data.Des = "分享链接为App带来了点击:" + cs_data.AgentId
+			err = InsertDBModel(s, aum_data)
+			if err != nil {
+				s.Rollback()
+				return err
+			}
+			//app.Yue = app.Yue - app.ShareInstallMoney
+		}
+
+		err = s.Commit()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func AddInstallAwardToAppUser(s *ModelSession, app *AppInfo, cs_data *ClickSession) error {
+
+	if s == nil {
+		s = NewModelSession()
+	}
+	defer s.Close()
+
+	su_data, _ := GetShareURLById(nil, cs_data.Shareid)
+	//if app.Status == 1 && app.Yue > 1000 {
+	if app.Status == 1 {
 		err := s.Begin()
 		if app.ShareInstallMoney > 0 {
 			id, err := GenerateAppuserMoneyId()
@@ -103,7 +147,7 @@ func AddAwardToAppUser(s *ModelSession, app *AppInfo, cs_data *ClickSession) err
 				s.Rollback()
 				return err
 			}
-			app.Yue = app.Yue - app.ShareInstallMoney
+			//app.Yue = app.Yue - app.ShareInstallMoney
 		}
 
 		if app.InstallMoney > 0 {
@@ -126,18 +170,18 @@ func AddAwardToAppUser(s *ModelSession, app *AppInfo, cs_data *ClickSession) err
 				s.Rollback()
 				return err
 			}
-			app.Yue = app.Yue - app.ShareInstallMoney
+			//app.Yue = app.Yue - app.ShareInstallMoney
 		}
-		err = UpdateDBModel(s, app)
-		if err != nil {
-			s.Rollback()
-			return err
-		}
-		if app.Yue < 0 {
-			err = fmt.Errorf("Not enough Yue Error")
-			s.Rollback()
-			return err
-		}
+		//err = UpdateDBModel(s, app)
+		//if err != nil {
+		//	s.Rollback()
+		//	return err
+		//}
+		//if app.Yue < 0 {
+		//	err = fmt.Errorf("Not enough Yue Error")
+		//	s.Rollback()
+		//	return err
+		//}
 		err = s.Commit()
 		if err != nil {
 			return err

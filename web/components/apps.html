@@ -16,9 +16,9 @@
                 <td style="text-align:left;">创建者</td>
                 <td style="text-align:center;">创建时间</td>
                 <td style="text-align:left;">是否奖励</td>
-                <td style="text-align:left; color:red;">余额(元)</td>
-                <td style="text-align:left;">奖励分享者(元)</td>
-                <td style="text-align:left;">奖励安装者(元)</td>
+                <td style="text-align:left;">点击奖励(分享者)</td>
+                <td style="text-align:left;">安装奖励(分享者)</td>
+                <td style="text-align:left;">奖励安装者</td>
                 <td v-if="$route.params.page!=undefined || $route.params.keyword!=undefined" style="text-align:center;">操作</td>
             </tr>
         </thead>
@@ -58,7 +58,7 @@
                     <td style="vertical-align:middle;text-align:center;">{{{app.created_utc | datetime}}}</td>
 
                     <td style="vertical-align:middle;text-align:center;">{{app.status}}</td>
-                    <td style="vertical-align:middle;text-align:center;color:red;">{{app.yue}}</td>
+                    <td style="vertical-align:middle;text-align:center;">{{app.share_click_money}}</td>
                     <td style="vertical-align:middle;text-align:center;">{{app.share_install_money}}</td>
                     <td style="vertical-align:middle;text-align:center;">{{app.install_money}}</td>
                     <td style="vertical-align:middle;text-align:center;" v-if="$route.params.page!=undefined || $route.params.keyword!=undefined">
@@ -131,11 +131,20 @@
                     </div>
                 </div>
 
+                <div class="form-group" v-bind:class="{'has-error':err_msg}">
+                    <label class="control-label">
+                       点击奖励(分享者)
+                    </label>
+                    <div>
+                        <input type="text" class="form-control" v-model="app.share_click_money">
+                        <span class="alert-danger">{{ err_msg }}</span>
+                    </div>
+                </div>
+
 
                 <div class="form-group" v-bind:class="{'has-error':err_msg}">
                     <label class="control-label">
-                       奖励分享者(元)
-
+                       安装奖励(分享者)
                     </label>
                     <div>
                         <input type="text" class="form-control" v-model="app.share_install_money">
@@ -144,8 +153,7 @@
                 </div>
                 <div class="form-group" v-bind:class="{'has-error':err_msg}">
                     <label class="control-label">
-                       奖励安装者(元)
-
+                       奖励安装者
                     </label>
                     <div>
                         <input type="text" class="form-control" v-model="app.install_money">

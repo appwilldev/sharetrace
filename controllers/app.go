@@ -52,9 +52,9 @@ func NewApp(c *gin.Context) {
 	appInfo.AppSchema = reqData.AppSchema
 	appInfo.AppHost = reqData.AppHost
 
-	appInfo.ShareClickMoney = int(reqData.ShareClickMoney * 100)
-	appInfo.ShareInstallMoney = int(reqData.ShareInstallMoney * 100)
-	appInfo.InstallMoney = int(reqData.InstallMoney * 100)
+	appInfo.ShareClickMoney = int(reqData.ShareClickMoney)
+	appInfo.ShareInstallMoney = int(reqData.ShareInstallMoney)
+	appInfo.InstallMoney = int(reqData.InstallMoney)
 
 	appInfo.Status = reqData.Status
 	appInfo.Userid = userid
@@ -102,9 +102,9 @@ func UpdateApp(c *gin.Context) {
 	appInfo.AppSchema = reqData.AppSchema
 	appInfo.AppHost = reqData.AppHost
 
-	appInfo.ShareClickMoney = int(reqData.ShareClickMoney * 100)
-	appInfo.ShareInstallMoney = int(reqData.ShareInstallMoney * 100)
-	appInfo.InstallMoney = int(reqData.InstallMoney * 100)
+	appInfo.ShareClickMoney = int(reqData.ShareClickMoney)
+	appInfo.ShareInstallMoney = int(reqData.ShareInstallMoney)
+	appInfo.InstallMoney = int(reqData.InstallMoney)
 
 	appInfo.Status = reqData.Status
 	appInfo.AppIcon = reqData.AppIcon
@@ -126,7 +126,7 @@ func AppInfoAll(c *gin.Context) {
 	}
 
 	var res []*models.AppInfo
-	var res_ret []*models.AppInfoRet
+	//var res_ret []*models.AppInfoRet
 	user, _ := models.GetUserInfoById(nil, userid)
 	res, total, err := models.GetAppInfoListByUserid(nil, userid)
 	if err != nil {
@@ -144,8 +144,8 @@ func AppInfoAll(c *gin.Context) {
 				res[i].Des = tmp_user.Name
 			}
 
-			temp_ret := models.GetAppInfoRet(res[i])
-			res_ret = append(res_ret, temp_ret)
+			//temp_ret := models.GetAppInfoRet(res[i])
+			//res_ret = append(res_ret, temp_ret)
 		}
 	} else {
 		tmp_user, _ := models.GetUserInfoById(nil, userid)
@@ -153,14 +153,14 @@ func AppInfoAll(c *gin.Context) {
 			resLen := len(res)
 			for i := 0; i < resLen; i++ {
 				res[i].Des = tmp_user.Name
-				temp_ret := models.GetAppInfoRet(res[i])
-				res_ret = append(res_ret, temp_ret)
+				//temp_ret := models.GetAppInfoRet(res[i])
+				//res_ret = append(res_ret, temp_ret)
 			}
 		}
 	}
 
 	ret := gin.H{"status": true}
 	ret["total"] = total
-	ret["data"] = res_ret
+	ret["data"] = res
 	c.JSON(200, ret)
 }

@@ -131,6 +131,7 @@ func main() {
 		statsAPIV1.GET("/share", controllers.StatsShare)
 		statsAPIV1.GET("/total", controllers.StatsTotal)
 		statsAPIV1.GET("/host", controllers.StatsHost)
+		statsAPIV1.GET("/appmoney", controllers.StatsAppMoney)
 	}
 
 	//ctAPIV1 := ginIns.Group("/1/ct")

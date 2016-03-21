@@ -1,7 +1,9 @@
 package models
 
 import (
+	"fmt"
 	"github.com/go-xorm/xorm"
+	"reflect"
 )
 
 func GetShareClickListByAppid(s *ModelSession, appid string) ([]*ShareClick, error) {
@@ -180,6 +182,26 @@ func GetTotalByHostiPhone(s *ModelSession, host string, date string, phone strin
 	if err != nil {
 		return -1, err
 	}
+
+	return total, nil
+}
+
+func GetMoneyTotalByAppid(s *ModelSession, appid string, date string, money_type int) (int64, error) {
+	var (
+		total int64
+		err   error
+	)
+	if s == nil {
+		s = newAutoCloseModelsSession()
+	}
+
+	sql := fmt.Sprintf("select sum(money) from appuser_money where appid = '%s' and money_type = %d and date(to_timestamp(created_utc)) = '%s'", appid, money_type, date)
+	columnTypes := []reflect.Type{reflect.TypeOf(int64(1))}
+	res, err := RawSqlQuery(sql, columnTypes)
+	if err != nil {
+		return -1, err
+	}
+	total = res[0][0].(int64) / 100
 
 	return total, nil
 }

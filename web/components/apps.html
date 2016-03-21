@@ -62,9 +62,10 @@
                     <td style="vertical-align:middle;text-align:center;">{{app.share_install_money}}</td>
                     <td style="vertical-align:middle;text-align:center;">{{app.install_money}}</td>
                     <td style="vertical-align:middle;text-align:center;" v-if="$route.params.page!=undefined || $route.params.keyword!=undefined">
-                        <a style="cursor:pointer;font-size:15px;" data-toggle="modal" data-target="#myModal" v-on:click="show_edit_app(app)">修改</a> |
-                        <a style="cursor:pointer;font-size:15px;" v-on:click="show_app_data(app)">App数据</a> | 
-                        <a style="cursor:pointer;font-size:15px;" v-if="app.apphost" v-on:click="show_app_data_host(app)">域名数据</a> 
+                        <a style="cursor:pointer;font-size:15px;" data-toggle="modal" data-target="#myModal" v-on:click="show_edit_app(app)">修改</a> <br/>
+                        <a style="cursor:pointer;font-size:15px;" v-on:click="show_app_data(app)">App数据</a> <br/> 
+                        <a style="cursor:pointer;font-size:15px;" v-on:click="show_app_money(app)">用户积分</a> <br/> 
+                        <a style="cursor:pointer;font-size:15px;" v-if="app.apphost" v-on:click="show_host_data(app)">域名数据</a> 
                     </td>
                 </tr>
         </tbody>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>ShareTrace</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <script src="../lib/echarts.min.js"></script>
+    <script src="../lib/fetch.js"></script>
+    <script src="../lib/jquery-2.1.4.min.js"></script>
+    <script src="../lib/jquery.datetimepicker.js"></script>
+    <script src="../js/utils.js"></script>
+    <link rel="shortcut icon" href="../img/sticon.ico" />
+    <link rel="stylesheet" type="text/css" href="../css/jquery.datetimepicker.css"/ >
+    <style>
+
+    </style>
+    <script>
+     $(function() {
+         $( "#datepicker_start" ).datetimepicker();
+         $( "#datepicker_end" ).datetimepicker();
+     });
+    </script>
+</head>
+<body>
+
+
+<div style="width: 600px; margin-left:120px; ">
+<h3 id="stattitle"></h3>
+<input id="datepicker_start" class="datetimepicker" type="text" size="20"> 
+-
+<input id="datepicker_end" class="datetimepicker" type="text" size="20"> 
+<button type="button" onclick="search()">查询</button>
+</div>
+<div style="width: 600px; margin-left:20px;">
+<span style="font-size:15px">
+名词解释：<br/>
+单位：元， 100积分对应1元<br/>
+Click_sharer:点击奖励分享者 | Install_sharer:安装奖励分享者 <br/>
+Installer:奖励安装者 | Award:总的奖励数额 <br/>
+Hfcz:用户话费充值<br/>
+<span>
+</div>
+
+<br/>
+<br/>
+
+<div id="main" style="width: 600px;height:400px;"></div>
+<br/>
+<br/>
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var mainChart = echarts.init(document.getElementById('main'));
+
+    var time_start, time_end;
+    get_data();
+
+    function search(){
+    	console.log("search");
+        var picker_start= $('#datepicker_start').val();
+        var picker_end= $('#datepicker_end').val();
+        if (picker_start  != 'undefined'){
+            time_start = new Date(picker_start);
+            time_start = time_start.getTime()/1000;
+        } //if
+        if (picker_end != 'undefined'){
+            time_end = new Date(picker_end);
+            time_end = time_end.getTime()/1000;
+        } //if
+        console.log(time_start, ",", time_end);
+        get_data();
+    }
+
+    function get_data(){
+        // 指定图表的配置项和数据
+        var url_vars = $.getUrlVars();                                           
+        var appid=url_vars["appid"];
+        var appname=decodeURI(url_vars["appname"]);
+        $("#stattitle").html(appname);
+        var ret_data;
+        var legend_data = new Array();
+        var xAxis_data = new Array();
+        var series_data = new Array();
+        var url = "/1/stats/appmoney?appid=" + appid;
+
+        if (time_start > 0){
+            url = url +  "&start=" + time_start;
+        }
+        if (time_end > 0){
+            url = url + "&end=" + time_end;
+        }
+        console.log(url);
+
+        fetch(url, {
+            method: 'get',
+            credentials: 'same-origin'
+        }).then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            if (isEmpty(data)){
+                alert("No data");
+            }
+        	ret_data = data;
+
+            for (var i=0;i<ret_data.data["click_sharer"].length;i++){
+                for (var key in ret_data.data["click_sharer"][i]){
+                	xAxis_data.push(key);
+                }
+            }
+
+        	for (var key in ret_data.data) {
+                legend_data.push(key);
+                var series_line = {};
+                series_line["name"] = key;
+                series_line["type"] = "line";
+                series_line["data"] = new Array();
+                for (var i=0;i<ret_data.data[key].length;i++){
+                    for (var datekey in ret_data.data[key][i]){
+                    	series_line["data"].push(ret_data.data[key][i][datekey]);
+                    }
+                }
+                series_data.push(series_line);
+            }
+
+
+            main_option = {
+                title: {
+                    text: '每日数据'
+                },
+                tooltip : {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data:legend_data
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                toolbox: {
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+                xAxis : [
+                    {
+                        type : 'category',
+                        boundaryGap : false,
+                        data:xAxis_data
+                    }
+                ],
+                yAxis : [
+                    {
+                        type : 'value'
+                    }
+                ],
+                series: series_data
+            };
+            
+            mainChart.setOption(main_option);
+        });
+    }
+
+    </script>
+
+
+</body>
+</html>

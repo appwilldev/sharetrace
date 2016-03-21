@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/appwilldev/sharetrace/conf"
 	"github.com/appwilldev/sharetrace/models"
 	"github.com/gin-gonic/gin"
 )
@@ -256,6 +257,85 @@ func StatsHost(c *gin.Context) {
 	data["weibo"] = weibo
 	data["chrome"] = chrome
 	data["browser_else"] = browser_else
+
+	ret["data"] = data
+	c.JSON(200, ret)
+}
+
+func StatsAppMoney(c *gin.Context) {
+
+	q := c.Request.URL.Query()
+	appIdStr := q["appid"][0]
+
+	var delta int
+	delta = 7
+	time_now := time.Now().AddDate(0, 0, -delta+1)
+
+	var t_start int64
+	if len(q["start"]) > 0 {
+		t_start_str := q["start"][0]
+		t_start, _ = strconv.ParseInt(t_start_str, 10, 64)
+		start_utc := time.Unix(t_start, 0)
+		time_now = start_utc
+	}
+
+	var t_end int64
+	if len(q["end"]) > 0 {
+		t_end_str := q["end"][0]
+		t_end, _ = strconv.ParseInt(t_end_str, 10, 64)
+	}
+
+	if t_start > 0 && t_end > 0 {
+		delta = int((t_end - t_start) / (24 * 3600))
+	}
+
+	ret := gin.H{"status": true}
+
+	var data map[string]interface{}
+	data = make(map[string]interface{})
+
+	click_sharer := make([]interface{}, 0)
+	install_sharer := make([]interface{}, 0)
+	installer := make([]interface{}, 0)
+	award := make([]interface{}, 0)
+	hfcz := make([]interface{}, 0)
+
+	for i := 0; i < delta; i++ {
+		time_now_tmp := time_now.AddDate(0, 0, +i)
+		year, month, day := time_now_tmp.Date()
+		date_tmp := fmt.Sprintf("%d-%d-%d", year, month, day)
+
+		click_sharer_tmp := make(map[string]interface{}, 1)
+		click_sharer_total, _ := models.GetMoneyTotalByAppid(nil, appIdStr, date_tmp, conf.MONEY_TYPE_CLICK_SHARER)
+		click_sharer_tmp[date_tmp] = click_sharer_total
+		click_sharer = append(click_sharer, click_sharer_tmp)
+
+		install_sharer_tmp := make(map[string]interface{}, 1)
+		install_sharer_total, _ := models.GetMoneyTotalByAppid(nil, appIdStr, date_tmp, conf.MONEY_TYPE_INSTALL_SHARER)
+		install_sharer_tmp[date_tmp] = install_sharer_total
+		install_sharer = append(install_sharer, install_sharer_tmp)
+
+		installer_tmp := make(map[string]interface{}, 1)
+		installer_total, _ := models.GetMoneyTotalByAppid(nil, appIdStr, date_tmp, conf.MONEY_TYPE_INSTALL_INSTALLER)
+		installer_tmp[date_tmp] = installer_total
+		installer = append(installer, installer_tmp)
+
+		award_tmp := make(map[string]interface{}, 1)
+		award_total := click_sharer_total + install_sharer_total + installer_total
+		award_tmp[date_tmp] = award_total
+		award = append(award, award_tmp)
+
+		hfcz_tmp := make(map[string]interface{}, 1)
+		hfcz_total, _ := models.GetMoneyTotalByAppid(nil, appIdStr, date_tmp, conf.MONEY_TYPE_HFCZ)
+		hfcz_tmp[date_tmp] = hfcz_total
+		hfcz = append(hfcz, hfcz_tmp)
+	}
+
+	data["click_sharer"] = click_sharer
+	data["install_sharer"] = install_sharer
+	data["installer"] = installer
+	data["award"] = award
+	data["hfcz"] = hfcz
 
 	ret["data"] = data
 	c.JSON(200, ret)

@@ -141,13 +141,18 @@ var Apps = function (resolve, reject) {
                     	window.open(url);
 
                     },
-                    show_app_data_host: function (app) {
+                    show_host_data: function (app) {
                     	var url = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + "/web/components/hoststats.html?host=" + app.apphost;
                     	console.log(url);
                     	window.open(url);
 
-                    }
+                    },
+                    show_app_money: function (app) {
+                    	var url = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + "/web/components/moneystats.html?appid=" + app.appid + "&appname=" + app.appname;
+                    	console.log(url);
+                    	window.open(url);
 
+                    },
                 }
             });
         });

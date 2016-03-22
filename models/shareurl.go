@@ -62,6 +62,20 @@ func GetShareURLByUrl(s *ModelSession, url string) (*ShareURL, error) {
 	return data, nil
 }
 
+func GetShareURLByAppIdFromIdItemId(s *ModelSession, appid string, fromid string, itemid string) (*ShareURL, error) {
+	if s == nil {
+		s = newAutoCloseModelsSession()
+	}
+
+	data := &ShareURL{}
+	has, err := s.Where("appid=? and fromid=? and itemid=?", appid, fromid, itemid).Get(data)
+	if !has || err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
 //////////////////////// Click_Session
 func GenerateClickSessionId() (int64, error) {
 	return generateSequenceValue("click_session_id")

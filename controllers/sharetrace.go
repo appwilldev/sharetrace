@@ -263,18 +263,25 @@ func WebBeacon(c *gin.Context) {
 		log.Println(err.Error())
 		return
 	}
+
 	idShareStr, err := caches.GetShareURLIdByUrl(share_url)
 	var shareid int64
 	shareid = 0
 	if err != nil {
-		log.Println(err.Error())
+		// weixin friends will add para after url :from=timeline&isappinstalled=1
+		m, err := url.ParseQuery(u.RawQuery)
+		if err != nil {
+		} else {
+			if m["appid"][0] != "" && m["fromid"][0] != "" && m["itemid"][0] != "" {
+				idShareStr, _ = caches.GetShareURLIdByTripleID(m["appid"][0], m["fromid"][0], m["itemid"][0])
+				if idShareStr != "" {
+					shareid, _ = strconv.ParseInt(idShareStr, 10, 64)
+				}
+			}
+		}
 		// not return when redis_nil_value, for domain trace
 	} else {
-		shareid, err = strconv.ParseInt(idShareStr, 10, 64)
-		if err != nil {
-			log.Println(err.Error())
-			return
-		}
+		shareid, _ = strconv.ParseInt(idShareStr, 10, 64)
 	}
 
 	// if no clientIP, return

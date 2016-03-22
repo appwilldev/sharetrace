@@ -26,6 +26,10 @@ func getShareURLIdCacheKeyByURL(str string) string {
 	return fmt.Sprintf("su_id_by_url_%s", str)
 }
 
+func getShareURLIdCacheKeyByTripleID(appid string, fromid string, itemid string) string {
+	return fmt.Sprintf("su_id_by_3id_%s_%s_%s", appid, fromid, itemid)
+}
+
 // clicksession
 func getClickSessionInfoCacheKey(id int64) string {
 	return fmt.Sprintf("csi_%d", id)

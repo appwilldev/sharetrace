@@ -32,6 +32,14 @@ func GetShareURLIdByUrl(url string) (string, error) {
 	return data, err
 }
 
+func GetShareURLIdByTripleID(appid string, fromid string, itemid string) (string, error) {
+	data, err := cache.Get(conf.DEFAULT_CACHE_DB_NAME, getShareURLIdCacheKeyByTripleID(appid, fromid, itemid))
+	if err != nil {
+		return "", err
+	}
+	return data, err
+}
+
 func UpdateShareURL(data *models.ShareURL) error {
 	v, _ := json.Marshal(data)
 	err := cache.Set(conf.DEFAULT_CACHE_DB_NAME, getShareURLInfoCacheKey(data.Id), string(v), conf.UserExpires)
@@ -45,5 +53,8 @@ func SetShareURL(data *models.ShareURL) error {
 	}
 	// Set url cache map
 	err = cache.Set(conf.DEFAULT_CACHE_DB_NAME, getShareURLIdCacheKeyByURL(data.ShareURL), fmt.Sprintf("%d", data.Id), conf.UserExpires)
+
+	// Set Triple ID cache map
+	err = cache.Set(conf.DEFAULT_CACHE_DB_NAME, getShareURLIdCacheKeyByTripleID(data.Appid, data.Fromid, data.Itemid), fmt.Sprintf("%d", data.Id), conf.UserExpires)
 	return err
 }

@@ -296,7 +296,8 @@ func WebBeacon(c *gin.Context) {
 		m, err := url.ParseQuery(u.RawQuery)
 		if err != nil {
 		} else {
-			if m["appid"][0] != "" && m["fromid"][0] != "" && m["itemid"][0] != "" {
+			//if m["appid"][0] != "" && m["fromid"][0] != "" && m["itemid"][0] != "" {
+			if m.Get("appid") != "" && m.Get("fromid") != "" && m.Get("itemid") != "" {
 				idShareStr, _ = caches.GetShareURLIdByTripleID(m["appid"][0], m["fromid"][0], m["itemid"][0])
 				if idShareStr != "" {
 					shareid, _ = strconv.ParseInt(idShareStr, 10, 64)

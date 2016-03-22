@@ -1,6 +1,6 @@
 function set_stiframe(){
     var iframe = document.createElement('iframe');
-    var stiframe_url="http://st.apptao.com/1/st/webbeacon?share_url=" + encodeURIComponent(window.location);
+    var stiframe_url="https://st.apptao.com/1/st/webbeacon?share_url=" + encodeURIComponent(window.location);
     iframe.src = stiframe_url;
     document.body.appendChild(iframe);
 }
@@ -13,7 +13,7 @@ function gotoAppStore(buttonid){
 		buttonid = 1;
     }
     var iframe = document.createElement('iframe');
-    var stiframe_url="http://st.apptao.com/1/st/webbeaconbutton?buttonid=" + buttonid ;
+    var stiframe_url="https://st.apptao.com/1/st/webbeaconbutton?buttonid=" + buttonid ;
     iframe.src = stiframe_url;
     document.body.appendChild(iframe);
 }

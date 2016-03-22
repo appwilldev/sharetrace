@@ -5,15 +5,17 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/appwilldev/sharetrace/conf"
-	"github.com/appwilldev/sharetrace/models"
-	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"strconv"
 	"time"
+
+	"github.com/appwilldev/sharetrace/conf"
+	"github.com/appwilldev/sharetrace/logger"
+	"github.com/appwilldev/sharetrace/models"
+	"github.com/gin-gonic/gin"
 )
 
 //----------------------------------
@@ -201,7 +203,11 @@ func Post(apiURL string, params url.Values) (rs []byte, err error) {
 func hfczOnlineOrderTask() {
 	dataList, _, err := models.GetAppuserOrderListByOrderStatus(nil, conf.ORDER_STATUS_INIT)
 	if err != nil {
-		log.Println("err:", err)
+		logger.ErrorLogger.Error(map[string]interface{}{
+			"type":    "juhe API",
+			"err_msg": err.Error(),
+		})
+
 		return
 	}
 	for _, row := range dataList {
@@ -236,15 +242,21 @@ func hfczOnlineOrderTask() {
 							row.Des = string(data)
 							err = models.UpdateDBModel(nil, row)
 							if err != nil {
-								log.Println(err.Error())
+								logger.ErrorLogger.Error(map[string]interface{}{
+									"type":    "juhe API",
+									"err_msg": err.Error(),
+								})
 								return
 							}
 						}
 					}
-					fmt.Printf("接口返回result字段是:\r\n%v", netReturn["result"])
+					//fmt.Printf("接口返回result字段是:\r\n%v", netReturn["result"])
 				}
 			} else {
-				log.Println("JUHE API Error Return:", netReturn)
+				logger.ErrorLogger.Error(map[string]interface{}{
+					"type":    "juhe API",
+					"err_msg": fmt.Sprintf("juhe API Error Return:%s", netReturn),
+				})
 			}
 		}
 	}

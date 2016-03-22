@@ -24,7 +24,7 @@
 * share_url: 必填，分享链接，最好包含3个信息<appid, fromid, itemid>
 * fromid:    必填，分享的用户ID, 可以用IDFA，或者注册后的UserID，但是不要混用
 * appid:     必填，App的ID，需要在管理系统中注册并录入该AppID
-* itemid:    选填，分享的内容ID
+* itemid:    必填，分享的内容ID
 * channel:   选填，weixin,qq,weibo,else
 * ver:       选填，App的版本
 * des:       选填，备注信息

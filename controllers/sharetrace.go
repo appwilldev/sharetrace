@@ -23,7 +23,7 @@ func Share(c *gin.Context) {
 		ShareURL string `json:"share_url" binding:"required"`
 		Fromid   string `json:"fromid" binding:"required"`
 		Appid    string `json:"appid" binding:"required"`
-		Itemid   string `json:"itemid"`
+		Itemid   string `json:"itemid" binding:"required"`
 		Channel  string `json:"channel"`
 		Ver      string `json:"ver"`
 		Des      string `json:"des"`
@@ -251,6 +251,7 @@ func AppUserScore(c *gin.Context) {
 
 // Just return nothing, maybe  set cookie
 func WebBeacon(c *gin.Context) {
+	//////////////////////////////////////////////////////// Return Condition First Start
 	// if no share_url para, return
 	q := c.Request.URL.Query()
 	share_url := q["share_url"][0]
@@ -258,11 +259,34 @@ func WebBeacon(c *gin.Context) {
 		log.Println("Error, No share_url para!")
 		return
 	}
+
+	// set click_type
+	click_type := conf.CLICK_TYPE_IP
+	agent := c.Request.Header.Get("User-Agent")
+	if agent == "" {
+		log.Println("No client agent")
+		return
+	} else {
+		if strings.Contains(agent, "Safari") && !strings.Contains(agent, "Chrome") {
+			click_type = conf.CLICK_TYPE_COOKIE
+		} else {
+			click_type = conf.CLICK_TYPE_IP
+		}
+	}
+
+	// if no clientIP, return
+	clientIP := c.ClientIP()
+	if clientIP == "" {
+		log.Println("No client IP")
+		return
+	}
+
 	u, err := url.Parse(share_url)
 	if err != nil {
 		log.Println(err.Error())
 		return
 	}
+	//////////////////////////////////////////////////////// Return Condition First End
 
 	idShareStr, err := caches.GetShareURLIdByUrl(share_url)
 	var shareid int64
@@ -282,27 +306,6 @@ func WebBeacon(c *gin.Context) {
 		// not return when redis_nil_value, for domain trace
 	} else {
 		shareid, _ = strconv.ParseInt(idShareStr, 10, 64)
-	}
-
-	// if no clientIP, return
-	clientIP := c.ClientIP()
-	if clientIP == "" {
-		log.Println("No client IP")
-		return
-	}
-
-	// set click_type
-	click_type := conf.CLICK_TYPE_COOKIE
-	agent := c.Request.Header.Get("User-Agent")
-	if agent == "" {
-		log.Println("No client agent")
-		return
-	} else {
-		if strings.Contains(agent, "Safari") && !strings.Contains(agent, "Chrome") {
-			click_type = conf.CLICK_TYPE_COOKIE
-		} else {
-			click_type = conf.CLICK_TYPE_IP
-		}
 	}
 
 	md5Ctx := md5.New()
@@ -346,33 +349,6 @@ func WebBeacon(c *gin.Context) {
 		return
 	}
 
-	if click_type == conf.CLICK_TYPE_COOKIE {
-		// if exist stcookieid, return
-		//stcookieid_cookie, stcookieid_err := c.Request.Cookie("stcookieid")
-		//if stcookieid_err == nil {
-		//	if stcookieid_cookie == nil || stcookieid_cookie.Value == "" {
-		//	} else {
-		//		//log.Println("Exist stcookieid:", stcookieid_cookie.Value)
-		//		return
-		//	}
-		//}
-	} else if click_type == conf.CLICK_TYPE_IP {
-		// if cookie forbidden by client, we can use IP
-		//idStr, err := caches.GetClickSessionIdByIP(clientIP)
-		//// if already exist IP cache, recookie, return
-		//if err == nil && idStr != "" {
-		//	log.Println("Exist IP:", clientIP)
-		//	// TODO:没有 cookie，但是同IP， 不同Agent呢？
-		//	// if exist stagentid, return
-		//	_, err = caches.GetClickSessionIdByAgentId(agentid)
-		//	if err != nil {
-		//		log.Println("Exist IP but no such agentid:", agentid)
-		//	} else {
-		//		return
-		//	}
-		//}
-	}
-
 	id, err := models.GenerateClickSessionId()
 	if err != nil {
 		log.Println(err.Error())
@@ -388,15 +364,13 @@ func WebBeacon(c *gin.Context) {
 	data.CreatedUTC = utils.GetNowSecond()
 	data.URLHost = u.Host
 	data.ClickURL = share_url
-
+	data.AgentId = agentid
 	if shareid > 0 {
 		data.Shareid = shareid
 		data.Cookieid = fmt.Sprintf("%s_%d_%d", conf.COOKIE_PREFIX, shareid, id)
 	}
 
-	data.AgentId = agentid
-
-	log.Println("Webbeacon clicksession data:%s", data)
+	log.Println("Webbeacon clicksession new data:%s", data)
 
 	err = models.InsertDBModel(nil, data)
 	if err != nil {

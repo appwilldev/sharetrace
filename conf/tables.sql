@@ -7,9 +7,9 @@ CREATE SEQUENCE share_url_id START 2016 NO CYCLE;
 CREATE TABLE share_url(
     id BIGINT NOT NULL PRIMARY KEY,
     share_url VARCHAR(2048) NOT NULL,
-    fromid  VARCHAR(256) NOT NULL,
     appid   VARCHAR(256) NOT NULL,
-    itemid  VARCHAR(256) DEFAULT NULL,
+    fromid  VARCHAR(256) NOT NULL,
+    itemid  VARCHAR(256) NOT NULL,
     channel VARCHAR(256) DEFAULT NULL,
     ver VARCHAR(256) DEFAULT NULL,
     des TEXT DEFAULT NULL,
@@ -23,6 +23,8 @@ CREATE INDEX idx_su_appid ON share_url(appid);
 CREATE INDEX idx_su_channel ON share_url(channel);
 CREATE INDEX idx_su_ver ON share_url(ver);
 CREATE UNIQUE INDEX uidx_su_urlfrom ON share_url(share_url, fromid, itemid, appid);
+CREATE UNIQUE INDEX uidx_su_from ON share_url(appid, fromid, itemid);
+alter table share_url alter column itemid set not null;
 
 -- cookieid: 唯一cookieid，SAAS生成, id_shareid
 -- shareid : share_url(id)

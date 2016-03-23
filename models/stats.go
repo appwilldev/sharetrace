@@ -2,8 +2,9 @@ package models
 
 import (
 	"fmt"
-	"github.com/go-xorm/xorm"
 	"reflect"
+
+	"github.com/go-xorm/xorm"
 )
 
 func GetShareClickListByAppid(s *ModelSession, appid string) ([]*ShareClick, error) {

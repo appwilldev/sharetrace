@@ -51,12 +51,12 @@ func authHandler() gin.HandlerFunc {
 			return
 		}
 
-		userId := utils.DecodeCookie(cookie.Value)
+		userID := utils.DecodeCookie(cookie.Value)
 		if conf.DebugMode {
-			log.Println("get user:", userId)
+			log.Println("get user:", userID)
 		}
-		if userId > 0 {
-			c.Set("userid", userId)
+		if userID > 0 {
+			c.Set("userid", userID)
 		}
 
 		c.Next()
@@ -87,33 +87,7 @@ func main() {
 		ginIns.Use(gin.Logger())
 	}
 
-	if conf.WebDebugMode {
-		// static
-		ginIns.Static("/web", "./web")
-	} else {
-		// bin static
-		ginIns.GET("/web/*file",
-			func(c *gin.Context) {
-				fileName := c.Param("file")
-				if fileName == "/" {
-					fileName = "/index.html"
-				}
-				//TOASK : ./main.go:53: undefined: Asset
-				//data, err := Asset("web" + fileName)
-				//if err != nil {
-				//	c.String(http.StatusNotFound, err.Error())
-				//	return
-				//}
-
-				//switch {
-				//case strings.LastIndex(fileName, ".html") == len(fileName)-5:
-				//	c.Header("Content-Type", "text/html; charset=utf-8")
-				//case strings.LastIndex(fileName, ".css") == len(fileName)-4:
-				//	c.Header("Content-Type", "text/css")
-				//}
-				//c.String(http.StatusOK, string(data))
-			})
-	}
+	ginIns.Static("/web", "./web")
 
 	stAPIV1 := ginIns.Group("/1/st")
 	{

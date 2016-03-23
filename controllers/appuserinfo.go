@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"time"
 
@@ -144,6 +146,13 @@ func AppUserScore(c *gin.Context) {
 	data["total"] = fmt.Sprintf("%d", total)
 	data["total_left"] = fmt.Sprintf("%d", total+used)
 	data["res"] = dataList
+
+	clientIP := c.ClientIP()
+	md5Ctx := md5.New()
+	sign_info := fmt.Sprintf("%s_%s_%s", appIdStr, userIdStr, clientIP)
+	md5Ctx.Write([]byte(sign_info))
+	sign := hex.EncodeToString(md5Ctx.Sum(nil))
+	data["sign"] = sign
 
 	c.HTML(200, "appuserscore.html", data)
 	return

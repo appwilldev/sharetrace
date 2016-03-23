@@ -119,15 +119,17 @@
 
   var balance = parseFloat({{.total_left}});
   var appid = {{.appid}};
+  var sign= {{.sign}};
   var appuserid = {{.appuserid}};
   function save() {
       var data = {
           appid: appid,
           appuserid: appuserid,
+          sign: sign,
           phoneno: $('#phoneno').val(),
           cardnum: $('#cardnum').val()
       };
-      if (balance < data.cardnum) {
+      if (balance < data.cardnum * 100) {
           alert('您的余额不够! 请分享到朋友圈邀请朋友下载App赚取收益吧');
           return false;
       }

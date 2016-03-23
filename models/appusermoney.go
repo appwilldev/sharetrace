@@ -1,10 +1,12 @@
 package models
 
 import (
-	//"fmt"
+	"fmt"
+	"reflect"
+	"strconv"
+
 	"github.com/appwilldev/sharetrace/conf"
 	"github.com/appwilldev/sharetrace/utils"
-	"strconv"
 )
 
 func GenerateAppuserMoneyId() (int64, error) {
@@ -71,6 +73,38 @@ func GetAppuserMoneyListByUserid(s *ModelSession, appid string, appuserid string
 	}
 
 	return dataList, total, nil
+}
+
+func GetAppuserMoneyTotalByUserid(s *ModelSession, appid string, appuserid string) (int64, int64, int64, error) {
+	var (
+		total      int64
+		total_used int64
+		total_left int64
+		err        error
+	)
+	if s == nil {
+		s = newAutoCloseModelsSession()
+	}
+
+	sql := fmt.Sprintf("select sum(money) from appuser_money where appid = '%s' and appuserid = '%s' and (money_type = %d or money_type = %d or money_type = %d) ", appid, appuserid, conf.MONEY_TYPE_CLICK_SHARER, conf.MONEY_TYPE_INSTALL_INSTALLER, conf.MONEY_TYPE_INSTALL_SHARER)
+	columnTypes := []reflect.Type{reflect.TypeOf(int64(1))}
+	res, err := RawSqlQuery(sql, columnTypes)
+	if err != nil {
+		return -1, -1, -1, err
+	}
+	total = res[0][0].(int64) / 100
+
+	sql = fmt.Sprintf("select sum(money) from appuser_money where appid = '%s' and appuserid = '%s' and money_type = %d ", appid, appuserid, conf.MONEY_TYPE_HFCZ)
+	columnTypes = []reflect.Type{reflect.TypeOf(int64(1))}
+	res, err = RawSqlQuery(sql, columnTypes)
+	if err != nil {
+		return -1, -1, -1, err
+	}
+	total_used = res[0][0].(int64) / 100
+
+	total_left = total - total_used
+
+	return total, total_used, total_left, nil
 }
 
 func AddClickAwardToAppUser(s *ModelSession, cs_data *ClickSession) error {

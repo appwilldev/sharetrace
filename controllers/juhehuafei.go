@@ -30,6 +30,7 @@ func HuaFeiChongZhi(c *gin.Context) {
 	var postData struct {
 		Appid     string `json:"appid" binding:"required"`
 		Appuserid string `json:"appuserid" binding:"required"` // IDFA
+		Sign      string `json:"sign" binding:"required"`
 		Phoneno   string `json:"phoneno" binding:"required"`
 		Cardnum   string `json:"cardnum" binding:"required"`
 	}
@@ -38,6 +39,46 @@ func HuaFeiChongZhi(c *gin.Context) {
 		Error(c, BAD_POST_DATA, nil, err.Error())
 		return
 	}
+
+	// 增加签名校验，防止作弊充值
+	clientIP := c.ClientIP()
+	md5Ctx := md5.New()
+	sign_info := fmt.Sprintf("%s_%s_%s", postData.Appid, postData.Appuserid, clientIP)
+	md5Ctx.Write([]byte(sign_info))
+	sign := hex.EncodeToString(md5Ctx.Sum(nil))
+	if sign != postData.Sign {
+		err = fmt.Errorf("Sign Error:%s", sign_info)
+		logger.ErrorLogger.Error(map[string]interface{}{
+			"type":    "HuaFeiChongZhi API",
+			"err_msg": err.Error(),
+		})
+		Error(c, BAD_POST_DATA, nil, err.Error())
+		return
+	}
+
+	// 增加积分总额判断，确认积分足够 Start
+	_, _, total_left, err := models.GetAppuserMoneyTotalByUserid(nil, postData.Appid, postData.Appuserid)
+	if err != nil {
+		Error(c, BAD_POST_DATA, nil, err.Error())
+		return
+	}
+
+	cardNum, err := strconv.ParseInt(postData.Cardnum, 10, 64)
+	if err != nil {
+		Error(c, BAD_POST_DATA, nil, err.Error())
+		return
+	}
+
+	if total_left < cardNum {
+		err = fmt.Errorf("Not enough yu e")
+		logger.ErrorLogger.Error(map[string]interface{}{
+			"type":    "HuaFeiChongZhi API",
+			"err_msg": err.Error(),
+		})
+		Error(c, BAD_POST_DATA, nil, err.Error())
+		return
+	}
+	// 增加积分总额判断，确认积分足够 End
 
 	err = models.AddOrderToAppUser(nil, postData.Appid, postData.Appuserid, postData.Phoneno, postData.Cardnum)
 	if err != nil {

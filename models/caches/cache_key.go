@@ -9,9 +9,21 @@ NOTE !!!!!:
 
 **************************************************************/
 
-const (
-	TEST_QUEUE = "test_queue"
-)
+// app_info
+func getAppInfoCacheKey(id int64) string {
+	return fmt.Sprintf("ai_%d", id)
+}
+func getAppIdCacheKeyByAppid(str string) string {
+	return fmt.Sprintf("ai_id_by_appid_%s", str)
+}
+
+// user_info
+func getUserInfoCacheKey(id int64) string {
+	return fmt.Sprintf("ui_%d", id)
+}
+func getUserIdCacheKeyByEmail(str string) string {
+	return fmt.Sprintf("ui_id_by_email_%s", str)
+}
 
 // sharetrace
 func getShareURLInfoCacheKey(id int64) string {

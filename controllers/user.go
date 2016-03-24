@@ -1,12 +1,13 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	//"strconv"
-	"fmt"
 
 	"github.com/appwilldev/sharetrace/models"
+	"github.com/appwilldev/sharetrace/models/caches"
 	"github.com/appwilldev/sharetrace/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -45,6 +46,53 @@ func Register(c *gin.Context) {
 	userInfo.CreatedUTC = utils.GetNowSecond()
 
 	err = models.InsertDBModel(nil, userInfo)
+	if err != nil {
+		Error(c, SERVER_ERROR, nil, err.Error())
+		return
+	}
+
+	err = caches.SetUserInfo(userInfo)
+	if err != nil {
+		Error(c, SERVER_ERROR, nil, err.Error())
+		return
+	}
+
+	Success(c, nil)
+}
+
+type UpdateUserPostData struct {
+	Id     int64  `json:"id" binding:"required"`
+	Email  string `json:"email" binding:"required"`
+	Passwd string `json:"passwd" binding:"required"`
+	Name   string `json:"name"`
+}
+
+func UpdateUserInfo(c *gin.Context) {
+	var reqData UpdateUserPostData
+	err := c.BindJSON(&reqData)
+	if err != nil {
+		Error(c, BAD_POST_DATA)
+		return
+	}
+
+	//userInfo, err := models.GetUserInfoByEmail(nil, reqData.Email)
+	userInfo, err := models.GetUserInfoById(nil, reqData.Id)
+	if err != nil {
+		Error(c, DATA_NOT_FOUND, nil, nil)
+		return
+	}
+
+	userInfo.Email = reqData.Email
+	userInfo.Passwd = reqData.Passwd
+	userInfo.Name = reqData.Name
+
+	err = models.UpdateDBModel(nil, userInfo)
+	if err != nil {
+		Error(c, SERVER_ERROR, nil, err.Error())
+		return
+	}
+
+	err = caches.SetUserInfo(userInfo)
 	if err != nil {
 		Error(c, SERVER_ERROR, nil, err.Error())
 		return

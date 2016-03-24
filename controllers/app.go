@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/appwilldev/sharetrace/models"
+	"github.com/appwilldev/sharetrace/models/caches"
 	"github.com/appwilldev/sharetrace/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -31,6 +32,13 @@ func NewApp(c *gin.Context) {
 	userid := getUserIdFromContext(c)
 	if userid <= 0 {
 		Error(c, LOGIN_NEEDED, nil, nil)
+	}
+
+	old_appid, err := caches.GetAppInfoIdByAppid(reqData.Appid)
+	if old_appid != "" {
+		log.Println("register duplicated appid:", reqData.Appid)
+		Error(c, DATA_DUPLICATED, nil, nil)
+		return
 	}
 
 	appDB, err := models.GetAppInfoByAppid(nil, reqData.Appid)
@@ -62,6 +70,12 @@ func NewApp(c *gin.Context) {
 	appInfo.CreatedUTC = utils.GetNowSecond()
 
 	err = models.InsertDBModel(nil, appInfo)
+	if err != nil {
+		Error(c, SERVER_ERROR, nil, err.Error())
+		return
+	}
+
+	err = caches.SetAppInfo(appInfo)
 	if err != nil {
 		Error(c, SERVER_ERROR, nil, err.Error())
 		return
@@ -115,8 +129,13 @@ func UpdateApp(c *gin.Context) {
 		return
 	}
 
-	Success(c, nil)
+	err = caches.SetAppInfo(appInfo)
+	if err != nil {
+		Error(c, SERVER_ERROR, nil, err.Error())
+		return
+	}
 
+	Success(c, nil)
 }
 
 func AppInfoAll(c *gin.Context) {

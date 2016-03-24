@@ -50,7 +50,7 @@ var Register = function (resolve, reject) {
                                 }
                             }
                         }
-                    }
+                    },
                 }
             });
         });
@@ -144,12 +144,45 @@ var Users = function (resolve, reject) {
                                     email: '',
                                     icon: '',
                                     aux_info: u.aux_info,
-                                    page_count: page_count
+                                    page_count: page_count,
+                                    user: null,
                                 };
                             });
                     }
                 },
                 methods: {
+                    //保存p数据
+                    save_data: function () {
+                        var vm = this;
+                        if (vm.judge_value == 2) {
+                            //修改APP
+                            fetch('/op/user', {
+                                method: 'PUT',
+                                body: JSON.stringify({
+                                    "id": vm.user.id,
+                                    "email": vm.user.email,
+                                    "name": vm.user.name,
+                                    "passwd": vm.user.passwd,
+                                }),
+                                credentials: 'same-origin'
+                            }).then(function (response) {
+                                return response.json();
+                            }).then(function (data) {
+                                if (data.status == true) {
+                                    $('#myModal').modal('hide');
+                                } else {
+                                	alert(data.msg);
+                                }
+                            });
+                        }
+                    },
+                    show_edit_user: function(user) {
+                        this.err_msg = null;
+                        this.judge_value = 2;
+                        this.user= clone(user);
+                        this.modal_title = '修改';
+                        this.operater = '保存';
+                    },
                 }
             });
         });

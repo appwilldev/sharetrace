@@ -216,6 +216,7 @@ func WebBeacon(c *gin.Context) {
 		return
 	}
 
+	// TOOD 先存redis队列，直接返回，后台任务再插入数据库，可以提高响应时间
 	// insert to db
 	data := new(models.ClickSession)
 	data.Id = id
@@ -262,7 +263,8 @@ func WebBeacon(c *gin.Context) {
 		http.SetCookie(c.Writer, cookie)
 	}
 
-	// TODO add appusermoney
+	// add appusermoney
+	// TODO 提前检查App是否有点击奖励
 	if shareid > 0 {
 		err := models.AddClickAwardToAppUser(nil, data)
 		if err != nil {
@@ -374,6 +376,7 @@ func WebBeaconCheck(c *gin.Context) {
 		trackid = c.ClientIP()
 	}
 
+	//TODO 检查是否该用户已经安装过APP
 	log.Println("Install trackid:", trackid)
 	idStr, _ = caches.GetClickSessionId(click_type, trackid)
 	if idStr == "" {
@@ -398,7 +401,7 @@ func WebBeaconCheck(c *gin.Context) {
 		cs_data, _ := caches.GetClickSessionModelInfoById(id)
 		log.Println("cs_data:", cs_data)
 		if cs_data.Shareid <= 0 {
-			Error(c, SERVER_ERROR, nil, err.Error())
+			// TODO 没有人分享改链接，但是以前看过该Host的链接, 然后该用户下载了
 			return
 		}
 

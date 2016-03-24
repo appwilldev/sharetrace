@@ -121,6 +121,7 @@ func main() {
 		opAPIGroup.POST("/login", controllers.Login)
 		opAPIGroup.POST("/logout", authHandler(), controllers.Logout)
 		opAPIGroup.GET("/users/:page/:count", authHandler(), controllers.UserInfoAll)
+		opAPIGroup.PUT("/user", authHandler(), controllers.UpdateUserInfo)
 
 		// app
 		opAPIGroup.GET("/apps/all/:page/:count", authHandler(), controllers.AppInfoAll)
@@ -129,7 +130,6 @@ func main() {
 
 		// JHHF: Juhe Hua Fei
 		opAPIGroup.GET("telcheck", controllers.TelCheck)
-
 	}
 
 	ginIns.LoadHTMLFiles("./templates/webbeaconcheck.html", "./templates/appuserscore.html", "./templates/appusermoney.html")

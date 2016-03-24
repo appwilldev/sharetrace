@@ -14,7 +14,7 @@ func init() {
 	registerJsonTypeInfo(&models.UserInfo{})
 }
 
-func GetUserModelInfoById(id int64) (*models.UserInfo, error) {
+func GetUserInfoModelById(id int64) (*models.UserInfo, error) {
 	j, err := getJsonModelInfo(getUserInfoCacheKey(id), true, 0)
 	if j == nil {
 		return nil, err

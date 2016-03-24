@@ -14,7 +14,7 @@ func init() {
 	registerJsonTypeInfo(&models.AppInfo{})
 }
 
-func GetAppModelInfoById(id int64) (*models.AppInfo, error) {
+func GetAppInfoModelById(id int64) (*models.AppInfo, error) {
 	j, err := getJsonModelInfo(getAppInfoCacheKey(id), true, 0)
 	if j == nil {
 		return nil, err

@@ -109,10 +109,10 @@ func Share(c *gin.Context) {
 	c.JSON(200, ret)
 }
 
-// Just return nothing, maybe  set cookie
+// 用户点击多个URL，如果安装了App，奖励算在最后那个URL的分享者
+// 用户点击后超过7天还没有安装，可以认为不是这次点击带来的有效安装
 func WebBeacon(c *gin.Context) {
-	//////////////////////////////////////////////////////// Return Condition First Start
-	// if no share_url para, return
+	// 条件检查，尽量提前返回
 	q := c.Request.URL.Query()
 	share_url := q["share_url"][0]
 	if share_url == "" {
@@ -146,52 +146,49 @@ func WebBeacon(c *gin.Context) {
 		log.Println(err.Error())
 		return
 	}
-	//////////////////////////////////////////////////////// Return Condition First End
+	//////////////////////////////////////////////////////// Return Condition End
 
+	// 如果不能够找到shareid，就是普通的域名下页面的访问
+	var shareid int64 = 0
+	appid := ""
 	idShareStr, err := caches.GetShareURLIdByUrl(share_url)
-	var shareid int64
-	shareid = 0
 	if err != nil {
-		// weixin friends will add para after url :from=timeline&isappinstalled=1
+		// 微信朋友圈会在分享URL后面，添加:from=timeline&isappinstalled=1
+		// 所以根据URL中的参数appid, fromid, itemid 重新唯一定位分享来源
 		m, err := url.ParseQuery(u.RawQuery)
 		if err != nil {
 		} else {
-			//if m["appid"][0] != "" && m["fromid"][0] != "" && m["itemid"][0] != "" {
 			if m.Get("appid") != "" && m.Get("fromid") != "" && m.Get("itemid") != "" {
+				appid = m.Get("appid")
 				idShareStr, _ = caches.GetShareURLIdByTripleID(m["appid"][0], m["fromid"][0], m["itemid"][0])
 				if idShareStr != "" {
 					shareid, _ = strconv.ParseInt(idShareStr, 10, 64)
 				}
 			}
 		}
-		// not return when redis_nil_value, for domain trace
 	} else {
 		shareid, _ = strconv.ParseInt(idShareStr, 10, 64)
 	}
 
+	// 根据md5(url+IP+agent)作为唯一标识区分不同点击
 	md5Ctx := md5.New()
 	agent_info := fmt.Sprintf("%s_%s_%s", share_url, clientIP, agent)
 	md5Ctx.Write([]byte(agent_info))
 	agentid := hex.EncodeToString(md5Ctx.Sum(nil))
 
-	//log.Println("agentid:", agentid)
-	_, err = caches.GetClickSessionIdByAgentId(agentid)
-	if err != nil {
-		log.Println("No such agentid, need create new clicksession:", agentid)
-	} else {
+	// agentid, clicksession info 在redis中会缓存7天
+	clickSessionIdStr, err := caches.GetClickSessionIdByAgentId(agentid)
+	if err == nil {
 		log.Println("Exist agentid")
-		// if exist stcookieid, return
 		stagentid_cookie, stagentid_err := c.Request.Cookie("stagentid")
-		if stagentid_err == nil {
-			if stagentid_cookie == nil || stagentid_cookie.Value == "" {
-			} else {
-				//log.Println("Exist stagentid:", stagentid_cookie.Value)
-				return
-			}
-		} else {
-			// need reset cookie and overwrite older agentid for buton click
-			old_data, _ := models.GetClickSessionByAgentId(nil, agentid)
-			log.Println("get old_data by agentid:", old_data)
+		// 没有stagentid Cookie，或者当前Cookie的值不等于这次的agentid，都需要重新设置Cookie
+		if stagentid_err != nil || stagentid_cookie == nil || stagentid_cookie.Value == "" || stagentid_cookie.Value != agentid {
+			log.Println("---reset cookie by stagentid:", agentid)
+			// 用户可能清除了Cookie, 需要重新写入用户浏览器
+			// 用户访问了多个不同的URL，会有多个agentid时，应该用最后的一个覆盖之前的
+			// 也就是说， Button Click 应该依据最后的一个agentid来计算跟踪
+			id, _ := strconv.ParseInt(clickSessionIdStr, 10, 64)
+			old_data, _ := caches.GetClickSessionModelInfoById(id)
 			cookie := new(http.Cookie)
 			if click_type == conf.CLICK_TYPE_COOKIE && old_data.Cookieid != "" {
 				cookie.Name = "stcookieid"
@@ -210,6 +207,7 @@ func WebBeacon(c *gin.Context) {
 		return
 	}
 
+	// 创建新的用户点击
 	id, err := models.GenerateClickSessionId()
 	if err != nil {
 		log.Println(err.Error())
@@ -247,6 +245,8 @@ func WebBeacon(c *gin.Context) {
 		return
 	}
 
+	// 把新的点击数据相关的信息，写入用户浏览器Cookie
+	// 如果以前有旧的Cookie，会被覆盖
 	cookie := new(http.Cookie)
 	if click_type == conf.CLICK_TYPE_COOKIE && data.Cookieid != "" {
 		cookie.Name = "stcookieid"
@@ -263,15 +263,28 @@ func WebBeacon(c *gin.Context) {
 		http.SetCookie(c.Writer, cookie)
 	}
 
-	// add appusermoney
-	// TODO 提前检查App是否有点击奖励
-	if shareid > 0 {
-		err := models.AddClickAwardToAppUser(nil, data)
+	// 奖励用户积分
+	if shareid > 0 && appid != "" {
+		// 提前检查App是否有点击奖励, 减少数据库操作
+		appInfoIdStr, err := caches.GetAppInfoIdByAppid(appid)
 		if err != nil {
-			logger.ErrorLogger.Error(map[string]interface{}{
-				"type":    "AddClickAwardToAppUser",
-				"err_msg": err.Error(),
-			})
+			log.Println("No such appInfo by appid:", appid)
+			return
+		}
+		appInfoId, _ := strconv.ParseInt(appInfoIdStr, 10, 64)
+		appInfo, err := caches.GetAppInfoModelById(appInfoId)
+		if err != nil {
+			log.Println("No such appinfo by appInfoId:", appInfoId)
+			return
+		}
+		if appInfo.ShareClickMoney > 0 {
+			err := models.AddClickAwardToAppUser(nil, data)
+			if err != nil {
+				logger.ErrorLogger.Error(map[string]interface{}{
+					"type":    "AddClickAwardToAppUser",
+					"err_msg": err.Error(),
+				})
+			}
 		}
 	}
 
